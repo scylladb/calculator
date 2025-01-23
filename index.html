@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="main.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
     <script src="main.js" defer></script>
 </head>
 <body>
@@ -40,7 +41,7 @@
                 </span>
             </label>
 
-            <input type="range" id="demand" min="0" max="1000000" step="10000" value="50000">
+            <input type="range" id="demand" min="1000" max="1000000" step="10000" value="50000">
         </div>
 
         <div>
@@ -63,7 +64,7 @@
                     <span class="tooltip-text">Enter the number of operations per second that your workload needs during off-peak periods.</span>
                 </span>
             </label>
-            <input type="range" id="baseline" min="0" max="500000" step="10000" value="50000">
+            <input type="range" id="baseline" min="1000" max="500000" step="10000" value="50000">
         </div>
 
         <div>
@@ -74,7 +75,7 @@
                     <span class="tooltip-text">Enter the maximum number of operations per second that your workload needs during peak periods.</span>
                 </span>
             </label>
-            <input type="range" id="peak" min="0" max="2000000" step="50000" value="300000">
+            <input type="range" id="peak" min="1000" max="2000000" step="50000" value="300000">
         </div>
 
         <div>
@@ -85,7 +86,7 @@
                     <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
                 </span>
             </label>
-            <input type="range" id="peakWidth" min="2" max="24" value="3">
+            <input type="range" id="peakWidth" min="1" max="24" value="3">
         </div>
 
         <div>

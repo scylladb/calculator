@@ -1,17 +1,12 @@
 const ctx = document.getElementById('chart').getContext('2d');
 
-let onDemand = 50000;
-let baseline = 30000;
-let peak = 300000;
-let peakWidth = 3;
+let onDemand = 10000;
+let baseline = 10000;
+let peak = 100000;
+let peakWidth = 1;
 
 const scyllaPrices = [{
-    family: "i4i",
-    instance: "i4i.xlarge",
-    baseline: 78000,
-    peak: 120000,
-    storage: 937,
-    price: 3.325
+    family: "i4i", instance: "i4i.xlarge", baseline: 78000, peak: 120000, storage: 937, price: 3.325
 }, {family: "i3en", instance: "i3en.xlarge", baseline: 39000, peak: 60000, storage: 2.44 * 1024, price: 4.378},]
 
 function updateDebugPanel(logs) {
@@ -26,9 +21,9 @@ function generateProvisionedData(baseline, peak, peakWidth) {
 
     for (let hour = 0; hour <= 24; hour++) {
         if (hour >= peakStart && hour < peakEnd) {
-            data.push(peak);
+            data.push({x: hour, y: peak});
         } else {
-            data.push(baseline);
+            data.push({x: hour, y: baseline});
         }
     }
     return data;
@@ -85,20 +80,29 @@ setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => val
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSize', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storage', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
 
-let onDemandData = Array(25).fill(onDemand);
+let onDemandData = Array.from({length: 25}, (_, i) => ({x: i, y: onDemand}));
 let provisionedData = generateProvisionedData(baseline, peak, peakWidth);
 
 const chart = new Chart(ctx, {
-    type: 'line', data: {
-        labels: Array.from({length: 25}, (_, i) => `${i}h`), // X-axis labels for 24 hours
+    type: 'scatter', data: {
         datasets: [{
+            label: "Workload",
+            borderColor: '#0F1040',
+            backgroundColor: 'rgba(170,170,170,0.5)',
+            data: [{x: 0, y: 5000}, {x: 8, y: 10000}, {x: 9, y: 100000}, {x: 10, y: 10000}, {x: 24, y: 5000}],
+            fill: true,
+            showLine: true,
+            borderDash: [4, 4],
+            tension: 0.2
+        }, {
             label: 'On Demand',
             data: onDemandData,
             borderColor: '#0F1040',
             backgroundColor: 'rgba(15,16,64,0.8)',
+            showLine: true,
+            pointRadius: 0,
             fill: true,
             tension: 0.1,
-            pointRadius: 0
         }, {
             label: 'Provisioned',
             data: provisionedData,
@@ -106,6 +110,7 @@ const chart = new Chart(ctx, {
             backgroundColor: 'rgba(15,16,64,0.8)',
             fill: true,
             tension: 0.1,
+            showLine: true,
             pointRadius: 0,
             hidden: true
         }]
@@ -113,26 +118,42 @@ const chart = new Chart(ctx, {
         plugins: {
             legend: {
                 display: false
+            }, title: {
+                display: true, text: "Total Ops"
+            }, tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return formatNumber(context.raw.y) + ' ops/sec';
+                    }
+                }
+            }, dragData: {
+                round: 1, showTooltip: true, onDrag: function (e, datasetIndex, index, value) {
+                    value.x = Math.round(value.x);
+                    value.y = Math.round(value.y / 1000) * 1000;
+                }, onDragEnd: function (e, datasetIndex, index, value) {
+                    updateTotalOps();
+                    chart.update();
+                }, dragX: true, dragY: true
             }
         }, scales: {
             x: {
-                title: {
+                min: 0, max: 24, title: {
                     display: false,
                 }, ticks: {
-                    display: false
+                    stepSize: 1, callback: function (value) {
+                        return value.toString().padStart(2, '0') + ':00';
+                    }
                 }
             }, y: {
                 type: 'logarithmic', title: {
                     display: true, text: 'op/sec'
-                }, min: 1000, max: 2000000, ticks: {
+                }, min: 1000, max: 10000000, ticks: {
                     callback: function (value) {
                         if (value === 1000) return '1K';
                         if (value === 10000) return '10K';
                         if (value === 100000) return '100K';
-                        if (value === 300000) return '300K';
-                        if (value === 600000) return '600K';
                         if (value === 1000000) return '1M';
-                        if (value === 2000000) return '2M';
+                        if (value === 10000000) return '10M';
                         return null;
                     }
                 }
@@ -142,11 +163,76 @@ const chart = new Chart(ctx, {
 });
 
 function updateChart() {
-    chart.data.datasets[0].data = Array(25).fill(onDemand);
-    chart.data.datasets[1].data = generateProvisionedData(baseline, peak, peakWidth);
+    chart.data.datasets[1].data = Array.from({length: 25}, (_, i) => ({x: i, y: onDemand}));
+    chart.data.datasets[2].data = generateProvisionedData(baseline, peak, peakWidth);
     chart.update();
+    updateTotalOps();
     updateCosts();
 }
+
+function ourClickHandler(event) {
+    const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+    const xValue = chart.scales.x.getValueForPixel(canvasPosition.x);
+    const yValue = chart.scales.y.getValueForPixel(canvasPosition.y);
+
+    if (xValue > chart.scales.x.min && xValue < chart.scales.x.max && yValue > chart.scales.y.min && yValue < chart.scales.y.max) {
+        const datasetIndex = 0;
+        const dataset = chart.data.datasets[datasetIndex];
+        dataset.data.push({
+            x: xValue,
+            y: yValue
+        });
+        updateTotalOps();
+        chart.update();
+    }
+}
+
+document.getElementById('chart').onclick = function (event) {
+    ourClickHandler(event);
+};
+
+function updateTotalOps() {
+    const dataSeries0 = chart.data.datasets[0].data;
+    const visibleSeriesIndex = chart.data.datasets[1].hidden ? 2 : 1;
+    const dataVisibleSeries = chart.data.datasets[visibleSeriesIndex].data;
+
+    let totalOpsSeries0 = 0;
+    let totalOpsVisibleSeries = 0;
+
+    for (let i = 1; i < dataSeries0.length; i++) {
+        const x1 = dataSeries0[i - 1].x;
+        const y1 = dataSeries0[i - 1].y;
+        const x2 = dataSeries0[i].x;
+        const y2 = dataSeries0[i].y;
+
+        const integral = ((y1 + y2) / 2) * (x2 - x1) * 3600;
+        totalOpsSeries0 += integral;
+    }
+
+    for (let i = 1; i < dataVisibleSeries.length; i++) {
+        const x1 = dataVisibleSeries[i - 1].x;
+        const y1 = dataVisibleSeries[i - 1].y;
+        const x2 = dataVisibleSeries[i].x;
+        const y2 = dataVisibleSeries[i].y;
+
+        const integral = ((y1 + y2) / 2) * (x2 - x1) * 3600;
+        totalOpsVisibleSeries += integral;
+    }
+
+    const totalOpsInMillionsSeries0 = totalOpsSeries0 / 1000000;
+    const totalOpsInMillionsVisibleSeries = totalOpsVisibleSeries / 1000000;
+    const coveragePercentage = (totalOpsVisibleSeries / totalOpsSeries0) * 100;
+
+    const titleColor = coveragePercentage < 100 ? 'red' : 'black';
+
+    chart.options.plugins.title.text = `Total Ops: ${totalOpsInMillionsSeries0.toFixed(2)}M, Coverage: ${coveragePercentage.toFixed(2)}%`;
+    chart.options.plugins.title.color = titleColor;
+    chart.update();
+}
+
+document.getElementById('chart').onclick = function (event) {
+    ourClickHandler(event);
+};
 
 document.querySelector('input[name="pricingModel"][value="onDemand"]').addEventListener('change', (event) => {
     const demandParams = document.getElementById('demandParams');
@@ -154,10 +240,11 @@ document.querySelector('input[name="pricingModel"][value="onDemand"]').addEventL
     if (event.target.checked) {
         demandParams.style.display = 'block';
         provisionedParams.style.display = 'none';
-        chart.data.datasets[0].hidden = false;
-        chart.data.datasets[1].hidden = true;
+        chart.data.datasets[1].hidden = false;
+        chart.data.datasets[2].hidden = true;
         chart.update();
-        updateCosts(); // Recalculate costs
+        updateTotalOps();
+        updateCosts();
     }
 });
 
@@ -167,10 +254,11 @@ document.querySelector('input[name="pricingModel"][value="provisioned"]').addEve
     if (event.target.checked) {
         demandParams.style.display = 'none';
         provisionedParams.style.display = 'block';
-        chart.data.datasets[0].hidden = true;
-        chart.data.datasets[1].hidden = false;
+        chart.data.datasets[1].hidden = true;
+        chart.data.datasets[2].hidden = false;
         chart.update();
-        updateCosts(); // Recalculate costs
+        updateTotalOps();
+        updateCosts();
     }
 });
 
@@ -194,7 +282,7 @@ document.getElementById('baseline').addEventListener('input', (event) => {
 });
 
 document.getElementById('peakWidth').addEventListener('input', (event) => {
-    peakWidth = Math.max(2, parseInt(event.target.value));
+    peakWidth = Math.max(1, parseInt(event.target.value));
     document.getElementById('peakWidthDsp').innerText = peakWidth;
     updateChart();
 });
@@ -395,14 +483,11 @@ function updateCosts() {
     document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
 
     let logs = ["DEBUG:", `itemSizeKB: ${itemSizeKB}`, `storageGB: ${storageGB}`, `readsOpsSec: ${readsOpsSec.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        minimumFractionDigits: 0, maximumFractionDigits: 0
     })}`, `writesOpsSec: ${writesOpsSec.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        minimumFractionDigits: 0, maximumFractionDigits: 0
     })}`, `totalOpsSec: ${totalOpsSec.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        minimumFractionDigits: 0, maximumFractionDigits: 0
     })}`,];
 
     if (selectedPricingModel === 'onDemand') {
@@ -426,4 +511,5 @@ function updateCosts() {
     chart.update();
 }
 
+updateTotalOps();
 updateCosts();
