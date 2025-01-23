@@ -83,17 +83,44 @@ setupSliderInteraction('storageDsp', 'storageInp', 'storage', value => value >= 
 let onDemandData = Array.from({length: 25}, (_, i) => ({x: i, y: onDemand}));
 let provisionedData = generateProvisionedData(baseline, peak, peakWidth);
 
+function getQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        workload: params.get('workload') || 'morningPeak'
+    };
+}
+
+function generateWorkloadData(workload) {
+    switch (workload) {
+        case 'twiceDaily':
+            return [
+                {x: 0, y: 5000}, {x: 6, y: 10000}, {x: 8, y: 100000}, {x: 10, y: 10000},
+                {x: 12, y: 5000}, {x: 16, y: 10000}, {x: 18, y: 100000}, {x: 20, y: 10000}, {x: 24, y: 5000}
+            ];
+        case 'constant':
+            return Array.from({length: 25}, (_, i) => ({x: i, y: 50000}));
+        case 'morningPeak':
+        default:
+            return [
+                {x: 0, y: 5000}, {x: 8, y: 10000}, {x: 9, y: 100000}, {x: 10, y: 10000}, {x: 24, y: 5000}
+            ];
+    }
+}
+
+const queryParams = getQueryParams();
+const workloadData = generateWorkloadData(queryParams.workload);
+
 const chart = new Chart(ctx, {
     type: 'scatter', data: {
         datasets: [{
             label: "Workload",
             borderColor: '#0F1040',
             backgroundColor: 'rgba(170,170,170,0.5)',
-            data: [{x: 0, y: 5000}, {x: 8, y: 10000}, {x: 9, y: 100000}, {x: 10, y: 10000}, {x: 24, y: 5000}],
+            data: workloadData,
             fill: true,
             showLine: true,
             borderDash: [4, 4],
-            tension: 0.2
+            tension: 0.3
         }, {
             label: 'On Demand',
             data: onDemandData,
@@ -123,7 +150,7 @@ const chart = new Chart(ctx, {
             }, tooltip: {
                 callbacks: {
                     label: function(context) {
-                        return formatNumber(context.raw.y) + ' ops/sec';
+                        return 'Workload: ' + formatNumber(context.raw.y) + ' ops/sec';
                     }
                 }
             }, dragData: {
@@ -220,12 +247,11 @@ function updateTotalOps() {
     }
 
     const totalOpsInMillionsSeries0 = totalOpsSeries0 / 1000000;
-    const totalOpsInMillionsVisibleSeries = totalOpsVisibleSeries / 1000000;
     const coveragePercentage = (totalOpsVisibleSeries / totalOpsSeries0) * 100;
 
     const titleColor = coveragePercentage < 100 ? 'red' : 'black';
 
-    chart.options.plugins.title.text = `Total Ops: ${totalOpsInMillionsSeries0.toFixed(2)}M, Coverage: ${coveragePercentage.toFixed(2)}%`;
+    chart.options.plugins.title.text = `Total Workload: ${totalOpsInMillionsSeries0.toFixed(0)}M ops, Pricing coverage: ${coveragePercentage.toFixed(2)}%`;
     chart.options.plugins.title.color = titleColor;
     chart.update();
 }
