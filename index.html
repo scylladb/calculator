@@ -1,154 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="main.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
-    <script src="main.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
+  <script type="module" src="/src/main.js" defer></script>
 </head>
 <body>
 <div class="container">
-    <canvas id="chart" width="800" height="400"></canvas>
-    <div class="cost">
-        <p>
-            <span id="costDiff">$0</span>
-            <span id="costDiffMo">/mo</span>
-        </p>
-        <p id="costDiffSaved">saved using ScyllaDB</p>
-    </div>
+  <canvas id="chart" width="800" height="400"></canvas>
+  <div class="cost">
+    <p>
+      <span id="costDiff">$0</span>
+      <span id="costDiffMo">/mo</span>
+    </p>
+    <p id="costDiffSaved">saved using ScyllaDB</p>
+  </div>
 
-    <div class="radio-container">
-        <label>
-            <input type="radio" name="pricingModel" value="onDemand" checked> On Demand
-        </label>
-        <label>
-            <input type="radio" name="pricingModel" value="provisioned"> Provisioned
-        </label>
-    </div>
+  <div class="radio-container">
+    <label>
+      <input type="radio" name="pricingModel" value="onDemand" checked> On Demand
+    </label>
+    <label>
+      <input type="radio" name="pricingModel" value="provisioned"> Provisioned
+    </label>
+  </div>
 
-    <div id="demandParams">
-        <div>
-            <label for="demand">On Demand:
-                <input type="text" id="demandInp" style="display: none; width: 80px; cursor: pointer;">
-                <span id="demandDsp" style="cursor: pointer;">50K</span> ops/sec
-                <span class="info-icon">i
+  <div id="demandParams">
+    <div>
+      <label for="demand">On Demand:
+        <input type="text" id="demandInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="demandDsp" style="cursor: pointer;">50K</span> ops/sec
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter the number of operations per second that your workload will use.</span>
                 </span>
-            </label>
+      </label>
 
-            <input type="range" id="demand" min="1000" max="1000000" step="1000" value="50000">
-        </div>
-
-        <div>
-            <label for="ratioDemand">Read/Write Ratio:
-                <span id="ratioDemandDsp">50/50</span>
-                <span class="info-icon">i
-                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
-                </span>
-            </label>
-            <input type="range" id="ratioDemand" min="0" max="100" step="1" value="50">
-        </div>
+      <input type="range" id="demand" min="1000" max="1000000" step="1000" value="50000">
     </div>
 
-    <div id="provisionedParams" style="display: none;">
-        <div>
-            <label for="baseline">Baseline:
-                <input type="text" id="baselineInp" style="display: none; width: 80px; cursor: pointer;">
-                <span id="baselineDsp">50K</span> ops/sec
-                <span class="info-icon">i
+    <div>
+      <label for="ratioDemand">Read/Write Ratio:
+        <span id="ratioDemandDsp">50/50</span>
+        <span class="info-icon">i
+                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
+                </span>
+      </label>
+      <input type="range" id="ratioDemand" min="0" max="100" step="1" value="50">
+    </div>
+  </div>
+
+  <div id="provisionedParams" style="display: none;">
+    <div>
+      <label for="baseline">Baseline:
+        <input type="text" id="baselineInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="baselineDsp">50K</span> ops/sec
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter the number of operations per second that your workload needs during off-peak periods.</span>
                 </span>
-            </label>
-            <input type="range" id="baseline" min="1000" max="500000" step="10000" value="50000">
-        </div>
+      </label>
+      <input type="range" id="baseline" min="1000" max="500000" step="10000" value="50000">
+    </div>
 
-        <div>
-            <label for="peak">Peak:
-                <input type="text" id="peakInp" style="display: none; width: 80px; cursor: pointer;">
-                <span id="peakDsp">300K</span> ops/sec
-                <span class="info-icon">i
+    <div>
+      <label for="peak">Peak:
+        <input type="text" id="peakInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="peakDsp">300K</span> ops/sec
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter the maximum number of operations per second that your workload needs during peak periods.</span>
                 </span>
-            </label>
-            <input type="range" id="peak" min="1000" max="2000000" step="50000" value="300000">
-        </div>
+      </label>
+      <input type="range" id="peak" min="1000" max="2000000" step="50000" value="300000">
+    </div>
 
-        <div>
-            <label for="peakWidth">Peak:
-                <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
-                <span id="peakWidthDsp">1</span> hours per day
-                <span class="info-icon">i
+    <div>
+      <label for="peakWidth">Peak:
+        <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="peakWidthDsp">1</span> hours per day
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
                 </span>
-            </label>
-            <input type="range" id="peakWidth" min="1" max="24" value="1">
-        </div>
+      </label>
+      <input type="range" id="peakWidth" min="1" max="24" value="1">
+    </div>
 
-        <div>
-            <label for="ratioProvisioned">Read/Write Ratio:
-                <span id="ratioProvisionedDsp">50/50</span>
-                <span class="info-icon">i
+    <div>
+      <label for="ratioProvisioned">Read/Write Ratio:
+        <span id="ratioProvisionedDsp">50/50</span>
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
                 </span>
-            </label>
-            <input type="range" id="ratioProvisioned" min="0" max="100" step="1" value="50">
-        </div>
+      </label>
+      <input type="range" id="ratioProvisioned" min="0" max="100" step="1" value="50">
     </div>
+  </div>
 
-    <a href="#" id="storageLink">▼ Storage</a>
+  <a href="#" id="storageLink">▼ Storage</a>
 
-    <div id="storageParams" style="display: none;">
-        <div>
-            <label for="itemSize">Item Size:
-                <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
-                <span id="itemSizeDsp">1 KB</span>
-                <span class="info-icon">i
+  <div id="storageParams" style="display: none;">
+    <div>
+      <label for="itemSize">Item Size:
+        <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="itemSizeDsp">1 KB</span>
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter your average item size (all attributes).</span>
                 </span>
-            </label>
-            <input type="range" id="itemSize" min="64" max="409600" step="64" value="1024">
-        </div>
+      </label>
+      <input type="range" id="itemSize" min="64" max="409600" step="64" value="1024">
+    </div>
 
-        <div>
-            <label for="storage">Storage:
-                <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
-                <span id="storageDsp">512 GB</span>
-                <span class="info-icon">i
+    <div>
+      <label for="storage">Storage:
+        <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="storageDsp">512 GB</span>
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter your total data storage size.</span>
                 </span>
-            </label>
-            <input type="range" id="storage" min="128" max="102400" step="128" value="512">
-        </div>
+      </label>
+      <input type="range" id="storage" min="128" max="102400" step="128" value="512">
     </div>
+  </div>
 
-    <a href="#" id="consistencyLink">▼ Consistency</a>
+  <a href="#" id="consistencyLink">▼ Consistency</a>
 
-    <div id="consistencyParams" style="display: none;">
-        <div>
-            <label for="writeTrans">Writes:
-                <span id="writeConsistencyDsp">Non Transactional</span>
-                <span class="info-icon">i
+  <div id="consistencyParams" style="display: none;">
+    <div>
+      <label for="writeTrans">Writes:
+        <span id="writeConsistencyDsp">Non Transactional</span>
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter write operations create, update, or delete items as a non transactional percentage, or, coordinated, all-or-nothing write operations as a transactional percentage.</span>
                 </span>
-            </label>
-            <input type="range" id="writeTrans" min="0" max="100" step="1" value="0">
-        </div>
+      </label>
+      <input type="range" id="writeTrans" min="0" max="100" step="1" value="0">
+    </div>
 
-        <div class="slider-container">
-            <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
-                <span class="info-icon">i
+    <div class="slider-container">
+      <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
+        <span class="info-icon">i
                     <span class="tooltip-text">Enter read operations as eventually consistent, strongly consistent and/or transactional as a percentage.</span>
                 </span>
-            </label>
-            <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
-            <input type="range" id="readTrans" class="slider" min="0" max="100" value="0">
-        </div>
+      </label>
+      <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
+      <input type="range" id="readTrans" class="slider" min="0" max="100" value="0">
     </div>
+  </div>
 </div>
 
 <div id="debugPanel" class="debug-panel"></div>
