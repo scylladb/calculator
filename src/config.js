@@ -1,3 +1,3 @@
 export const config = {
-    onDemand: 10000, baseline: 10000, peak: 100000, peakWidth: 1
+    onDemand: 50000, baseline: 50000, peak: 300000, peakWidth: 1
 };

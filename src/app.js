@@ -76,6 +76,7 @@ setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
 setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSize', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storage', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
+setupSliderInteraction('reservedCapacityDsp', 'reservedCapacity', 'reservedCapacity', value => `${value}%`);
 
 document.getElementById('chart').onclick = function (event) {
     ourClickHandler(event);
