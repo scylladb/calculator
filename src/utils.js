@@ -16,5 +16,8 @@ export const queryParams = getQueryParams();
 
 export function updateDebugPanel(logs) {
     const debugPanel = document.getElementById('debugPanel');
-    debugPanel.innerHTML = logs.join('<br>');
+    debugPanel.innerHTML = logs.map(log => {
+        const [key, value] = log.split(': ');
+        return `<div class="debug-entry"><span class="debug-key">${key}:</span><span class="debug-value">${value}</span></div>`;
+    }).join('');
 }

@@ -119,20 +119,20 @@ export function updateCosts() {
     const readRatioDemand = parseInt(document.getElementById('ratioDemand').value) / 100;
     const numberReads = config.onDemand * readRatioDemand * 3600 * totalHoursPerMonth;
     const readRequestUnits = (numberReads * readEventuallyConsistent * 0.5 * readRequestUnitsPerItem) + (numberReads * readStronglyConsistent * readRequestUnitsPerItem) + (numberReads * readTransactional * 2 * readRequestUnitsPerItem);
-    const dynamoReadCostDemand = readRequestUnits * 0.000000125;
+    const dynamoCostDemandReads = readRequestUnits * 0.000000125;
     const writeRatioDemand = 1 - readRatioProvisioned;
     const numberWrites = config.onDemand * writeRatioDemand * 3600 * totalHoursPerMonth;
     const writeRequestUnits = (numberWrites * writeNonTransactional * writeRequestUnitsPerItem) + (numberWrites * writeTransactional * 2 * writeRequestUnitsPerItem);
-    const dynamoWriteCostDemand = writeRequestUnits * 0.000000625;
-    const dynamoCostDemand = dynamoReadCostDemand + dynamoWriteCostDemand;
+    const dynamoCostDemandWrites = writeRequestUnits * 0.000000625;
+    const dynamoCostDemand = dynamoCostDemandReads + dynamoCostDemandWrites;
 
 // storage
     const storageGB = parseInt(document.getElementById('storage').value);
-    const dynamoStorageCost = storageGB * 0.25;
+    const dynamoCostStorage = storageGB * 0.25;
 
 // dynamo total
     const selectedPricingModel = document.querySelector('input[name="pricingModel"]:checked').value;
-    const dynamoCostTotal = selectedPricingModel === 'onDemand' ? dynamoCostDemand + dynamoStorageCost : dynamoCostProvisioned + dynamoStorageCost;
+    const dynamoCostTotal = selectedPricingModel === 'onDemand' ? dynamoCostDemand + dynamoCostStorage : dynamoCostProvisioned + dynamoCostStorage;
 
 // scylla
     const readsOpsSec = selectedPricingModel === 'onDemand' ? config.onDemand * readRatioDemand : config.baseline * readRatioProvisioned;
@@ -146,7 +146,7 @@ export function updateCosts() {
 
     document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
 
-    let logs = ["DEBUG:", `itemSizeKB: ${itemSizeKB}`, `storageGB: ${storageGB}`, `readsOpsSec: ${readsOpsSec.toLocaleString(undefined, {
+    let logs = [`itemSizeKB: ${itemSizeKB}`, `storageGB: ${storageGB}`, `readsOpsSec: ${readsOpsSec.toLocaleString(undefined, {
         minimumFractionDigits: 0, maximumFractionDigits: 0
     })}`, `writesOpsSec: ${writesOpsSec.toLocaleString(undefined, {
         minimumFractionDigits: 0, maximumFractionDigits: 0
@@ -155,14 +155,12 @@ export function updateCosts() {
     })}`,];
 
     if (selectedPricingModel === 'onDemand') {
-        logs = logs.concat([`dynamoReadCostDemand: $${dynamoReadCostDemand.toFixed(2)}`, `dynamoWriteCostDemand: $${dynamoWriteCostDemand.toFixed(2)}`, `dynamoCostDemand: $${dynamoCostDemand.toFixed(2)}`,]);
+        logs = logs.concat([`dynamoCostDemandReads: $${dynamoCostDemandReads.toFixed(2)}`, `dynamoCostDemandWrites: $${dynamoCostDemandWrites.toFixed(2)}`, `dynamoCostDemand: $${dynamoCostDemand.toFixed(2)}`,]);
     } else {
-        logs = logs.concat([`dynamoCostMonthlyWCU: ${dynamoCostMonthlyWCU.toFixed(2)}`, `dynamoCostUpfrontWCU: ${dynamoCostUpfrontWCU.toFixed(2)}`, `dynamoCostMonthlyRCU: ${dynamoCostMonthlyRCU.toFixed(2)}`, `dynamoCostUpfrontRCU: ${dynamoCostUpfrontRCU.toLocaleString(undefined, {
-            minimumFractionDigits: 0, maximumFractionDigits: 0
-        })}`,]);
+        logs = logs.concat([`dynamoCostMonthlyWCU: $${dynamoCostMonthlyWCU.toFixed(2)}`, `dynamoCostUpfrontWCU: $${dynamoCostUpfrontWCU.toFixed(2)}`, `dynamoCostMonthlyRCU: $${dynamoCostMonthlyRCU.toFixed(2)}`, `dynamoCostUpfrontRCU: $${dynamoCostUpfrontRCU.toFixed(2)}`,]);
     }
 
-    logs = logs.concat([`dynamoStorageCost: $${dynamoStorageCost.toFixed(2)}`, `dynamoCostTotal: $${dynamoCostTotal.toFixed(2)}`, `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`, `costRatio: ${costRatio}`, `nodeCount: ${scyllaResult.nodeCount}`, `family: ${scyllaResult.family}`]);
+    logs = logs.concat([`dynamoCostStorage: $${dynamoCostStorage.toFixed(2)}`, `dynamoCostTotal: $${dynamoCostTotal.toFixed(2)}`, `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`, `costRatio: ${costRatio}`, `nodeCount: ${scyllaResult.nodeCount}`, `family: ${scyllaResult.family}`]);
 
     updateDebugPanel(logs);
 
