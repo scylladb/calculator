@@ -17,8 +17,8 @@ function getNodeCount(storageGB, storageLimit, totalOpsSec, baselineOpsSec) {
     return 3;
 }
 
-export function calculateScyllaCosts(storageGB, totalOpsSec) {
-    const scyllaStorageGB = storageGB * 0.5;
+export function calculateScyllaCosts(totalOpsSec) {
+    const scyllaStorageGB = config.storageGB * 0.5;
     const annualDiscount = 0.2;
 
     const i4i_nodeCount = getNodeCount(scyllaStorageGB, scyllaPrices[0].storage, totalOpsSec, scyllaPrices[0].baseline);
@@ -39,132 +39,173 @@ export function calculateScyllaCosts(storageGB, totalOpsSec) {
     };
 }
 
+function getStorageValues() {
+    config.storageGB = parseInt(document.getElementById('storage').value);
+    config.itemSizeKB = parseInt(document.getElementById('itemSize').value) * 0.0009765625;
+    config.itemSizeKB = config.itemSizeKB > 1 ? Math.floor(config.itemSizeKB) : config.itemSizeKB;
+}
+
+function getConsistencyValues() {
+    config.readStronglyConsistent = parseInt(document.getElementById('readConst').value) / 100;
+    config.readEventuallyConsistent = 1 - config.readStronglyConsistent;
+    config.readTransactional = parseInt(document.getElementById('readTrans').value) / 100;
+    config.readNonTransactional = 1 - config.readTransactional;
+    config.writeTransactional = parseInt(document.getElementById('writeTrans').value) / 100;
+    config.writeNonTransactional = 1 - config.writeTransactional;
+}
+
+function getDemandValues() {
+    config.readRatioDemand = parseInt(document.getElementById('ratioDemand').value) / 100;
+    config.writeRatioDemand = 1 - config.readRatioDemand;
+}
+
+function getProvisionedValues() {
+    config.peakHours = config.peakWidth * 30;
+    config.baselineHours = config.totalHoursPerMonth - config.peakHours;
+    config.reservedCapacity = parseInt(document.getElementById('reservedCapacity').value) / 100;
+    config.readRatioProvisioned = parseInt(document.getElementById('ratioProvisioned').value) / 100;
+    config.writeRatioProvisioned = 1 - config.readRatioProvisioned;
+}
+
+function calculateProvisionedCosts() {
+    config.writeRequestUnitsPerItem = Math.ceil(config.itemSizeKB);
+    config.readRequestUnitsPerItem = Math.ceil(config.itemSizeKB / 4.0);
+
+    config.baselineWCUNonTransactional = config.baseline * config.writeRatioProvisioned * config.writeNonTransactional * config.writeRequestUnitsPerItem;
+    config.baselineWCUTransactional = config.baseline * config.writeRatioProvisioned * config.writeTransactional * 2 * config.writeRequestUnitsPerItem;
+    config.baselineWCUTotal = config.baselineWCUNonTransactional + config.baselineWCUTransactional;
+    config.reservedWCU = config.baselineWCUTotal * config.reservedCapacity;
+    config.reservedWCU = Math.ceil(config.reservedWCU / 100.0) * 100;
+    config.provisionedBaselineWCU = config.baselineWCUTotal - config.reservedWCU;
+    config.provisionedBaselineWCU = Math.ceil(Math.max(config.provisionedBaselineWCU, 0));
+    config.provisionedBaselineWCUHours = Math.ceil(config.provisionedBaselineWCU * config.baselineHours);
+    config.peakWCUNonTransactional = config.peak * config.writeRatioProvisioned * config.writeNonTransactional * config.writeRequestUnitsPerItem;
+    config.peakWCUTransactional = config.peak * config.writeRatioProvisioned * config.writeTransactional * 2 * config.writeRequestUnitsPerItem;
+    config.peakWCUTotal = config.peakWCUNonTransactional + config.peakWCUTransactional;
+    config.provisionedPeakWCU = config.peakWCUTotal - config.reservedWCU;
+    config.provisionedPeakWCU = Math.ceil(Math.max(config.provisionedPeakWCU, 0));
+    config.provisionedPeakWCUHours = Math.ceil(config.provisionedPeakWCU * config.peakHours);
+    config.provisionedTotalWCUHours = Math.ceil(config.provisionedBaselineWCUHours + config.provisionedPeakWCUHours);
+    config.dynamoCostProvisionedWCU = config.provisionedTotalWCUHours * 0.00065;
+    config.dynamoCostReservedWCU = config.reservedWCU * 0.000128 * 730;
+    config.dynamoCostMonthlyWCU = config.dynamoCostProvisionedWCU + config.dynamoCostReservedWCU;
+    config.dynamoCostUpfrontWCU = config.reservedWCU * 1.50;
+
+    config.baselineRCUNonTransactional = config.baseline * config.readRatioProvisioned * config.readEventuallyConsistent * 0.5 * config.readRequestUnitsPerItem;
+    config.baselineRCUStronglyConsistent = config.baseline * config.readRatioProvisioned * config.readStronglyConsistent * config.readRequestUnitsPerItem;
+    config.baselineRCUTransactional = config.baseline * config.readRatioProvisioned * config.readTransactional * 2 * config.readRequestUnitsPerItem;
+    config.baselineRCUTotal = config.baselineRCUNonTransactional + config.baselineRCUStronglyConsistent + config.baselineRCUTransactional;
+    config.reservedRCU = config.baselineRCUTotal * config.reservedCapacity;
+    config.reservedRCU = Math.ceil(config.reservedRCU / 100.0) * 100;
+    config.provisionedBaselineRCU = config.baselineRCUTotal - config.reservedRCU;
+    config.provisionedBaselineRCU = Math.ceil(Math.max(config.provisionedBaselineRCU, 0));
+    config.provisionedBaselineRCUHours = Math.ceil(config.provisionedBaselineRCU * config.baselineHours);
+    config.peakRCUNonTransactional = config.peak * config.readRatioProvisioned * config.readEventuallyConsistent * 0.5 * config.readRequestUnitsPerItem;
+    config.peakRCUStronglyConsistent = config.peak * config.readRatioProvisioned * config.readStronglyConsistent * config.readRequestUnitsPerItem;
+    config.peakRCUTransactional = config.peak * config.readRatioProvisioned * config.readTransactional * 2 * config.readRequestUnitsPerItem;
+    config.peakRCUTotal = config.peakRCUNonTransactional + config.peakRCUStronglyConsistent + config.peakRCUTransactional;
+    config.provisionedPeakRCU = config.peakRCUTotal - config.reservedRCU;
+    config.provisionedPeakRCU = Math.ceil(Math.max(config.provisionedPeakRCU, 0));
+    config.provisionedPeakRCUHours = Math.ceil(config.provisionedPeakRCU * config.peakHours);
+    config.provisionedTotalRCUHours = Math.ceil(config.provisionedBaselineRCUHours + config.provisionedPeakRCUHours);
+    config.dynamoCostProvisionedRCU = config.provisionedTotalRCUHours * 0.00013;
+    config.dynamoCostReservedRCU = config.reservedRCU * 0.000025 * 730;
+    config.dynamoCostMonthlyRCU = config.dynamoCostProvisionedRCU + config.dynamoCostReservedRCU;
+    config.dynamoCostUpfrontRCU = config.reservedRCU * 0.3;
+
+    config.dynamoCostProvisionedMonthly = config.dynamoCostMonthlyWCU + config.dynamoCostMonthlyRCU;
+    config.dynamoCostProvisionedUpfront = config.dynamoCostUpfrontWCU + config.dynamoCostUpfrontRCU;
+    config.dynamoCostProvisioned = config.dynamoCostProvisionedMonthly + config.dynamoCostProvisionedUpfront / 12;
+}
+
+function calculateDemandCosts() {
+    config.readRequestUnitsPerItem = Math.ceil(config.itemSizeKB / 4.0);
+    config.writeRequestUnitsPerItem = Math.ceil(config.itemSizeKB);
+
+    config.numberReads = config.onDemand * config.readRatioDemand * 3600 * config.totalHoursPerMonth;
+    config.readRequestUnits = (config.numberReads * config.readEventuallyConsistent * 0.5 * config.readRequestUnitsPerItem) +
+        (config.numberReads * config.readStronglyConsistent * config.readRequestUnitsPerItem) +
+        (config.numberReads * config.readTransactional * 2 * config.readRequestUnitsPerItem);
+    config.dynamoCostDemandReads = config.readRequestUnits * 0.000000125;
+
+    config.numberWrites = config.onDemand * config.writeRatioDemand * 3600 * config.totalHoursPerMonth;
+    config.writeRequestUnits = (config.numberWrites * config.writeNonTransactional * config.writeRequestUnitsPerItem) +
+        (config.numberWrites * config.writeTransactional * 2 * config.writeRequestUnitsPerItem);
+    config.dynamoCostDemandWrites = config.writeRequestUnits * 0.000000625;
+
+    config.dynamoCostDemand = config.dynamoCostDemandReads + config.dynamoCostDemandWrites;
+}
+
 export function updateCosts() {
-    const totalHoursPerMonth = 730;
+    getSelectedPricingModel();
+    getStorageValues();
+    getConsistencyValues();
+    getDemandValues();
+    getProvisionedValues();
 
-// item size
-    let itemSizeKB = parseInt(document.getElementById('itemSize').value) * 0.0009765625;
-    if (itemSizeKB > 1) {
-        itemSizeKB = Math.floor(itemSizeKB);
-    }
-    const writeRequestUnitsPerItem = Math.ceil(itemSizeKB);
-    const readRequestUnitsPerItem = Math.ceil(itemSizeKB / 4.0);
+    calculateProvisionedCosts();
+    calculateDemandCosts();
+    calculateStorageCost();
+    calculateTotalOpsSec();
 
-// consistency
-    const readStronglyConsistent = parseInt(document.getElementById('readConst').value) / 100;
-    const readEventuallyConsistent = 1 - readStronglyConsistent;
-    const readTransactional = parseInt(document.getElementById('readTrans').value) / 100;
-    const writeTransactional = parseInt(document.getElementById('writeTrans').value) / 100;
-    const writeNonTransactional = 1 - writeTransactional;
+    config.dynamoCostTotal = config.selectedPricingModel === 'onDemand' ? config.dynamoCostDemand + config.dynamoCostStorage : config.dynamoCostProvisioned + config.dynamoCostStorage;
 
-// provisioned
-    const peakHours = config.peakWidth * 30;
-    const baselineHours = totalHoursPerMonth - peakHours;
+    const scyllaResult = calculateScyllaCosts();
 
-    const baselineXCUHours = config.baseline * baselineHours;
-    const peakXCUHours = config.peak * peakHours;
-    const totalXCUHours = baselineXCUHours + peakXCUHours;
-
-    const reservedCapacity = parseInt(document.getElementById('reservedCapacity').value) / 100;
-    const readRatioProvisioned = parseInt(document.getElementById('ratioProvisioned').value) / 100;
-    const writeRatioProvisioned = 1 - readRatioProvisioned;
-
-    const baselineWCUNonTransactional = config.baseline * writeRatioProvisioned * writeNonTransactional * writeRequestUnitsPerItem;
-    const baselineWCUTransactional = config.baseline * writeRatioProvisioned * writeTransactional * 2 * writeRequestUnitsPerItem;
-    const baselineWCUTotal = baselineWCUNonTransactional + baselineWCUTransactional;
-    let reservedWCU = baselineWCUTotal * reservedCapacity;
-    reservedWCU = Math.ceil(reservedWCU / 100.0) * 100;
-    let provisionedBaselineWCU = baselineWCUTotal - reservedWCU;
-    provisionedBaselineWCU = Math.ceil(Math.max(provisionedBaselineWCU, 0));
-    let provisionedBaselineWCUHours = Math.ceil(provisionedBaselineWCU * baselineHours);
-    let peakWCUNonTransactional = config.peak * writeRatioProvisioned * writeNonTransactional * writeRequestUnitsPerItem;
-    let peakWCUTransactional = config.peak * writeRatioProvisioned * writeTransactional * 2 * writeRequestUnitsPerItem;
-    let peakWCUTotal = peakWCUNonTransactional + peakWCUTransactional;
-    let provisionedPeakWCU = peakWCUTotal - reservedWCU;
-    provisionedPeakWCU = Math.ceil(Math.max(provisionedPeakWCU, 0));
-    let provisionedPeakWCUHours = Math.ceil(provisionedPeakWCU * peakHours);
-    let provisionedTotalWCUHours = Math.ceil(provisionedBaselineWCUHours + provisionedPeakWCUHours);
-    let dynamoCostProvisionedWCU = provisionedTotalWCUHours * 0.00065;
-    let dynamoCostReservedWCU = reservedWCU * 0.000128 * 730;
-    let dynamoCostMonthlyWCU = dynamoCostProvisionedWCU + dynamoCostReservedWCU;
-    let dynamoCostUpfrontWCU = reservedWCU * 1.50;
-
-    const baselineRCUNonTransactional = config.baseline * readRatioProvisioned * readEventuallyConsistent * 0.5 * readRequestUnitsPerItem;
-    const baselineRCUStronglyConsistent = config.baseline * readRatioProvisioned * readStronglyConsistent * readRequestUnitsPerItem;
-    const baselineRCUTransactional = config.baseline * readRatioProvisioned * readTransactional * 2 * readRequestUnitsPerItem;
-    const baselineRCUTotal = baselineRCUNonTransactional + baselineRCUStronglyConsistent + baselineRCUTransactional;
-    let reservedRCU = baselineRCUTotal * reservedCapacity;
-    reservedRCU = Math.ceil(reservedRCU / 100.0) * 100;
-    let provisionedBaselineRCU = baselineRCUTotal - reservedRCU;
-    provisionedBaselineRCU = Math.ceil(Math.max(provisionedBaselineRCU, 0));
-    let provisionedBaselineRCUHours = Math.ceil(provisionedBaselineRCU * baselineHours);
-    let peakRCUNonTransactional = config.peak * readRatioProvisioned * readEventuallyConsistent * 0.5 * readRequestUnitsPerItem;
-    let peakRCUStronglyConsistent = config.peak * readRatioProvisioned * readStronglyConsistent * readRequestUnitsPerItem;
-    let peakRCUTransactional = config.peak * readRatioProvisioned * readTransactional * 2 * readRequestUnitsPerItem;
-    let peakRCUTotal = peakRCUNonTransactional + peakRCUStronglyConsistent + peakRCUTransactional;
-    let provisionedPeakRCU = peakRCUTotal - reservedRCU;
-    provisionedPeakRCU = Math.ceil(Math.max(provisionedPeakRCU, 0));
-    let provisionedPeakRCUHours = Math.ceil(provisionedPeakRCU * peakHours);
-    let provisionedTotalRCUHours = Math.ceil(provisionedBaselineRCUHours + provisionedPeakRCUHours);
-    let dynamoCostProvisionedRCU = provisionedTotalRCUHours * 0.00013;
-    let dynamoCostReservedRCU = reservedRCU * 0.000025 * 730;
-    let dynamoCostMonthlyRCU = dynamoCostProvisionedRCU + dynamoCostReservedRCU;
-    let dynamoCostUpfrontRCU = reservedRCU * 0.3;
-
-    const dynamoCostProvisionedMonthly = dynamoCostMonthlyWCU + dynamoCostMonthlyRCU;
-    const dynamoCostProvisionedUpfront = dynamoCostUpfrontWCU + dynamoCostUpfrontRCU;
-    const dynamoCostProvisioned = dynamoCostProvisionedMonthly + dynamoCostProvisionedUpfront/12;
-
-// demand
-    const readRatioDemand = parseInt(document.getElementById('ratioDemand').value) / 100;
-    const numberReads = config.onDemand * readRatioDemand * 3600 * totalHoursPerMonth;
-    const readRequestUnits = (numberReads * readEventuallyConsistent * 0.5 * readRequestUnitsPerItem) + (numberReads * readStronglyConsistent * readRequestUnitsPerItem) + (numberReads * readTransactional * 2 * readRequestUnitsPerItem);
-    const dynamoCostDemandReads = readRequestUnits * 0.000000125;
-    const writeRatioDemand = 1 - readRatioProvisioned;
-    const numberWrites = config.onDemand * writeRatioDemand * 3600 * totalHoursPerMonth;
-    const writeRequestUnits = (numberWrites * writeNonTransactional * writeRequestUnitsPerItem) + (numberWrites * writeTransactional * 2 * writeRequestUnitsPerItem);
-    const dynamoCostDemandWrites = writeRequestUnits * 0.000000625;
-    const dynamoCostDemand = dynamoCostDemandReads + dynamoCostDemandWrites;
-
-// storage
-    const storageGB = parseInt(document.getElementById('storage').value);
-    const dynamoCostStorage = storageGB * 0.25;
-
-// dynamo total
-    const selectedPricingModel = document.querySelector('input[name="pricingModel"]:checked').value;
-    const dynamoCostTotal = selectedPricingModel === 'onDemand' ? dynamoCostDemand + dynamoCostStorage : dynamoCostProvisioned + dynamoCostStorage;
-
-// scylla
-    const readsOpsSec = selectedPricingModel === 'onDemand' ? config.onDemand * readRatioDemand : config.baseline * readRatioProvisioned;
-    const writesOpsSec = selectedPricingModel === 'onDemand' ? config.onDemand * writeRatioDemand : config.baseline * writeRatioProvisioned;
-    const totalOpsSec = readsOpsSec + writesOpsSec;
-    const scyllaResult = calculateScyllaCosts(storageGB, totalOpsSec);
-
-// comparison
-    const savings = dynamoCostTotal / 2;
-    const costRatio = (dynamoCostTotal / scyllaResult.scyllaCost).toFixed(1);
+    const savings = config.dynamoCostTotal / 2;
+    const costRatio = (config.dynamoCostTotal / scyllaResult.scyllaCost).toFixed(1);
 
     document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
 
-    let logs = [`itemSizeKB: ${itemSizeKB}`, `storageGB: ${storageGB}`, `readsOpsSec: ${readsOpsSec.toLocaleString(undefined, {
-        minimumFractionDigits: 0, maximumFractionDigits: 0
-    })}`, `writesOpsSec: ${writesOpsSec.toLocaleString(undefined, {
-        minimumFractionDigits: 0, maximumFractionDigits: 0
-    })}`, `totalOpsSec: ${totalOpsSec.toLocaleString(undefined, {
+    logCosts(scyllaResult, costRatio);
+
+    chart.update();
+}
+
+function calculateStorageCost() {
+    config.dynamoCostStorage = config.storageGB * 0.25;
+}
+
+function calculateTotalOpsSec() {
+    config.readsOpsSec = config.selectedPricingModel === 'onDemand' ? config.onDemand * config.readRatioDemand : config.baseline *  config.readRatioProvisioned;
+    config.writesOpsSec = config.selectedPricingModel === 'onDemand' ? config.onDemand *  config.writeRatioDemand : config.baseline *  config.writeRatioProvisioned;
+    config.totalOpsSec = config.readsOpsSec + config.writesOpsSec;
+}
+
+function getSelectedPricingModel() {
+    config.selectedPricingModel = document.querySelector('input[name="pricingModel"]:checked').value;
+}
+
+function logCosts(scyllaResult, costRatio) {
+    let logs = [
+        `itemSizeKB: ${config.itemSizeKB} KB`,
+        `storageGB: ${config.storageGB} GB`,
+        `totalOpsSec: ${config.totalOpsSec.toLocaleString(undefined, {
         minimumFractionDigits: 0, maximumFractionDigits: 0
     })}`,];
 
-    if (selectedPricingModel === 'onDemand') {
-        logs = logs.concat([`dynamoCostDemandReads: $${dynamoCostDemandReads.toFixed(2)}`, `dynamoCostDemandWrites: $${dynamoCostDemandWrites.toFixed(2)}`, `dynamoCostDemand: $${dynamoCostDemand.toFixed(2)}`,]);
+    if (config.selectedPricingModel === 'onDemand') {
+        logs = logs.concat([
+            `dynamoCostDemandReads: $${config.dynamoCostDemandReads.toFixed(2)}`,
+            `dynamoCostDemandWrites: $${config.dynamoCostDemandWrites.toFixed(2)}`,
+            `dynamoCostDemand: $${config.dynamoCostDemand.toFixed(2)}`,]);
     } else {
-        logs = logs.concat([`dynamoCostMonthlyWCU: $${dynamoCostMonthlyWCU.toFixed(2)}`, `dynamoCostUpfrontWCU: $${dynamoCostUpfrontWCU.toFixed(2)}`, `dynamoCostMonthlyRCU: $${dynamoCostMonthlyRCU.toFixed(2)}`, `dynamoCostUpfrontRCU: $${dynamoCostUpfrontRCU.toFixed(2)}`,]);
+        logs = logs.concat([
+            `dynamoCostMonthlyWCU: $${config.dynamoCostMonthlyWCU.toFixed(2)}`,
+            `dynamoCostUpfrontWCU: $${config.dynamoCostUpfrontWCU.toFixed(2)}`,
+            `dynamoCostMonthlyRCU: $${config.dynamoCostMonthlyRCU.toFixed(2)}`,
+            `dynamoCostUpfrontRCU: $${config.dynamoCostUpfrontRCU.toFixed(2)}`,]);
     }
 
-    logs = logs.concat([`dynamoCostStorage: $${dynamoCostStorage.toFixed(2)}`, `dynamoCostTotal: $${dynamoCostTotal.toFixed(2)}`, `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`, `costRatio: ${costRatio}`, `nodeCount: ${scyllaResult.nodeCount}`, `family: ${scyllaResult.family}`]);
+    logs = logs.concat([
+        `dynamoCostStorage: $${config.dynamoCostStorage.toFixed(2)}`,
+        `dynamoCostTotal: $${config.dynamoCostTotal.toFixed(2)}`,
+        `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`,
+        `costRatio: ${costRatio}`,
+        `nodeCount: ${scyllaResult.nodeCount}`,
+        `family: ${scyllaResult.family}`]);
 
     updateDebugPanel(logs);
-
-    chart.update();
 }
 
 export function updateOps() {
