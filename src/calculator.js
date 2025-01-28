@@ -17,12 +17,12 @@ function getNodeCount(storageGB, storageLimit, totalOpsSec, baselineOpsSec) {
     return 3;
 }
 
-export function calculateScyllaCosts(totalOpsSec) {
+export function calculateScyllaCosts() {
     const scyllaStorageGB = config.storageGB * 0.5;
     const annualDiscount = 0.2;
 
-    const i4i_nodeCount = getNodeCount(scyllaStorageGB, scyllaPrices[0].storage, totalOpsSec, scyllaPrices[0].baseline);
-    const i3en_nodeCount = getNodeCount(scyllaStorageGB, scyllaPrices[1].storage, totalOpsSec, scyllaPrices[1].baseline);
+    const i4i_nodeCount = getNodeCount(scyllaStorageGB, scyllaPrices[0].storage, config.totalOpsSec, scyllaPrices[0].baseline);
+    const i3en_nodeCount = getNodeCount(scyllaStorageGB, scyllaPrices[1].storage, config.totalOpsSec, scyllaPrices[1].baseline);
 
     const i4i_CostPerHour = scyllaPrices[0].price;
     const i3en_CostPerHour = scyllaPrices[1].price;
