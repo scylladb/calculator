@@ -1,6 +1,6 @@
 import {cfg} from './config.js';
 import {chart} from "./chart.js";
-import {formatNumber, updateDebugPanel} from "./utils.js";
+import {formatNumber, updateSavedCosts} from "./utils.js";
 
 const scyllaPrices = [{
     family: "i4i", instance: "i4i.xlarge", baseline: 78000, peak: 120000, storage: 937, price: 3.325
@@ -232,7 +232,8 @@ function logCosts(scyllaResult, costRatio) {
         `nodeCount: ${scyllaResult.nodeCount}`,
         `family: ${scyllaResult.family}`]);
 
-    updateDebugPanel(logs);
+    console.log(cfg);
+    updateSavedCosts(logs);
 }
 
 export function updateOps() {

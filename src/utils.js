@@ -15,10 +15,11 @@ function getQueryParams() {
 
 export const queryParams = getQueryParams();
 
-export function updateDebugPanel(logs) {
-    const debugPanel = document.getElementById('debugPanel');
-    debugPanel.innerHTML = logs.map(log => {
+export function updateSavedCosts(logs) {
+    const costDiffPanel = document.getElementById('costSavedTip');
+    costDiffPanel.style.display = 'block';
+    costDiffPanel.innerHTML = logs.map(log => {
         const [key, value] = log.split(': ');
-        return `<div class="debug-entry"><span class="debug-key">${key}:</span><span class="debug-value">${value}</span></div>`;
+        return `<div class="cost-entry"><span class="cost-key">${key}:</span><span class="cost-value">${value}</span></div>`;
     }).join('');
 }

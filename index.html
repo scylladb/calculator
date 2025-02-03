@@ -19,7 +19,11 @@
       <span id="costDiff">$0</span>
       <span id="costDiffMo">/mo</span>
     </p>
-    <p id="costDiffSaved">saved using ScyllaDB</p>
+    <p id="costSaved">saved using ScyllaDB
+      <span class="info-icon">i
+        <span class="tooltip-text" id="costSavedTip"></span>
+      </span>
+    </p>
   </div>
 
   <div class="radio-container">
@@ -121,8 +125,8 @@
           <option value="infrequentAccess">Infrequent Access</option>
         </select>
         <span class="info-icon">i
-      <span class="tooltip-text">Select the table class for your workload.</span>
-    </span>
+          <span class="tooltip-text">Select the table class for your workload.</span>
+        </span>
       </label>
     </div>
 

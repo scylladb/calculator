@@ -8,8 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
-  <script type="module" crossorigin src="/assets/index-UnL-7Xdd.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-C4_nV1QP.css">
+  <script type="module" crossorigin src="/assets/index-CTLm646y.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-B9xDjrZ1.css">
 </head>
 <body>
 <div class="container">
@@ -19,7 +19,11 @@
       <span id="costDiff">$0</span>
       <span id="costDiffMo">/mo</span>
     </p>
-    <p id="costDiffSaved">saved using ScyllaDB</p>
+    <p id="costSaved">saved using ScyllaDB
+      <span class="info-icon">i
+        <span class="tooltip-text" id="costSavedTip"></span>
+      </span>
+    </p>
   </div>
 
   <div class="radio-container">
@@ -121,8 +125,8 @@
           <option value="infrequentAccess">Infrequent Access</option>
         </select>
         <span class="info-icon">i
-      <span class="tooltip-text">Select the table class for your workload.</span>
-    </span>
+          <span class="tooltip-text">Select the table class for your workload.</span>
+        </span>
       </label>
     </div>
 
