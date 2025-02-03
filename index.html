@@ -31,20 +31,6 @@
     </label>
   </div>
 
-  <div class="tableClass">
-    <div>
-      <label for="tableClass">Table Class:
-        <select id="tableClass">
-          <option value="standard">Standard</option>
-          <option value="infrequentAccess">Infrequent Access</option>
-        </select>
-        <span class="info-icon">i
-      <span class="tooltip-text">Select the table class for your workload.</span>
-    </span>
-      </label>
-    </div>
-  </div>
-
   <div id="demandParams">
     <div>
       <label for="demand">On Demand:
@@ -123,6 +109,33 @@
       </label>
       <input type="range" id="reservedCapacity" min="0" max="100" step="1" value="0">
     </div>
+  </div>
+
+  <a href="#" id="tableLink">▼ Tables</a>
+
+  <div id="tableParams" style="display: none;">
+    <div>
+      <label for="tableClass">Table Class:
+        <select id="tableClass">
+          <option value="standard">Standard</option>
+          <option value="infrequentAccess">Infrequent Access</option>
+        </select>
+        <span class="info-icon">i
+      <span class="tooltip-text">Select the table class for your workload.</span>
+    </span>
+      </label>
+    </div>
+
+    <div>
+      <label for="storage">Global Table Replicated Regions:
+        <input type="text" id="replicatedRegionsInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="replicatedRegionsDsp">0</span>
+        <span class="info-icon">i
+            <span class="tooltip-text">Enter the number of regions where your data is replicated as a Global Table.</span>
+        </span>
+        </label>
+        <input type="range" id="replicatedRegions" min="0" max="24" step="1" value="0">
+        </div>
   </div>
 
   <a href="#" id="storageLink">▼ Storage</a>

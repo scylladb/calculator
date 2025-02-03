@@ -76,6 +76,7 @@ setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
 setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSize', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storage', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
+setupSliderInteraction('replicatedRegionsDsp', 'replicatedRegionsInp', 'replicatedRegions', value => value);
 
 document.getElementById('chart').onclick = function (event) {
     ourClickHandler(event);
@@ -171,6 +172,7 @@ document.getElementById('storage').addEventListener('input', (event) => {
 
 document.getElementById('storageDsp').innerText = document.getElementById('storage').value;
 
+toggleSection('tableLink', 'tableParams', '▲ Tables', '▼ Tables');
 toggleSection('storageLink', 'storageParams', '▲ Storage', '▼ Storage');
 toggleSection('consistencyLink', 'consistencyParams', '▲ Consistency', '▼ Consistency');
 

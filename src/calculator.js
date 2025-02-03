@@ -43,6 +43,10 @@ function getTableClass() {
     cfg.tableClass = document.getElementById('tableClass').value;
 }
 
+function getReplicatedRegions() {
+    cfg.replicatedRegions = parseInt(document.getElementById('replicatedRegions').value);
+}
+
 function getStorageValues() {
     cfg.storageGB = parseInt(document.getElementById('storage').value);
     cfg.itemSizeKB = parseInt(document.getElementById('itemSize').value) * (1 / 1024);
@@ -91,8 +95,9 @@ function calculateProvisionedCosts() {
     cfg.provisionedPeakWCUHours = Math.ceil(cfg.provisionedPeakWCU * cfg.peakHours);
     cfg.provisionedTotalWCUHours = Math.ceil(cfg.provisionedBaselineWCUHours + cfg.provisionedPeakWCUHours);
     cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+    cfg.dynamoCostReplicatedWRU = cfg.replicatedRegions * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
     cfg.dynamoCostReservedWCU = cfg.reservedWCU * 0.000128 * 730;
-    cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU;
+    cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU + cfg.dynamoCostReplicatedWRU;
     cfg.dynamoCostUpfrontWCU = cfg.reservedWCU * 1.50;
 
     cfg.baselineRCUNonTransactional = cfg.baseline * cfg.readRatioProvisioned * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem;
@@ -137,12 +142,15 @@ function calculateDemandCosts() {
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
     cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
-    cfg.dynamoCostDemand = cfg.dynamoCostDemandReads + cfg.dynamoCostDemandWrites;
+    cfg.dynamoCostReplicatedWRU = cfg.replicatedRegions * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
+
+    cfg.dynamoCostDemand = cfg.dynamoCostDemandReads + cfg.dynamoCostDemandWrites + cfg.dynamoCostReplicatedWRU;
 }
 
 export function updateCosts() {
     getSelectedPricingModel();
     getTableClass();
+    getReplicatedRegions()
     getStorageValues();
     getConsistencyValues();
     getDemandValues();
@@ -203,6 +211,7 @@ function logCosts(scyllaResult, costRatio) {
     }
 
     logs = logs.concat([
+        `dynamoCostReplicatedWRU: $${cfg.dynamoCostReplicatedWRU.toFixed(2)}`,
         `dynamoCostStorage: $${cfg.dynamoCostStorage.toFixed(2)}`,
         `dynamoCostTotal: $${cfg.dynamoCostTotal.toFixed(2)}`,
         `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`,
