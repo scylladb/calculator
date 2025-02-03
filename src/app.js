@@ -77,6 +77,7 @@ setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => val
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSize', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storage', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
 setupSliderInteraction('replicatedRegionsDsp', 'replicatedRegionsInp', 'replicatedRegions', value => value);
+setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
 document.getElementById('chart').onclick = function (event) {
     ourClickHandler(event);
@@ -174,6 +175,7 @@ document.getElementById('storageDsp').innerText = document.getElementById('stora
 toggleSection('tableLink', 'tableParams', '▲ Tables', '▼ Tables');
 toggleSection('storageLink', 'storageParams', '▲ Storage', '▼ Storage');
 toggleSection('consistencyLink', 'consistencyParams', '▲ Consistency', '▼ Consistency');
+toggleSection('daxLink', 'daxParams', '▲ Accelerator (DAX)', '▼ Accelerator (DAX)');
 
 document.getElementById('itemSize').addEventListener('input', function (event) {
     const slider = event.target;

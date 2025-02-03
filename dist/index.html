@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
-  <script type="module" crossorigin src="/assets/index-CTLm646y.js"></script>
+  <script type="module" crossorigin src="/assets/index-DZzuerjI.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-B9xDjrZ1.css">
 </head>
 <body>
@@ -139,7 +139,7 @@
         </span>
         </label>
         <input type="range" id="replicatedRegions" min="0" max="24" step="1" value="0">
-        </div>
+    </div>
   </div>
 
   <a href="#" id="storageLink">▼ Storage</a>
@@ -150,8 +150,8 @@
         <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="itemSizeDsp">1 KB</span>
         <span class="info-icon">i
-                    <span class="tooltip-text">Enter your average item size (all attributes).</span>
-                </span>
+            <span class="tooltip-text">Enter your average item size (all attributes).</span>
+        </span>
       </label>
       <input type="range" id="itemSize" min="64" max="409600" step="64" value="1024">
     </div>
@@ -161,8 +161,8 @@
         <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="storageDsp">512 GB</span>
         <span class="info-icon">i
-                    <span class="tooltip-text">Enter your total data storage size.</span>
-                </span>
+            <span class="tooltip-text">Enter your total data storage size.</span>
+        </span>
       </label>
       <input type="range" id="storage" min="128" max="102400" step="128" value="512">
     </div>
@@ -175,8 +175,8 @@
       <label for="writeTrans">Writes:
         <span id="writeConsistencyDsp">Non Transactional</span>
         <span class="info-icon">i
-                    <span class="tooltip-text">Enter write operations create, update, or delete items as a non transactional percentage, or, coordinated, all-or-nothing write operations as a transactional percentage.</span>
-                </span>
+            <span class="tooltip-text">Enter write operations create, update, or delete items as a non transactional percentage, or, coordinated, all-or-nothing write operations as a transactional percentage.</span>
+        </span>
       </label>
       <input type="range" id="writeTrans" min="0" max="100" step="1" value="0">
     </div>
@@ -184,15 +184,48 @@
     <div class="slider-container">
       <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
         <span class="info-icon">i
-                    <span class="tooltip-text">Enter read operations as eventually consistent, strongly consistent and/or transactional as a percentage.</span>
-                </span>
+            <span class="tooltip-text">Enter read operations as eventually consistent, strongly consistent and/or transactional as a percentage.</span>
+        </span>
       </label>
       <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
       <input type="range" id="readTrans" class="slider" min="0" max="100" value="0">
     </div>
   </div>
+
+  <a href="#" id="daxLink">▼ Accelerator (DAX)</a>
+
+  <div id="daxParams" style="display: none;">
+    <div>
+      <label for="daxInstanceClass">Instance Class:
+        <select id="daxInstanceClass">
+          <option value="r5Large">dax.r5.large | 2vCPU 16GB RAM</option>
+          <option value="r5XLarge">dax.r5.xlarge | 4vCPU 32GB RAM</option>
+          <option value="r52XLarge">dax.r5.2xlarge | 8vCPU 64GB RAM</option>
+          <option value="r54XLarge">dax.r5.4xlarge | 16vCPU 128GB RAM</option>
+          <option value="r58XLarge">dax.r5.8xlarge | 32vCPU 256GB RAM</option>
+          <option value="r512XLarge">dax.r5.12xlarge | 48vCPU 384GB RAM</option>
+          <option value="r516XLarge">dax.r5.16xlarge | 64vCPU 512GB RAM</option>
+          <option value="r524XLarge">dax.r5.24xlarge | 96vCPU 768GB RAM</option>
+        </select>
+        <span class="info-icon">i
+          <span class="tooltip-text">Select the instance class for your workload.</span>
+        </span>
+      </label>
+    </div>
+
+    <div>
+      <label for="daxNodes">Number of Nodes:
+        <input type="text" id="daxNodesInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="daxNodesDsp">0</span>
+        <span class="info-icon">i
+            <span class="tooltip-text">Enter the number of nodes for your workload.</span>
+        </span>
+      </label>
+      <input type="range" id="daxNodes" min="0" max="24" step="3" value="0">
+    </div>
+  </div>
 </div>
 
-<div id="debugPanel" class="debug-panel"></div>
 </body>
 </html>
+

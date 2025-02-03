@@ -47,6 +47,11 @@ function getReplicatedRegions() {
     cfg.replicatedRegions = parseInt(document.getElementById('replicatedRegions').value);
 }
 
+function getDaxValues() {
+    cfg.daxNodes = parseInt(document.getElementById('daxNodes').value);
+    cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
+}
+
 function getStorageValues() {
     cfg.storageGB = parseInt(document.getElementById('storage').value);
     cfg.itemSizeKB = parseInt(document.getElementById('itemSize').value) * (1 / 1024);
@@ -154,6 +159,11 @@ function calculateNetworkCosts() {
     cfg.dynamoCostNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
+function calculateDaxCosts() {
+    cfg.daxInstanceClassCost = cfg.daxInstanceClassCosts[cfg.daxInstanceClass];
+    cfg.dynamoDaxCost = cfg.daxNodes * cfg.totalHoursPerMonth * cfg.daxInstanceClassCost;
+}
+
 export function updateCosts() {
     getSelectedPricingModel();
     getTableClass();
@@ -162,18 +172,20 @@ export function updateCosts() {
     getConsistencyValues();
     getDemandValues();
     getProvisionedValues();
+    getDaxValues();
 
     calculateProvisionedCosts();
     calculateDemandCosts();
     calculateStorageCost();
     calculateTotalOpsSec();
     calculateNetworkCosts();
+    calculateDaxCosts();
 
     cfg.dynamoCostTotal = cfg.selectedPricingModel === 'onDemand' ?
         cfg.dynamoCostDemand + cfg.dynamoCostStorage :
         cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
 
-    cfg.dynamoCostTotal = cfg.dynamoCostTotal + cfg.dynamoCostNetwork + cfg.dynamoCostReplication;
+    cfg.dynamoCostTotal = cfg.dynamoCostTotal + cfg.dynamoCostNetwork + cfg.dynamoCostReplication + cfg.dynamoDaxCost;
 
     const scyllaResult = calculateScyllaCosts();
 
@@ -225,6 +237,7 @@ function logCosts(scyllaResult, costRatio) {
     logs = logs.concat([
         `dynamoCostNetwork: $${cfg.dynamoCostNetwork.toFixed(2)}`,
         `dynamoCostReplication: $${cfg.dynamoCostReplication.toFixed(2)}`,
+        `dynamoDaxCost: $${cfg.dynamoDaxCost.toFixed(2)}`,
         `dynamoCostStorage: $${cfg.dynamoCostStorage.toFixed(2)}`,
         `dynamoCostTotal: $${cfg.dynamoCostTotal.toFixed(2)}`,
         `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`,
