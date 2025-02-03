@@ -280,8 +280,6 @@ export function updateOps() {
     const totalOpsInMillionsSeries0 = totalOpsSeries0 / 1000000;
     const coveragePercentage = (totalOpsVisibleSeries / totalOpsSeries0) * 100;
 
-    const titleColor = coveragePercentage < 100 ? 'red' : 'black';
-
     if (totalOpsInMillionsSeries0 !== 0) {
         chart.options.plugins.tooltip.callbacks.title = function () {
             return `Total Workload: ${totalOpsInMillionsSeries0.toFixed(0)}M ops/month, Pricing coverage: ${coveragePercentage.toFixed(0)}%`;
