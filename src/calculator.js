@@ -90,7 +90,7 @@ function calculateProvisionedCosts() {
     cfg.provisionedPeakWCU = Math.ceil(Math.max(cfg.provisionedPeakWCU, 0));
     cfg.provisionedPeakWCUHours = Math.ceil(cfg.provisionedPeakWCU * cfg.peakHours);
     cfg.provisionedTotalWCUHours = Math.ceil(cfg.provisionedBaselineWCUHours + cfg.provisionedPeakWCUHours);
-    cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * cfg.pricePerWCU;
+    cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
     cfg.dynamoCostReservedWCU = cfg.reservedWCU * 0.000128 * 730;
     cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU;
     cfg.dynamoCostUpfrontWCU = cfg.reservedWCU * 1.50;
@@ -112,7 +112,7 @@ function calculateProvisionedCosts() {
     cfg.provisionedPeakRCU = Math.ceil(Math.max(cfg.provisionedPeakRCU, 0));
     cfg.provisionedPeakRCUHours = Math.ceil(cfg.provisionedPeakRCU * cfg.peakHours);
     cfg.provisionedTotalRCUHours = Math.ceil(cfg.provisionedBaselineRCUHours + cfg.provisionedPeakRCUHours);
-    cfg.dynamoCostProvisionedRCU = cfg.provisionedTotalRCUHours * cfg.pricePerRCU;
+    cfg.dynamoCostProvisionedRCU = cfg.provisionedTotalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
     cfg.dynamoCostReservedRCU = cfg.reservedRCU * 0.000025 * 730;
     cfg.dynamoCostMonthlyRCU = cfg.dynamoCostProvisionedRCU + cfg.dynamoCostReservedRCU;
     cfg.dynamoCostUpfrontRCU = cfg.reservedRCU * 0.3;
@@ -130,12 +130,12 @@ function calculateDemandCosts() {
     cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem);
-    cfg.dynamoCostDemandReads = cfg.readRequestUnits * 0.000000125;
+    cfg.dynamoCostDemandReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
     cfg.numberWrites = cfg.onDemand * cfg.writeRatioDemand * 3600 * cfg.totalHoursPerMonth;
     cfg.writeRequestUnits = (cfg.numberWrites * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem) +
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
-    cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * 0.000000625;
+    cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
     cfg.dynamoCostDemand = cfg.dynamoCostDemandReads + cfg.dynamoCostDemandWrites;
 }

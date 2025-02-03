@@ -113,6 +113,12 @@ document.querySelector('input[name="pricingModel"][value="provisioned"]').addEve
     }
 });
 
+document.getElementById('tableClass').addEventListener('change', (event) => {
+    cfg.tableClass = event.target.value;
+    console.log(cfg.tableClass);
+    updateChart();
+});
+
 document.getElementById('demand').addEventListener('input', (event) => {
     cfg.onDemand = parseInt(event.target.value);
     document.getElementById('demandDsp').innerText = formatNumber(cfg.onDemand);

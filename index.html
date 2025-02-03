@@ -31,6 +31,20 @@
     </label>
   </div>
 
+  <div class="tableClass">
+    <div>
+      <label for="tableClass">Table Class:
+        <select id="tableClass">
+          <option value="standard">Standard</option>
+          <option value="infrequentAccess">Infrequent Access</option>
+        </select>
+        <span class="info-icon">i
+      <span class="tooltip-text">Select the table class for your workload.</span>
+    </span>
+      </label>
+    </div>
+  </div>
+
   <div id="demandParams">
     <div>
       <label for="demand">On Demand:
@@ -52,18 +66,6 @@
                 </span>
       </label>
       <input type="range" id="ratioDemand" min="0" max="100" step="1" value="50">
-    </div>
-
-    <div>
-      <label for="tableClass">Table Class:
-        <select id="tableClass">
-          <option value="standard">Standard</option>
-          <option value="infrequentAccess">Infrequent Access</option>
-        </select>
-        <span class="info-icon">i
-      <span class="tooltip-text">Select the table class for your workload.</span>
-    </span>
-      </label>
     </div>
   </div>
 
