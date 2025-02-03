@@ -95,9 +95,9 @@ function calculateProvisionedCosts() {
     cfg.provisionedPeakWCUHours = Math.ceil(cfg.provisionedPeakWCU * cfg.peakHours);
     cfg.provisionedTotalWCUHours = Math.ceil(cfg.provisionedBaselineWCUHours + cfg.provisionedPeakWCUHours);
     cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    cfg.dynamoCostReplicatedWRU = cfg.replicatedRegions * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
+    cfg.dynamoCostReplication = cfg.replicatedRegions * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
     cfg.dynamoCostReservedWCU = cfg.reservedWCU * 0.000128 * 730;
-    cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU + cfg.dynamoCostReplicatedWRU;
+    cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU + cfg.dynamoCostReplication;
     cfg.dynamoCostUpfrontWCU = cfg.reservedWCU * 1.50;
 
     cfg.baselineRCUNonTransactional = cfg.baseline * cfg.readRatioProvisioned * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem;
@@ -142,9 +142,16 @@ function calculateDemandCosts() {
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
     cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
-    cfg.dynamoCostReplicatedWRU = cfg.replicatedRegions * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
+    cfg.dynamoCostReplication = cfg.replicatedRegions * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
 
-    cfg.dynamoCostDemand = cfg.dynamoCostDemandReads + cfg.dynamoCostDemandWrites + cfg.dynamoCostReplicatedWRU;
+    cfg.dynamoCostDemand = cfg.dynamoCostDemandReads + cfg.dynamoCostDemandWrites + cfg.dynamoCostReplication;
+}
+
+function calculateNetworkCosts() {
+    cfg.totalReadsKB = cfg.readsOpsSec * 3600 * cfg.totalHoursPerMonth * cfg.itemSizeKB;
+    cfg.totalWritesKB = cfg.writesOpsSec * 3600 * cfg.totalHoursPerMonth * cfg.itemSizeKB;
+    cfg.totalReplicatedWritesGB =( cfg.replicatedRegions * cfg.totalWritesKB) / 1024 / 1024;
+    cfg.dynamoCostNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
 export function updateCosts() {
@@ -160,8 +167,13 @@ export function updateCosts() {
     calculateDemandCosts();
     calculateStorageCost();
     calculateTotalOpsSec();
+    calculateNetworkCosts();
 
-    cfg.dynamoCostTotal = cfg.selectedPricingModel === 'onDemand' ? cfg.dynamoCostDemand + cfg.dynamoCostStorage : cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
+    cfg.dynamoCostTotal = cfg.selectedPricingModel === 'onDemand' ?
+        cfg.dynamoCostDemand + cfg.dynamoCostStorage :
+        cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
+
+    cfg.dynamoCostTotal = cfg.dynamoCostTotal + cfg.dynamoCostNetwork + cfg.dynamoCostReplication;
 
     const scyllaResult = calculateScyllaCosts();
 
@@ -211,7 +223,8 @@ function logCosts(scyllaResult, costRatio) {
     }
 
     logs = logs.concat([
-        `dynamoCostReplicatedWRU: $${cfg.dynamoCostReplicatedWRU.toFixed(2)}`,
+        `dynamoCostNetwork: $${cfg.dynamoCostNetwork.toFixed(2)}`,
+        `dynamoCostReplication: $${cfg.dynamoCostReplication.toFixed(2)}`,
         `dynamoCostStorage: $${cfg.dynamoCostStorage.toFixed(2)}`,
         `dynamoCostTotal: $${cfg.dynamoCostTotal.toFixed(2)}`,
         `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`,

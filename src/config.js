@@ -15,6 +15,8 @@ export const cfg = {
     pricePerRCU_IA:     0.00016,
     pricePerWCU_IA:     0.00081,
     // Replicated
-    pricePerRWRU:      0.000001875,
-    pricePerRWRU_IA:   0.000002344,
+    pricePerRWRU:       0.000000625,
+    pricePerRWRU_IA:    0.000000780,
+    // Data Transfer
+    priceIntraRegPerGB: 0.02,
 };
