@@ -45,16 +45,36 @@ export function ourClickHandler(event) {
     const xValue = chart.scales.x.getValueForPixel(canvasPosition.x);
     const yValue = chart.scales.y.getValueForPixel(canvasPosition.y);
 
-    if (xValue > chart.scales.x.min && xValue < chart.scales.x.max && yValue > chart.scales.y.min && yValue < chart.scales.y.max) {
-        const datasetIndex = 0;
-        const dataset = chart.data.datasets[datasetIndex];
-        dataset.data.push({
-            x: xValue, y: yValue
-        });
-        updateOps();
-        chart.update();
+    const datasetIndex = 0;
+    const dataset = chart.data.datasets[datasetIndex];
+
+    if (event.shiftKey) {
+        // Remove the last point from the dataset
+        if (dataset.data.length > 0) {
+            dataset.data.pop();
+            updateOps();
+            chart.update();
+        }
+    } else {
+        if (xValue > chart.scales.x.min && xValue < chart.scales.x.max && yValue > chart.scales.y.min && yValue < chart.scales.y.max) {
+            dataset.data.push({ x: xValue, y: yValue });
+            updateOps();
+            chart.update();
+        }
     }
 }
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Shift') {
+        document.getElementById('chart').style.cursor = 'not-allowed';
+    }
+});
+
+document.addEventListener('keyup', function(event) {
+    if (event.key === 'Shift') {
+        document.getElementById('chart').style.cursor = 'default';
+    }
+});
 
 export function toggleSection(linkId, sectionId, expandedText, collapsedText) {
     document.getElementById(linkId).addEventListener('click', function (event) {

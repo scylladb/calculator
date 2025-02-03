@@ -245,7 +245,7 @@ function logCosts(scyllaResult, costRatio) {
         `nodeCount: ${scyllaResult.nodeCount}`,
         `family: ${scyllaResult.family}`]);
 
-    console.log(cfg);
+    console.log("config", cfg);
     updateSavedCosts(logs);
 }
 
