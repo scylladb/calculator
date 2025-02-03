@@ -1,4 +1,4 @@
-import {config} from './config.js';
+import {cfg} from './config.js';
 import {chart, updateChart} from "./chart.js";
 import {updateCosts, updateOps} from "./calculator.js";
 import {formatNumber} from "./utils.js";
@@ -114,8 +114,8 @@ document.querySelector('input[name="pricingModel"][value="provisioned"]').addEve
 });
 
 document.getElementById('demand').addEventListener('input', (event) => {
-    config.onDemand = parseInt(event.target.value);
-    document.getElementById('demandDsp').innerText = formatNumber(config.onDemand);
+    cfg.onDemand = parseInt(event.target.value);
+    document.getElementById('demandDsp').innerText = formatNumber(cfg.onDemand);
     updateChart();
 });
 
@@ -127,20 +127,20 @@ document.getElementById('ratioDemand').addEventListener('input', (event) => {
 });
 
 document.getElementById('baseline').addEventListener('input', (event) => {
-    config.baseline = parseInt(event.target.value);
-    document.getElementById('baselineDsp').innerText = formatNumber(config.baseline);
+    cfg.baseline = parseInt(event.target.value);
+    document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
     updateChart();
 });
 
 document.getElementById('peakWidth').addEventListener('input', (event) => {
-    config.peakWidth = Math.max(1, parseInt(event.target.value));
-    document.getElementById('peakWidthDsp').innerText = config.peakWidth;
+    cfg.peakWidth = Math.max(1, parseInt(event.target.value));
+    document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
     updateChart();
 });
 
 document.getElementById('peak').addEventListener('input', (event) => {
-    config.peak = parseInt(event.target.value);
-    document.getElementById('peakDsp').innerText = formatNumber(config.peak);
+    cfg.peak = parseInt(event.target.value);
+    document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
     updateChart();
 });
 
@@ -152,8 +152,8 @@ document.getElementById('ratioProvisioned').addEventListener('input', (event) =>
 });
 
 document.getElementById('reservedCapacity').addEventListener('input', (event) => {
-    config.reservedCapacity = parseInt(event.target.value);
-    document.getElementById('reservedCapacityDsp').innerText = `${formatNumber(config.reservedCapacity)}%`;
+    cfg.reservedCapacity = parseInt(event.target.value);
+    document.getElementById('reservedCapacityDsp').innerText = `${formatNumber(cfg.reservedCapacity)}%`;
     updateChart();
 });
 
