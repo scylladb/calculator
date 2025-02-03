@@ -1,4 +1,4 @@
-import {config} from './config.js';
+import {cfg} from './config.js';
 import {updateCosts, updateOps} from "./calculator.js";
 import {formatNumber, queryParams} from "./utils.js";
 
@@ -20,7 +20,7 @@ export function generateProvisionedData(baseline, peak, peakWidth) {
 }
 
 export function generateOnDemandData() {
-    return Array.from({length: 25}, (_, i) => ({x: i, y: config.onDemand}));
+    return Array.from({length: 25}, (_, i) => ({x: i, y: cfg.onDemand}));
 }
 
 export function generateWorkloadData(workload) {
@@ -39,7 +39,7 @@ export function generateWorkloadData(workload) {
 }
 
 export let onDemandData = generateOnDemandData();
-export let provisionedData = generateProvisionedData(config.baseline, config.peak, config.peakWidth);
+export let provisionedData = generateProvisionedData(cfg.baseline, cfg.peak, cfg.peakWidth);
 export let workloadData = generateWorkloadData(queryParams.workload);
 
 export const chart = new Chart(ctx, {
@@ -122,8 +122,8 @@ export const chart = new Chart(ctx, {
 });
 
 export function updateChart() {
-    chart.data.datasets[1].data = Array.from({length: 25}, (_, i) => ({x: i, y: config.onDemand}));
-    chart.data.datasets[2].data = generateProvisionedData(config.baseline, config.peak, config.peakWidth);
+    chart.data.datasets[1].data = Array.from({length: 25}, (_, i) => ({x: i, y: cfg.onDemand}));
+    chart.data.datasets[2].data = generateProvisionedData(cfg.baseline, cfg.peak, cfg.peakWidth);
     chart.update();
     updateOps();
     updateCosts();
