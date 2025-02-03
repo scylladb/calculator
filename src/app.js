@@ -236,5 +236,10 @@ readTrans.addEventListener('input', () => {
     updateReadConsistency();
 });
 
+document.getElementById('daxInstanceClass').addEventListener('change', (event) => {
+    cfg.daxInstanceClass = event.target.value;
+    updateChart();
+});
+
 updateOps();
 updateCosts();
