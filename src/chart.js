@@ -34,7 +34,7 @@ export function generateWorkloadData(workload) {
             return Array.from({length: 25}, (_, i) => ({x: i, y: 50000}));
         case 'morningPeak':
         default:
-            return [{x: 0, y: 5000}, {x: 8, y: 10000}, {x: 9, y: 100000}, {x: 10, y: 10000}, {x: 24, y: 5000}];
+            return [];
     }
 }
 
@@ -78,7 +78,7 @@ export const chart = new Chart(ctx, {
             legend: {
                 display: false
             }, title: {
-                display: true, text: "Total Ops"
+                display: false
             }, tooltip: {
                 callbacks: {
                     label: function (context) {

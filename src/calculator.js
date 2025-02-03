@@ -282,7 +282,10 @@ export function updateOps() {
 
     const titleColor = coveragePercentage < 100 ? 'red' : 'black';
 
-    chart.options.plugins.title.text = `Total Workload: ${totalOpsInMillionsSeries0.toFixed(0)}M ops, Pricing coverage: ${coveragePercentage.toFixed(2)}%`;
-    chart.options.plugins.title.color = titleColor;
-    chart.update();
+    if (totalOpsInMillionsSeries0 !== 0) {
+        chart.options.plugins.tooltip.callbacks.title = function () {
+            return `Total Workload: ${totalOpsInMillionsSeries0.toFixed(0)}M ops/month, Pricing coverage: ${coveragePercentage.toFixed(0)}%`;
+        };
+        chart.update();
+    }
 }
