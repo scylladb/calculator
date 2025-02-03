@@ -199,7 +199,7 @@ export function updateCosts() {
     chart.update();
 }
 
-function calculateStorageCost() {
+export function calculateStorageCost() {
     cfg.dynamoCostStorage = cfg.storageGB * 0.25;
 }
 
