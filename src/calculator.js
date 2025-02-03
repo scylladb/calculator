@@ -39,6 +39,10 @@ export function calculateScyllaCosts() {
     };
 }
 
+function getTableClass() {
+    cfg.tableClass = document.getElementById('tableClass').value;
+}
+
 function getStorageValues() {
     cfg.storageGB = parseInt(document.getElementById('storage').value);
     cfg.itemSizeKB = parseInt(document.getElementById('itemSize').value) * (1 / 1024);
@@ -138,6 +142,7 @@ function calculateDemandCosts() {
 
 export function updateCosts() {
     getSelectedPricingModel();
+    getTableClass();
     getStorageValues();
     getConsistencyValues();
     getDemandValues();
