@@ -2,8 +2,6 @@ import {cfg} from './config.js';
 import {chart} from "./chart.js";
 import {formatNumber, getQueryParams, updateAll} from "./utils.js";
 
-
-
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
     const display = document.getElementById(displayId);
     const input = document.getElementById(inputId);

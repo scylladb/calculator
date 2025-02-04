@@ -32,15 +32,36 @@ export function updateQueryParams() {
     debounceTimeout = setTimeout(() => {
         const params = new URLSearchParams(window.location.search);
 
-        params.set('onDemand', cfg.onDemand);
-        params.set('baseline', cfg.baseline);
-        params.set('peak', cfg.peak);
-        params.set('peakWidth', cfg.peakWidth);
+        params.set('pricingModel', cfg.pricingModel);
         params.set('hoursPerMonth', cfg.hoursPerMonth);
         params.set('storageGB', cfg.storageGB);
-        params.set('pricingModel', cfg.pricingModel);
-        params.set('replicatedRegions', cfg.replicatedRegions);
-        params.set('daxNodes', cfg.daxNodes);
+        params.set('itemSize', cfg.itemSize);
+
+        if (cfg.pricingModel === 'onDemand') {
+            params.delete('baseline');
+            params.delete('peak');
+            params.delete('peakWidth');
+            params.set('onDemand', cfg.onDemand);
+        } else {
+            params.delete('onDemand');
+            params.set('baseline', cfg.baseline);
+            params.set('peak', cfg.peak);
+            params.set('peakWidth', cfg.peakWidth);
+        }
+
+        if (cfg.daxNodes === 0) {
+            params.delete('daxNodes');
+            params.delete('daxInstanceClass');
+        } else {
+            params.set('daxNodes', cfg.daxNodes);
+            params.set('daxInstanceClass', cfg.daxInstanceClass);
+        }
+
+        if (cfg.replicatedRegions === 0) {
+            params.delete('replicatedRegions');
+        } else {
+            params.set('replicatedRegions', cfg.replicatedRegions);
+        }
 
         window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
     }, 2000); // Adjust the delay as needed
