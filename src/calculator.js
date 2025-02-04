@@ -103,7 +103,7 @@ export function calculateProvisionedCosts() {
     cfg.provisionedTotalWCUHours = Math.ceil(cfg.provisionedBaselineWCUHours + cfg.provisionedPeakWCUHours);
     cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
     cfg.dynamoCostReplication = cfg.regions * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
-    cfg.dynamoCostReservedWCU = cfg.reservedWCU * 0.000128 * 730;
+    cfg.dynamoCostReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
     cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU + cfg.dynamoCostReplication;
     cfg.dynamoCostUpfrontWCU = cfg.reservedWCU * 1.50;
 
@@ -125,7 +125,7 @@ export function calculateProvisionedCosts() {
     cfg.provisionedPeakRCUHours = Math.ceil(cfg.provisionedPeakRCU * cfg.peakHours);
     cfg.provisionedTotalRCUHours = Math.ceil(cfg.provisionedBaselineRCUHours + cfg.provisionedPeakRCUHours);
     cfg.dynamoCostProvisionedRCU = cfg.provisionedTotalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
-    cfg.dynamoCostReservedRCU = cfg.reservedRCU * 0.000025 * 730;
+    cfg.dynamoCostReservedRCU = cfg.reservedRCU * cfg.pricePerRRCU * cfg.hoursPerMonth;
     cfg.dynamoCostMonthlyRCU = cfg.dynamoCostProvisionedRCU + cfg.dynamoCostReservedRCU;
     cfg.dynamoCostUpfrontRCU = cfg.reservedRCU * 0.3;
 
