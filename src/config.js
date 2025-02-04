@@ -36,5 +36,12 @@ export const cfg = {
     r512XLarge:         6.11700000,
     r516XLarge:         8.13700000,
     r524XLarge:        12.23400000,
-    }
+    },
+    scyllaPrices: [
+        {
+            family: "i4i", instance: "i4i.xlarge", baseline: 78000, peak: 120000, storage: 937, price: 3.325
+        }, {
+            family: "i3en", instance: "i3en.xlarge", baseline: 39000, peak: 60000, storage: 2.44 * 1024, price: 4.378
+        }
+    ]
 };

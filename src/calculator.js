@@ -1,10 +1,6 @@
 import {cfg} from './config.js';
 import {chart} from "./chart.js";
-import {formatNumber, getQueryParams, updateSavedCosts} from "./utils.js";
-
-const scyllaPrices = [{
-    family: "i4i", instance: "i4i.xlarge", baseline: 78000, peak: 120000, storage: 937, price: 3.325
-}, {family: "i3en", instance: "i3en.xlarge", baseline: 39000, peak: 60000, storage: 2.44 * 1024, price: 4.378},]
+import {formatNumber, updateSavedCosts} from "./utils.js";
 
 function getNodeCount(storageGB, storageLimit, totalOpsSec, baselineOpsSec) {
     for (let nodes = 3; nodes < 1000; nodes += 3) {
@@ -21,11 +17,11 @@ export function calculateScyllaCosts() {
     const scyllaStorageGB = cfg.storageGB * 0.5;
     const annualDiscount = 0.2;
 
-    const i4i_nodeCount = getNodeCount(scyllaStorageGB, scyllaPrices[0].storage, cfg.totalOpsSec, scyllaPrices[0].baseline);
-    const i3en_nodeCount = getNodeCount(scyllaStorageGB, scyllaPrices[1].storage, cfg.totalOpsSec, scyllaPrices[1].baseline);
+    const i4i_nodeCount = getNodeCount(scyllaStorageGB, cfg.scyllaPrices[0].storage, cfg.totalOpsSec, cfg.scyllaPrices[0].baseline);
+    const i3en_nodeCount = getNodeCount(scyllaStorageGB, cfg.scyllaPrices[1].storage, cfg.totalOpsSec, cfg.scyllaPrices[1].baseline);
 
-    const i4i_CostPerHour = scyllaPrices[0].price;
-    const i3en_CostPerHour = scyllaPrices[1].price;
+    const i4i_CostPerHour = cfg.scyllaPrices[0].price;
+    const i3en_CostPerHour = cfg.scyllaPrices[1].price;
 
     const i4i_scyllaCost = (i4i_nodeCount / 3) * i4i_CostPerHour * 730 * (1 - annualDiscount);
     const i3en_scyllaCost = (i3en_nodeCount / 3) * i3en_CostPerHour * 730 * (1 - annualDiscount);
