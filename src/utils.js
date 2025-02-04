@@ -1,6 +1,6 @@
 import { cfg } from './config.js';
 import {updateCosts, updateOps} from "./calculator.js";
-import {chart, updateChart} from "./chart.js";
+import {updateChart} from "./chart.js";
 
 export function formatNumber(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(0) + 'B';
