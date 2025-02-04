@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
-  <script type="module" crossorigin src="/assets/index-M29YhEEQ.js"></script>
+  <script type="module" crossorigin src="/assets/index-DLKmjAIi.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-B9xDjrZ1.css">
 </head>
 <body>
@@ -28,10 +28,10 @@
 
   <div class="radio-container">
     <label>
-      <input type="radio" name="pricingModel" value="onDemand" checked> On Demand
+      <input type="radio" name="pricing" value="demand" checked> On Demand
     </label>
     <label>
-      <input type="radio" name="pricingModel" value="provisioned"> Provisioned
+      <input type="radio" name="pricing" value="provisioned"> Provisioned
     </label>
   </div>
 
@@ -46,16 +46,6 @@
       </label>
 
       <input type="range" id="demand" min="1000" max="1000000" step="1000" value="10000">
-    </div>
-
-    <div>
-      <label for="ratioDemand">Read/Write Ratio:
-        <span id="ratioDemandDsp">50/50</span>
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
-                </span>
-      </label>
-      <input type="range" id="ratioDemand" min="0" max="100" step="1" value="50">
     </div>
   </div>
 
@@ -94,16 +84,6 @@
     </div>
 
     <div>
-      <label for="ratioProvisioned">Read/Write Ratio:
-        <span id="ratioProvisionedDsp">50/50</span>
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
-                </span>
-      </label>
-      <input type="range" id="ratioProvisioned" min="0" max="100" step="1" value="50">
-    </div>
-
-    <div>
       <label for="reservedCapacity">Reserved Capacity:
         <input type="text" id="reservedCapacityInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="reservedCapacityDsp">0%</span>
@@ -113,6 +93,16 @@
       </label>
       <input type="range" id="reservedCapacity" min="0" max="100" step="1" value="0">
     </div>
+  </div>
+
+  <div>
+    <label for="ratio">Read/Write Ratio:
+      <span id="ratioDsp">50/50</span>
+      <span class="info-icon">i
+                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
+                </span>
+    </label>
+    <input type="range" id="ratio" min="0" max="100" step="1" value="50">
   </div>
 
   <a href="#" id="tableLink">▼ Tables</a>
@@ -131,14 +121,14 @@
     </div>
 
     <div>
-      <label for="storage">Global Table Replicated Regions:
-        <input type="text" id="replicatedRegionsInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="replicatedRegionsDsp">0</span>
+      <label for="regions">Global Table Replicated Regions:
+        <input type="text" id="regionsInp" style="display: none; width: 80px; cursor: pointer;">
+        <span id="regionsDsp">0</span>
         <span class="info-icon">i
             <span class="tooltip-text">Enter the number of regions where your data is replicated as a Global Table.</span>
         </span>
         </label>
-        <input type="range" id="replicatedRegions" min="0" max="24" step="1" value="0">
+        <input type="range" id="regions" min="0" max="24" step="1" value="0">
     </div>
   </div>
 
@@ -146,25 +136,25 @@
 
   <div id="storageParams" style="display: none;">
     <div>
-      <label for="itemSize">Item Size:
+      <label for="itemSizeB">Item Size:
         <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="itemSizeDsp">1 KB</span>
         <span class="info-icon">i
             <span class="tooltip-text">Enter your average item size (all attributes).</span>
         </span>
       </label>
-      <input type="range" id="itemSize" min="64" max="409600" step="64" value="1024">
+      <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
     </div>
 
     <div>
-      <label for="storage">Storage:
+      <label for="storageGB">Storage:
         <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="storageDsp">512 GB</span>
         <span class="info-icon">i
             <span class="tooltip-text">Enter your total data storage size.</span>
         </span>
       </label>
-      <input type="range" id="storage" min="128" max="102400" step="128" value="512">
+      <input type="range" id="storageGB" min="128" max="102400" step="128" value="512">
     </div>
   </div>
 
