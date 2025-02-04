@@ -39,6 +39,10 @@ export function calculateScyllaCosts() {
     };
 }
 
+function getPricing() {
+    cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
+}
+
 function getTableClass() {
     cfg.tableClass = document.getElementById('tableClass').value;
 }
@@ -166,40 +170,6 @@ function calculateDaxCosts() {
     cfg.dynamoDaxCost = cfg.daxNodes * cfg.hoursPerMonth * cfg.daxInstanceClassCost;
 }
 
-export function updateCosts() {
-    getSelectedPricingModel();
-    getTableClass();
-    getReplicatedRegions()
-    getStorageValues();
-    getConsistencyValues();
-    getRatioValues();
-    getDemandValues();
-    getProvisionedValues();
-    getDaxValues();
-
-    calculateProvisionedCosts();
-    calculateDemandCosts();
-    calculateStorageCost();
-    calculateTotalOpsSec();
-    calculateNetworkCosts();
-    calculateDaxCosts();
-
-    cfg.dynamoCostTotal = cfg.pricing === 'demand' ?
-        cfg.dynamoCostDemand + cfg.dynamoCostStorage :
-        cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
-
-    cfg.dynamoCostTotal = cfg.dynamoCostTotal + cfg.dynamoCostNetwork + cfg.dynamoCostReplication + cfg.dynamoDaxCost;
-
-    const scyllaResult = calculateScyllaCosts();
-
-    const savings = cfg.dynamoCostTotal / 2;
-    const costRatio = (cfg.dynamoCostTotal / scyllaResult.scyllaCost).toFixed(1);
-
-    document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
-
-    logCosts(scyllaResult, costRatio);
-}
-
 export function calculateStorageCost() {
     cfg.dynamoCostStorage = cfg.storageGB * 0.25;
 }
@@ -208,10 +178,6 @@ function calculateTotalOpsSec() {
     cfg.readsOpsSec = cfg.pricing === 'demand' ? cfg.demand * cfg.readRatio : cfg.baseline *  cfg.readRatio;
     cfg.writesOpsSec = cfg.pricing === 'demand' ? cfg.demand *  cfg.writeRatio : cfg.baseline *  cfg.writeRatio;
     cfg.totalOpsSec = cfg.readsOpsSec + cfg.writesOpsSec;
-}
-
-function getSelectedPricingModel() {
-    cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
 }
 
 function logCosts(scyllaResult, costRatio) {
@@ -286,4 +252,38 @@ export function updateOps() {
             return `Total Workload: ${totalOpsInMillionsSeries0.toFixed(0)}M ops/month, Pricing coverage: ${coveragePercentage.toFixed(0)}%`;
         };
     }
+}
+
+export function updateCosts() {
+    getPricing();
+    getTableClass();
+    getReplicatedRegions()
+    getStorageValues();
+    getConsistencyValues();
+    getRatioValues();
+    getDemandValues();
+    getProvisionedValues();
+    getDaxValues();
+
+    calculateProvisionedCosts();
+    calculateDemandCosts();
+    calculateStorageCost();
+    calculateTotalOpsSec();
+    calculateNetworkCosts();
+    calculateDaxCosts();
+
+    cfg.dynamoCostTotal = cfg.pricing === 'demand' ?
+        cfg.dynamoCostDemand + cfg.dynamoCostStorage :
+        cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
+
+    cfg.dynamoCostTotal = cfg.dynamoCostTotal + cfg.dynamoCostNetwork + cfg.dynamoCostReplication + cfg.dynamoDaxCost;
+
+    const scyllaResult = calculateScyllaCosts();
+
+    const savings = cfg.dynamoCostTotal / 2;
+    const costRatio = (cfg.dynamoCostTotal / scyllaResult.scyllaCost).toFixed(1);
+
+    document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
+
+    logCosts(scyllaResult, costRatio);
 }
