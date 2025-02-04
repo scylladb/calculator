@@ -5,8 +5,8 @@ export const cfg = {
     peak:               100000,
     peakWidth:          1,
     hoursPerMonth:      730,
-    itemSize:           1024,
-    storage:            512,
+    itemSizeB:          1024,
+    storageGB:          512,
     tableClass:         'standard',
     // Demand
     pricePerRRU:        0.000000125,

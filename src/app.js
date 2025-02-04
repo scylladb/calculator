@@ -91,8 +91,8 @@ setupSliderInteraction('demandDsp', 'demandInp', 'demand', formatNumber);
 setupSliderInteraction('baselineDsp', 'baselineInp', 'baseline', formatNumber);
 setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
 setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
-setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSize', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
-setupSliderInteraction('storageDsp', 'storageInp', 'storage', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
+setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
+setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
 setupSliderInteraction('replicatedRegionsDsp', 'replicatedRegionsInp', 'replicatedRegions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
@@ -177,20 +177,20 @@ document.getElementById('reservedCapacity').addEventListener('input', (event) =>
     updateAll();
 });
 
-document.getElementById('storage').addEventListener('input', (event) => {
+document.getElementById('storageGB').addEventListener('input', (event) => {
     const storageGB = parseInt(event.target.value);
     document.getElementById('storageDsp').innerText = storageGB >= 1024 ? (storageGB / 1024).toFixed(2) + ' TB' : storageGB + ' GB';
     updateAll();
 });
 
-document.getElementById('storageDsp').innerText = document.getElementById('storage').value;
+document.getElementById('storageDsp').innerText = document.getElementById('storageGB').value;
 
 toggleSection('tableLink', 'tableParams', '▲ Tables', '▼ Tables');
 toggleSection('storageLink', 'storageParams', '▲ Storage', '▼ Storage');
 toggleSection('consistencyLink', 'consistencyParams', '▲ Consistency', '▼ Consistency');
 toggleSection('daxLink', 'daxParams', '▲ Accelerator (DAX)', '▼ Accelerator (DAX)');
 
-document.getElementById('itemSize').addEventListener('input', function (event) {
+document.getElementById('itemSizeB').addEventListener('input', function (event) {
     const slider = event.target;
     const value = parseInt(slider.value);
 
@@ -274,8 +274,8 @@ document.getElementById('demand').value = cfg.demand;
 document.getElementById('baseline').value = cfg.baseline;
 document.getElementById('peak').value = cfg.peak;
 document.getElementById('peakWidth').value = cfg.peakWidth;
-document.getElementById('itemSize').value = cfg.itemSize;
-document.getElementById('storage').value = cfg.storage;
+document.getElementById('itemSizeB').value = cfg.itemSizeB;
+document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('replicatedRegions').value = cfg.replicatedRegions;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 
@@ -283,7 +283,7 @@ document.getElementById('demandDsp').innerText = formatNumber(cfg.demand);
 document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
 document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
-document.getElementById('itemSizeDsp').innerText = cfg.itemSize < 1024 ? `${cfg.itemSize} B` : `${Math.floor(cfg.itemSize / 1024)} KB`;
+document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storage >= 1024 ? (cfg.storage / 1024).toFixed(2) + ' TB' : cfg.storage + ' GB';
 document.getElementById('replicatedRegionsDsp').innerText = cfg.replicatedRegions;
 document.getElementById('daxNodesDsp').innerText = cfg.daxNodes;

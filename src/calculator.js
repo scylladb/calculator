@@ -53,8 +53,8 @@ function getDaxValues() {
 }
 
 function getStorageValues() {
-    cfg.storageGB = parseInt(document.getElementById('storage').value);
-    cfg.itemSizeKB = parseInt(document.getElementById('itemSize').value) * (1 / 1024);
+    cfg.storageGB = parseInt(document.getElementById('storageGB').value);
+    cfg.itemSizeKB = parseInt(document.getElementById('itemSizeB').value) * (1 / 1024);
     cfg.itemSizeKB = cfg.itemSizeKB > 1 ? Math.floor(cfg.itemSizeKB) : cfg.itemSizeKB;
 }
 

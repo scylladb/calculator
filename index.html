@@ -131,7 +131,7 @@
     </div>
 
     <div>
-      <label for="storage">Global Table Replicated Regions:
+      <label for="replicatedRegions">Global Table Replicated Regions:
         <input type="text" id="replicatedRegionsInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="replicatedRegionsDsp">0</span>
         <span class="info-icon">i
@@ -146,25 +146,25 @@
 
   <div id="storageParams" style="display: none;">
     <div>
-      <label for="itemSize">Item Size:
+      <label for="itemSizeB">Item Size:
         <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="itemSizeDsp">1 KB</span>
         <span class="info-icon">i
             <span class="tooltip-text">Enter your average item size (all attributes).</span>
         </span>
       </label>
-      <input type="range" id="itemSize" min="64" max="409600" step="64" value="1024">
+      <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
     </div>
 
     <div>
-      <label for="storage">Storage:
+      <label for="storageGB">Storage:
         <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="storageDsp">512 GB</span>
         <span class="info-icon">i
             <span class="tooltip-text">Enter your total data storage size.</span>
         </span>
       </label>
-      <input type="range" id="storage" min="128" max="102400" step="128" value="512">
+      <input type="range" id="storageGB" min="128" max="102400" step="128" value="512">
     </div>
   </div>
 

@@ -33,7 +33,7 @@ export function updateQueryParams() {
 
         params.set('pricing', cfg.pricing);
         params.set('storageGB', cfg.storageGB);
-        params.set('itemSize', cfg.itemSize);
+        params.set('itemSizeB', cfg.itemSizeB);
         params.set('tableClass', cfg.tableClass);
 
         if (cfg.pricing === 'demand') {
