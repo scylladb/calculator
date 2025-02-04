@@ -284,7 +284,7 @@ document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
 document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
-document.getElementById('storageDsp').innerText = cfg.storage >= 1024 ? (cfg.storage / 1024).toFixed(2) + ' TB' : cfg.storage + ' GB';
+document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('regionsDsp').innerText = cfg.regions;
 document.getElementById('daxNodesDsp').innerText = cfg.daxNodes;
 
