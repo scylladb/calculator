@@ -82,7 +82,7 @@ function getProvisionedValues() {
     cfg.reservedCapacity = parseInt(document.getElementById('reservedCapacity').value) / 100;
 }
 
-function calculateProvisionedCosts() {
+export function calculateProvisionedCosts() {
     cfg.writeRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB);
     cfg.readRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB / 4.0);
 
