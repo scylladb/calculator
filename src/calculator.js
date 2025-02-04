@@ -134,10 +134,9 @@ function calculateProvisionedCosts() {
     cfg.dynamoCostProvisioned = cfg.dynamoCostProvisionedMonthly + cfg.dynamoCostProvisionedUpfront / 12;
 }
 
-function calculateDemandCosts() {
+export function calculateDemandCosts() {
     cfg.readRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB / 4.0);
     cfg.writeRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB);
-
     cfg.numberReads = cfg.demand * cfg.readRatio * 3600 * cfg.hoursPerMonth;
     cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem) +
