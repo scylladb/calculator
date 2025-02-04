@@ -256,6 +256,20 @@ document.getElementById('daxInstanceClass').addEventListener('change', (event) =
 
 getQueryParams();
 
+if (cfg.pricing === 'demand') {
+    document.querySelector('input[name="pricing"][value="demand"]').checked = true;
+    document.getElementById('demandParams').style.display = 'block';
+    document.getElementById('provisionedParams').style.display = 'none';
+    chart.data.datasets[1].hidden = false;
+    chart.data.datasets[2].hidden = true;
+} else if (cfg.pricing === 'provisioned') {
+    document.querySelector('input[name="pricing"][value="provisioned"]').checked = true;
+    document.getElementById('demandParams').style.display = 'none';
+    document.getElementById('provisionedParams').style.display = 'block';
+    chart.data.datasets[1].hidden = true;
+    chart.data.datasets[2].hidden = false;
+}
+
 document.getElementById('demand').value = cfg.demand;
 document.getElementById('baseline').value = cfg.baseline;
 document.getElementById('peak').value = cfg.peak;

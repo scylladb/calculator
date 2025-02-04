@@ -1,5 +1,6 @@
 export const cfg = {
-    demand:           10000,
+    pricing:            'demand',
+    demand:             10000,
     baseline:           10000,
     peak:               100000,
     peakWidth:          1,

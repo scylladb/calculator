@@ -18,7 +18,6 @@ export function getQueryParams() {
     if (params.get('baseline')) cfg.baseline = parseInt(params.get('baseline'));
     if (params.get('peak')) cfg.peak = parseInt(params.get('peak'));
     if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
-    if (params.get('hoursPerMonth')) cfg.hoursPerMonth = parseInt(params.get('hoursPerMonth'));
     if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
     if (params.get('pricing')) cfg.pricing = params.get('pricing');
     if (params.get('replicatedRegions')) cfg.replicatedRegions = parseInt(params.get('replicatedRegions'));
@@ -33,7 +32,6 @@ export function updateQueryParams() {
         const params = new URLSearchParams(window.location.search);
 
         params.set('pricing', cfg.pricing);
-        params.set('hoursPerMonth', cfg.hoursPerMonth);
         params.set('storageGB', cfg.storageGB);
         params.set('itemSize', cfg.itemSize);
         params.set('tableClass', cfg.tableClass);
