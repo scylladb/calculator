@@ -181,7 +181,7 @@ export function updateCosts() {
     calculateNetworkCosts();
     calculateDaxCosts();
 
-    cfg.dynamoCostTotal = cfg.pricingModel === 'demand' ?
+    cfg.dynamoCostTotal = cfg.pricing === 'demand' ?
         cfg.dynamoCostDemand + cfg.dynamoCostStorage :
         cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
 
@@ -202,13 +202,13 @@ export function calculateStorageCost() {
 }
 
 function calculateTotalOpsSec() {
-    cfg.readsOpsSec = cfg.pricingModel === 'demand' ? cfg.demand * cfg.readRatioDemand : cfg.baseline *  cfg.readRatioProvisioned;
-    cfg.writesOpsSec = cfg.pricingModel === 'demand' ? cfg.demand *  cfg.writeRatioDemand : cfg.baseline *  cfg.writeRatioProvisioned;
+    cfg.readsOpsSec = cfg.pricing === 'demand' ? cfg.demand * cfg.readRatioDemand : cfg.baseline *  cfg.readRatioProvisioned;
+    cfg.writesOpsSec = cfg.pricing === 'demand' ? cfg.demand *  cfg.writeRatioDemand : cfg.baseline *  cfg.writeRatioProvisioned;
     cfg.totalOpsSec = cfg.readsOpsSec + cfg.writesOpsSec;
 }
 
 function getSelectedPricingModel() {
-    cfg.pricingModel = document.querySelector('input[name="pricingModel"]:checked').value;
+    cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
 }
 
 function logCosts(scyllaResult, costRatio) {
@@ -219,7 +219,7 @@ function logCosts(scyllaResult, costRatio) {
         minimumFractionDigits: 0, maximumFractionDigits: 0
     })}`,];
 
-    if (cfg.pricingModel === 'demand') {
+    if (cfg.pricing === 'demand') {
         logs = logs.concat([
             `dynamoCostDemandReads: $${cfg.dynamoCostDemandReads.toFixed(2)}`,
             `dynamoCostDemandWrites: $${cfg.dynamoCostDemandWrites.toFixed(2)}`,

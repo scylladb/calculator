@@ -104,7 +104,7 @@ document.getElementById('chart').onclick = function (event) {
     ourClickHandler(event);
 };
 
-document.querySelector('input[name="pricingModel"][value="demand"]').addEventListener('change', (event) => {
+document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
     const demandParams = document.getElementById('demandParams');
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
@@ -116,7 +116,7 @@ document.querySelector('input[name="pricingModel"][value="demand"]').addEventLis
     }
 });
 
-document.querySelector('input[name="pricingModel"][value="provisioned"]').addEventListener('change', (event) => {
+document.querySelector('input[name="pricing"][value="provisioned"]').addEventListener('change', (event) => {
     const demandParams = document.getElementById('demandParams');
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {

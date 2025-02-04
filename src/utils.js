@@ -20,7 +20,7 @@ export function getQueryParams() {
     if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
     if (params.get('hoursPerMonth')) cfg.hoursPerMonth = parseInt(params.get('hoursPerMonth'));
     if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
-    if (params.get('pricingModel')) cfg.pricingModel = params.get('pricingModel');
+    if (params.get('pricing')) cfg.pricing = params.get('pricing');
     if (params.get('replicatedRegions')) cfg.replicatedRegions = parseInt(params.get('replicatedRegions'));
     if (params.get('daxNodes')) cfg.daxNodes = parseInt(params.get('daxNodes'));
 }
@@ -32,13 +32,13 @@ export function updateQueryParams() {
     debounceTimeout = setTimeout(() => {
         const params = new URLSearchParams(window.location.search);
 
-        params.set('pricingModel', cfg.pricingModel);
+        params.set('pricing', cfg.pricing);
         params.set('hoursPerMonth', cfg.hoursPerMonth);
         params.set('storageGB', cfg.storageGB);
         params.set('itemSize', cfg.itemSize);
         params.set('tableClass', cfg.tableClass);
 
-        if (cfg.pricingModel === 'demand') {
+        if (cfg.pricing === 'demand') {
             params.delete('baseline');
             params.delete('peak');
             params.delete('peakWidth');
