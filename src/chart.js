@@ -19,7 +19,7 @@ function generateProvisionedData(baseline, peak, peakWidth) {
 }
 
 function generateOnDemandData() {
-    return Array.from({length: 25}, (_, i) => ({x: i, y: cfg.onDemand}));
+    return Array.from({length: 25}, (_, i) => ({x: i, y: cfg.demand}));
 }
 
 function generateWorkloadData(workload) {

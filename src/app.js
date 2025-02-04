@@ -104,7 +104,7 @@ document.getElementById('chart').onclick = function (event) {
     ourClickHandler(event);
 };
 
-document.querySelector('input[name="pricingModel"][value="onDemand"]').addEventListener('change', (event) => {
+document.querySelector('input[name="pricingModel"][value="demand"]').addEventListener('change', (event) => {
     const demandParams = document.getElementById('demandParams');
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
@@ -134,8 +134,8 @@ document.getElementById('tableClass').addEventListener('change', (event) => {
 });
 
 document.getElementById('demand').addEventListener('input', (event) => {
-    cfg.onDemand = parseInt(event.target.value);
-    document.getElementById('demandDsp').innerText = formatNumber(cfg.onDemand);
+    cfg.demand = parseInt(event.target.value);
+    document.getElementById('demandDsp').innerText = formatNumber(cfg.demand);
     updateAll();
 });
 
@@ -256,7 +256,7 @@ document.getElementById('daxInstanceClass').addEventListener('change', (event) =
 
 getQueryParams();
 
-document.getElementById('demand').value = cfg.onDemand;
+document.getElementById('demand').value = cfg.demand;
 document.getElementById('baseline').value = cfg.baseline;
 document.getElementById('peak').value = cfg.peak;
 document.getElementById('peakWidth').value = cfg.peakWidth;
@@ -265,7 +265,7 @@ document.getElementById('storage').value = cfg.storage;
 document.getElementById('replicatedRegions').value = cfg.replicatedRegions;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 
-document.getElementById('demandDsp').innerText = formatNumber(cfg.onDemand);
+document.getElementById('demandDsp').innerText = formatNumber(cfg.demand);
 document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
 document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;

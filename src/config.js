@@ -1,11 +1,12 @@
 export const cfg = {
-    onDemand:           10000,
+    demand:           10000,
     baseline:           10000,
     peak:               100000,
     peakWidth:          1,
     hoursPerMonth:      730,
     itemSize:           1024,
     storage:            512,
+    tableClass:         'standard',
     // Demand
     pricePerRRU:        0.000000125,
     pricePerWRU:        0.000000625,

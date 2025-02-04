@@ -14,7 +14,7 @@ export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
 
     if (params.get('workload')) cfg.workload = params.get('workload');
-    if (params.get('onDemand')) cfg.onDemand = parseInt(params.get('onDemand'));
+    if (params.get('demand')) cfg.demand = parseInt(params.get('demand'));
     if (params.get('baseline')) cfg.baseline = parseInt(params.get('baseline'));
     if (params.get('peak')) cfg.peak = parseInt(params.get('peak'));
     if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
@@ -36,14 +36,15 @@ export function updateQueryParams() {
         params.set('hoursPerMonth', cfg.hoursPerMonth);
         params.set('storageGB', cfg.storageGB);
         params.set('itemSize', cfg.itemSize);
+        params.set('tableClass', cfg.tableClass);
 
-        if (cfg.pricingModel === 'onDemand') {
+        if (cfg.pricingModel === 'demand') {
             params.delete('baseline');
             params.delete('peak');
             params.delete('peakWidth');
-            params.set('onDemand', cfg.onDemand);
+            params.set('demand', cfg.demand);
         } else {
-            params.delete('onDemand');
+            params.delete('demand');
             params.set('baseline', cfg.baseline);
             params.set('peak', cfg.peak);
             params.set('peakWidth', cfg.peakWidth);
