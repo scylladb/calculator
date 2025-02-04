@@ -63,7 +63,7 @@ export function updateQueryParams() {
         }
 
         window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
-    }, 2000); // Adjust the delay as needed
+    }, 1000); // Adjust the delay as needed
 }
 
 export function updateAll() {
