@@ -102,7 +102,8 @@ export const chart = new Chart(ctx, {
                 }, ticks: {
                     stepSize: 1, callback: function (value) {
                         return value.toString().padStart(2, '0') + ':00';
-                    }
+                    },
+                    display: false
                 }
             }, y: {
                 type: 'logarithmic', title: {

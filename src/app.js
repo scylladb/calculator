@@ -39,7 +39,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-export function ourClickHandler(event) {
+export function clickHandler(event) {
     const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
     const xValue = chart.scales.x.getValueForPixel(canvasPosition.x);
     const yValue = chart.scales.y.getValueForPixel(canvasPosition.y);
@@ -47,13 +47,14 @@ export function ourClickHandler(event) {
     const datasetIndex = 0;
     const dataset = chart.data.datasets[datasetIndex];
 
-    if (event.shiftKey) {
+    if (event.altKey) {
         // Remove the last point from the dataset
         if (dataset.data.length > 0) {
             dataset.data.pop();
             updateAll();
         }
-    } else {
+    } else if (event.shiftKey) {
+        // add point to the dataset
         if (xValue > chart.scales.x.min && xValue < chart.scales.x.max && yValue > chart.scales.y.min && yValue < chart.scales.y.max) {
             dataset.data.push({ x: xValue, y: yValue });
             updateAll();
@@ -63,7 +64,7 @@ export function ourClickHandler(event) {
 
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Shift') {
-        document.getElementById('chart').style.cursor = 'not-allowed';
+        document.getElementById('chart').style.cursor = 'copy';
     }
 });
 
@@ -97,11 +98,11 @@ setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
 document.getElementById('chart').onclick = function (event) {
-    ourClickHandler(event);
+    clickHandler(event);
 };
 
 document.getElementById('chart').onclick = function (event) {
-    ourClickHandler(event);
+    clickHandler(event);
 };
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
