@@ -20,7 +20,7 @@ export function getQueryParams() {
     if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
     if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
     if (params.get('pricing')) cfg.pricing = params.get('pricing');
-    if (params.get('replicatedRegions')) cfg.replicatedRegions = parseInt(params.get('replicatedRegions'));
+    if (params.get('regions')) cfg.regions = parseInt(params.get('regions'));
     if (params.get('daxNodes')) cfg.daxNodes = parseInt(params.get('daxNodes'));
 }
 
@@ -56,14 +56,14 @@ export function updateQueryParams() {
             params.set('daxInstanceClass', cfg.daxInstanceClass);
         }
 
-        if (cfg.replicatedRegions === 0) {
-            params.delete('replicatedRegions');
+        if (cfg.regions === 0) {
+            params.delete('regions');
         } else {
-            params.set('replicatedRegions', cfg.replicatedRegions);
+            params.set('regions', cfg.regions);
         }
 
         window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
-    }, 1000); // Adjust the delay as needed
+    }, 1000);
 }
 
 export function updateAll() {
