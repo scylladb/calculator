@@ -1,6 +1,6 @@
 import {cfg} from './config.js';
 import {chart} from "./chart.js";
-import {formatNumber, updateSavedCosts} from "./utils.js";
+import {formatNumber, getQueryParams, updateSavedCosts} from "./utils.js";
 
 const scyllaPrices = [{
     family: "i4i", instance: "i4i.xlarge", baseline: 78000, peak: 120000, storage: 937, price: 3.325
@@ -74,7 +74,7 @@ function getDemandValues() {
 
 function getProvisionedValues() {
     cfg.peakHours = cfg.peakWidth * 30;
-    cfg.baselineHours = cfg.totalHoursPerMonth - cfg.peakHours;
+    cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
     cfg.reservedCapacity = parseInt(document.getElementById('reservedCapacity').value) / 100;
     cfg.readRatioProvisioned = parseInt(document.getElementById('ratioProvisioned').value) / 100;
     cfg.writeRatioProvisioned = 1 - cfg.readRatioProvisioned;
@@ -136,13 +136,13 @@ function calculateDemandCosts() {
     cfg.readRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB / 4.0);
     cfg.writeRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB);
 
-    cfg.numberReads = cfg.onDemand * cfg.readRatioDemand * 3600 * cfg.totalHoursPerMonth;
+    cfg.numberReads = cfg.onDemand * cfg.readRatioDemand * 3600 * cfg.hoursPerMonth;
     cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem);
     cfg.dynamoCostDemandReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
-    cfg.numberWrites = cfg.onDemand * cfg.writeRatioDemand * 3600 * cfg.totalHoursPerMonth;
+    cfg.numberWrites = cfg.onDemand * cfg.writeRatioDemand * 3600 * cfg.hoursPerMonth;
     cfg.writeRequestUnits = (cfg.numberWrites * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem) +
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
     cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
@@ -153,15 +153,15 @@ function calculateDemandCosts() {
 }
 
 function calculateNetworkCosts() {
-    cfg.totalReadsKB = cfg.readsOpsSec * 3600 * cfg.totalHoursPerMonth * cfg.itemSizeKB;
-    cfg.totalWritesKB = cfg.writesOpsSec * 3600 * cfg.totalHoursPerMonth * cfg.itemSizeKB;
+    cfg.totalReadsKB = cfg.readsOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
+    cfg.totalWritesKB = cfg.writesOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalReplicatedWritesGB =( cfg.replicatedRegions * cfg.totalWritesKB) / 1024 / 1024;
     cfg.dynamoCostNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
 function calculateDaxCosts() {
     cfg.daxInstanceClassCost = cfg.daxInstanceClassCosts[cfg.daxInstanceClass];
-    cfg.dynamoDaxCost = cfg.daxNodes * cfg.totalHoursPerMonth * cfg.daxInstanceClassCost;
+    cfg.dynamoDaxCost = cfg.daxNodes * cfg.hoursPerMonth * cfg.daxInstanceClassCost;
 }
 
 export function updateCosts() {
@@ -181,7 +181,7 @@ export function updateCosts() {
     calculateNetworkCosts();
     calculateDaxCosts();
 
-    cfg.dynamoCostTotal = cfg.selectedPricingModel === 'onDemand' ?
+    cfg.dynamoCostTotal = cfg.pricingModel === 'onDemand' ?
         cfg.dynamoCostDemand + cfg.dynamoCostStorage :
         cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
 
@@ -195,8 +195,6 @@ export function updateCosts() {
     document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
 
     logCosts(scyllaResult, costRatio);
-
-    chart.update();
 }
 
 export function calculateStorageCost() {
@@ -204,13 +202,13 @@ export function calculateStorageCost() {
 }
 
 function calculateTotalOpsSec() {
-    cfg.readsOpsSec = cfg.selectedPricingModel === 'onDemand' ? cfg.onDemand * cfg.readRatioDemand : cfg.baseline *  cfg.readRatioProvisioned;
-    cfg.writesOpsSec = cfg.selectedPricingModel === 'onDemand' ? cfg.onDemand *  cfg.writeRatioDemand : cfg.baseline *  cfg.writeRatioProvisioned;
+    cfg.readsOpsSec = cfg.pricingModel === 'onDemand' ? cfg.onDemand * cfg.readRatioDemand : cfg.baseline *  cfg.readRatioProvisioned;
+    cfg.writesOpsSec = cfg.pricingModel === 'onDemand' ? cfg.onDemand *  cfg.writeRatioDemand : cfg.baseline *  cfg.writeRatioProvisioned;
     cfg.totalOpsSec = cfg.readsOpsSec + cfg.writesOpsSec;
 }
 
 function getSelectedPricingModel() {
-    cfg.selectedPricingModel = document.querySelector('input[name="pricingModel"]:checked').value;
+    cfg.pricingModel = document.querySelector('input[name="pricingModel"]:checked').value;
 }
 
 function logCosts(scyllaResult, costRatio) {
@@ -221,7 +219,7 @@ function logCosts(scyllaResult, costRatio) {
         minimumFractionDigits: 0, maximumFractionDigits: 0
     })}`,];
 
-    if (cfg.selectedPricingModel === 'onDemand') {
+    if (cfg.pricingModel === 'onDemand') {
         logs = logs.concat([
             `dynamoCostDemandReads: $${cfg.dynamoCostDemandReads.toFixed(2)}`,
             `dynamoCostDemandWrites: $${cfg.dynamoCostDemandWrites.toFixed(2)}`,
@@ -284,6 +282,5 @@ export function updateOps() {
         chart.options.plugins.tooltip.callbacks.title = function () {
             return `Total Workload: ${totalOpsInMillionsSeries0.toFixed(0)}M ops/month, Pricing coverage: ${coveragePercentage.toFixed(0)}%`;
         };
-        chart.update();
     }
 }

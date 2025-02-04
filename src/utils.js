@@ -1,3 +1,7 @@
+import { cfg } from './config.js';
+import {updateCosts, updateOps} from "./calculator.js";
+import {chart, updateChart} from "./chart.js";
+
 export function formatNumber(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(0) + 'B';
     if (num >= 1e6) return (num / 1e6).toFixed(0) + 'M';
@@ -6,14 +10,48 @@ export function formatNumber(num) {
     return num.toString();
 }
 
-function getQueryParams() {
+export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
-    return {
-        workload: params.get('workload') || 'morningPeak'
-    };
+
+    if (params.get('workload')) cfg.workload = params.get('workload');
+    if (params.get('onDemand')) cfg.onDemand = parseInt(params.get('onDemand'));
+    if (params.get('baseline')) cfg.baseline = parseInt(params.get('baseline'));
+    if (params.get('peak')) cfg.peak = parseInt(params.get('peak'));
+    if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
+    if (params.get('hoursPerMonth')) cfg.hoursPerMonth = parseInt(params.get('hoursPerMonth'));
+    if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
+    if (params.get('pricingModel')) cfg.pricingModel = params.get('pricingModel');
+    if (params.get('replicatedRegions')) cfg.replicatedRegions = parseInt(params.get('replicatedRegions'));
+    if (params.get('daxNodes')) cfg.daxNodes = parseInt(params.get('daxNodes'));
 }
 
-export const queryParams = getQueryParams();
+let debounceTimeout;
+
+export function updateQueryParams() {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        params.set('onDemand', cfg.onDemand);
+        params.set('baseline', cfg.baseline);
+        params.set('peak', cfg.peak);
+        params.set('peakWidth', cfg.peakWidth);
+        params.set('hoursPerMonth', cfg.hoursPerMonth);
+        params.set('storageGB', cfg.storageGB);
+        params.set('pricingModel', cfg.pricingModel);
+        params.set('replicatedRegions', cfg.replicatedRegions);
+        params.set('daxNodes', cfg.daxNodes);
+
+        window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+    }, 2000); // Adjust the delay as needed
+}
+
+export function updateAll() {
+    updateQueryParams();
+    updateChart();
+    updateOps();
+    updateCosts();
+}
 
 export function updateSavedCosts(logs) {
     const costDiffPanel = document.getElementById('costSavedTip');

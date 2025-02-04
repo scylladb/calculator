@@ -3,7 +3,9 @@ export const cfg = {
     baseline:           10000,
     peak:               100000,
     peakWidth:          1,
-    totalHoursPerMonth: 730,
+    hoursPerMonth:      730,
+    itemSize:           1024,
+    storage:            512,
     // Demand
     pricePerRRU:        0.000000125,
     pricePerWRU:        0.000000625,
@@ -15,11 +17,13 @@ export const cfg = {
     pricePerRCU_IA:     0.00016,
     pricePerWCU_IA:     0.00081,
     // Replicated
+    replicatedRegions:  0,
     pricePerRWRU:       0.000000625,
     pricePerRWRU_IA:    0.000000780,
     // Data Transfer
     priceIntraRegPerGB: 0.02,
     // DAX Node Costs
+    daxNodes:           0,
     daxInstanceClassCosts: {
     r5Large:            0.25500000,
     r5XLarge:           0.50900000,

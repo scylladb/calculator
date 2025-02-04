@@ -1,10 +1,9 @@
 import {cfg} from './config.js';
-import {updateCosts, updateOps} from "./calculator.js";
-import {formatNumber, queryParams} from "./utils.js";
+import {formatNumber, updateAll} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
-export function generateProvisionedData(baseline, peak, peakWidth) {
+function generateProvisionedData(baseline, peak, peakWidth) {
     const data = [];
     const peakStart = Math.floor((24 - peakWidth) / 2);
     const peakEnd = peakStart + peakWidth;
@@ -19,11 +18,11 @@ export function generateProvisionedData(baseline, peak, peakWidth) {
     return data;
 }
 
-export function generateOnDemandData() {
+function generateOnDemandData() {
     return Array.from({length: 25}, (_, i) => ({x: i, y: cfg.onDemand}));
 }
 
-export function generateWorkloadData(workload) {
+function generateWorkloadData(workload) {
     switch (workload) {
         case 'twiceDaily':
             return [{x: 0, y: 5000}, {x: 6, y: 10000}, {x: 8, y: 100000}, {x: 10, y: 10000}, {x: 12, y: 5000}, {
@@ -38,9 +37,11 @@ export function generateWorkloadData(workload) {
     }
 }
 
-export let onDemandData = generateOnDemandData();
-export let provisionedData = generateProvisionedData(cfg.baseline, cfg.peak, cfg.peakWidth);
-export let workloadData = generateWorkloadData(queryParams.workload);
+export function updateChart() {
+    chart.data.datasets[1].data = generateOnDemandData();
+    chart.data.datasets[2].data = generateProvisionedData(cfg.baseline, cfg.peak, cfg.peakWidth);
+    chart.update();
+}
 
 export const chart = new Chart(ctx, {
     type: 'scatter', data: {
@@ -48,14 +49,14 @@ export const chart = new Chart(ctx, {
             label: "Workload",
             borderColor: '#0F1040',
             backgroundColor: 'rgba(170,170,170,0.5)',
-            data: workloadData,
+            data: generateWorkloadData(cfg.workload),
             fill: true,
             showLine: true,
             borderDash: [4, 4],
             tension: 0.3
         }, {
             label: 'On Demand',
-            data: onDemandData,
+            data: generateOnDemandData(),
             borderColor: '#0F1040',
             backgroundColor: 'rgba(15,16,64,0.8)',
             showLine: true,
@@ -64,7 +65,7 @@ export const chart = new Chart(ctx, {
             tension: 0.1,
         }, {
             label: 'Provisioned',
-            data: provisionedData,
+            data: generateProvisionedData(),
             borderColor: '#0F1040',
             backgroundColor: 'rgba(15,16,64,0.8)',
             fill: true,
@@ -90,8 +91,8 @@ export const chart = new Chart(ctx, {
                     value.x = Math.round(value.x);
                     value.y = Math.round(value.y / 1000) * 1000;
                 }, onDragEnd: function (e, datasetIndex, index, value) {
-                    updateOps();
                     chart.update();
+                    updateAll();
                 }, dragX: true, dragY: true
             }
         }, scales: {
@@ -120,11 +121,3 @@ export const chart = new Chart(ctx, {
         }
     }
 });
-
-export function updateChart() {
-    chart.data.datasets[1].data = Array.from({length: 25}, (_, i) => ({x: i, y: cfg.onDemand}));
-    chart.data.datasets[2].data = generateProvisionedData(cfg.baseline, cfg.peak, cfg.peakWidth);
-    chart.update();
-    updateOps();
-    updateCosts();
-}

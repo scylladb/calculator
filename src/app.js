@@ -1,7 +1,8 @@
 import {cfg} from './config.js';
-import {chart, updateChart} from "./chart.js";
-import {updateCosts, updateOps} from "./calculator.js";
-import {formatNumber} from "./utils.js";
+import {chart} from "./chart.js";
+import {formatNumber, getQueryParams, updateAll} from "./utils.js";
+
+
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
     const display = document.getElementById(displayId);
@@ -21,7 +22,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
             slider.value = newValue;
             display.innerText = formatFunction(newValue);
-            updateChart();
+            updateAll();
         }
         input.style.display = 'none';
         display.style.display = 'inline';
@@ -36,7 +37,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
 
     slider.addEventListener('input', function (event) {
         display.innerText = formatFunction(parseInt(event.target.value));
-        updateChart();
+        updateAll();
     });
 }
 
@@ -52,14 +53,12 @@ export function ourClickHandler(event) {
         // Remove the last point from the dataset
         if (dataset.data.length > 0) {
             dataset.data.pop();
-            updateOps();
-            chart.update();
+            updateAll();
         }
     } else {
         if (xValue > chart.scales.x.min && xValue < chart.scales.x.max && yValue > chart.scales.y.min && yValue < chart.scales.y.max) {
             dataset.data.push({ x: xValue, y: yValue });
-            updateOps();
-            chart.update();
+            updateAll();
         }
     }
 }
@@ -115,9 +114,7 @@ document.querySelector('input[name="pricingModel"][value="onDemand"]').addEventL
         provisionedParams.style.display = 'none';
         chart.data.datasets[1].hidden = false;
         chart.data.datasets[2].hidden = true;
-        chart.update();
-        updateOps();
-        updateCosts();
+        updateAll();
     }
 });
 
@@ -129,65 +126,63 @@ document.querySelector('input[name="pricingModel"][value="provisioned"]').addEve
         provisionedParams.style.display = 'block';
         chart.data.datasets[1].hidden = true;
         chart.data.datasets[2].hidden = false;
-        chart.update();
-        updateOps();
-        updateCosts();
+        updateAll();
     }
 });
 
 document.getElementById('tableClass').addEventListener('change', (event) => {
     cfg.tableClass = event.target.value;
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('demand').addEventListener('input', (event) => {
     cfg.onDemand = parseInt(event.target.value);
     document.getElementById('demandDsp').innerText = formatNumber(cfg.onDemand);
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('ratioDemand').addEventListener('input', (event) => {
     const readRatio = parseInt(event.target.value);
     const writeRatio = 100 - readRatio;
     document.getElementById('ratioDemandDsp').innerText = `${readRatio}/${writeRatio}`;
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('baseline').addEventListener('input', (event) => {
     cfg.baseline = parseInt(event.target.value);
     document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('peakWidth').addEventListener('input', (event) => {
     cfg.peakWidth = Math.max(1, parseInt(event.target.value));
     document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('peak').addEventListener('input', (event) => {
     cfg.peak = parseInt(event.target.value);
     document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('ratioProvisioned').addEventListener('input', (event) => {
     const readRatio = parseInt(event.target.value);
     const writeRatio = 100 - readRatio;
     document.getElementById('ratioProvisionedDsp').innerText = `${readRatio}/${writeRatio}`;
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('reservedCapacity').addEventListener('input', (event) => {
     cfg.reservedCapacity = parseInt(event.target.value);
     document.getElementById('reservedCapacityDsp').innerText = `${formatNumber(cfg.reservedCapacity)}%`;
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('storage').addEventListener('input', (event) => {
     const storageGB = parseInt(event.target.value);
     document.getElementById('storageDsp').innerText = storageGB >= 1024 ? (storageGB / 1024).toFixed(2) + ' TB' : storageGB + ' GB';
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('storageDsp').innerText = document.getElementById('storage').value;
@@ -214,13 +209,13 @@ document.getElementById('itemSize').addEventListener('input', function (event) {
         displayValue = `${Math.floor(value / 1024)} KB`;
     }
     document.getElementById('itemSizeDsp').innerText = displayValue;
-    updateChart();
+    updateAll();
 });
 
 document.getElementById('writeTrans').addEventListener('input', (event) => {
     const transactional = parseInt(event.target.value);
     document.getElementById('writeConsistencyDsp').innerText = transactional === 0 ? 'Non Transactional' : transactional === 100 ? 'Transactional' : `${transactional}% Transactional (${100 - transactional}% Non Transactional)`;
-    updateChart();
+    updateAll();
 });
 
 export const readConst = document.getElementById('readConst');
@@ -239,7 +234,7 @@ export function updateReadConsistency() {
     } else {
         display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%, Transactional: ${transactional}%`;
     }
-    updateChart();
+    updateAll();
 }
 
 readConst.addEventListener('input', () => {
@@ -258,8 +253,27 @@ readTrans.addEventListener('input', () => {
 
 document.getElementById('daxInstanceClass').addEventListener('change', (event) => {
     cfg.daxInstanceClass = event.target.value;
-    updateChart();
+    updateAll();
 });
 
-updateOps();
-updateCosts();
+getQueryParams();
+
+document.getElementById('demand').value = cfg.onDemand;
+document.getElementById('baseline').value = cfg.baseline;
+document.getElementById('peak').value = cfg.peak;
+document.getElementById('peakWidth').value = cfg.peakWidth;
+document.getElementById('itemSize').value = cfg.itemSize;
+document.getElementById('storage').value = cfg.storage;
+document.getElementById('replicatedRegions').value = cfg.replicatedRegions;
+document.getElementById('daxNodes').value = cfg.daxNodes;
+
+document.getElementById('demandDsp').innerText = formatNumber(cfg.onDemand);
+document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
+document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
+document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
+document.getElementById('itemSizeDsp').innerText = cfg.itemSize < 1024 ? `${cfg.itemSize} B` : `${Math.floor(cfg.itemSize / 1024)} KB`;
+document.getElementById('storageDsp').innerText = cfg.storage >= 1024 ? (cfg.storage / 1024).toFixed(2) + ' TB' : cfg.storage + ' GB';
+document.getElementById('replicatedRegionsDsp').innerText = cfg.replicatedRegions;
+document.getElementById('daxNodesDsp').innerText = cfg.daxNodes;
+
+updateAll();
