@@ -139,10 +139,11 @@ document.getElementById('demand').addEventListener('input', (event) => {
     updateAll();
 });
 
-document.getElementById('ratioDemand').addEventListener('input', (event) => {
-    const readRatio = parseInt(event.target.value);
+document.getElementById('ratio').addEventListener('input', (event) => {
+    cfg.ratio = parseInt(event.target.value);
+    const readRatio = cfg.ratio;
     const writeRatio = 100 - readRatio;
-    document.getElementById('ratioDemandDsp').innerText = `${readRatio}/${writeRatio}`;
+    document.getElementById('ratioDsp').innerText = `${readRatio}/${writeRatio}`;
     updateAll();
 });
 
@@ -164,10 +165,10 @@ document.getElementById('peak').addEventListener('input', (event) => {
     updateAll();
 });
 
-document.getElementById('ratioProvisioned').addEventListener('input', (event) => {
+document.getElementById('ratio').addEventListener('input', (event) => {
     const readRatio = parseInt(event.target.value);
     const writeRatio = 100 - readRatio;
-    document.getElementById('ratioProvisionedDsp').innerText = `${readRatio}/${writeRatio}`;
+    document.getElementById('ratioDsp').innerText = `${readRatio}/${writeRatio}`;
     updateAll();
 });
 
@@ -276,6 +277,7 @@ document.getElementById('peak').value = cfg.peak;
 document.getElementById('peakWidth').value = cfg.peakWidth;
 document.getElementById('itemSizeB').value = cfg.itemSizeB;
 document.getElementById('storageGB').value = cfg.storageGB;
+document.getElementById('ratio').value = cfg.ratio;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 
@@ -285,6 +287,7 @@ document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
 document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
+document.getElementById('ratioDsp').innerText = `${cfg.ratio}/${100 - cfg.ratio}`;
 document.getElementById('regionsDsp').innerText = cfg.regions;
 document.getElementById('daxNodesDsp').innerText = cfg.daxNodes;
 

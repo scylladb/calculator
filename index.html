@@ -47,16 +47,6 @@
 
       <input type="range" id="demand" min="1000" max="1000000" step="1000" value="10000">
     </div>
-
-    <div>
-      <label for="ratioDemand">Read/Write Ratio:
-        <span id="ratioDemandDsp">50/50</span>
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
-                </span>
-      </label>
-      <input type="range" id="ratioDemand" min="0" max="100" step="1" value="50">
-    </div>
   </div>
 
   <div id="provisionedParams" style="display: none;">
@@ -94,16 +84,6 @@
     </div>
 
     <div>
-      <label for="ratioProvisioned">Read/Write Ratio:
-        <span id="ratioProvisionedDsp">50/50</span>
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
-                </span>
-      </label>
-      <input type="range" id="ratioProvisioned" min="0" max="100" step="1" value="50">
-    </div>
-
-    <div>
       <label for="reservedCapacity">Reserved Capacity:
         <input type="text" id="reservedCapacityInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="reservedCapacityDsp">0%</span>
@@ -113,6 +93,16 @@
       </label>
       <input type="range" id="reservedCapacity" min="0" max="100" step="1" value="0">
     </div>
+  </div>
+
+  <div>
+    <label for="ratio">Read/Write Ratio:
+      <span id="ratioDsp">50/50</span>
+      <span class="info-icon">i
+                    <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
+                </span>
+    </label>
+    <input type="range" id="ratio" min="0" max="100" step="1" value="50">
   </div>
 
   <a href="#" id="tableLink">▼ Tables</a>

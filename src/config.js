@@ -7,6 +7,7 @@ export const cfg = {
     hoursPerMonth:      730,
     itemSizeB:          1024,
     storageGB:          512,
+    ratio:              50,
     tableClass:         'standard',
     // Demand
     pricePerRRU:        0.000000125,

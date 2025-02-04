@@ -19,6 +19,8 @@ export function getQueryParams() {
     if (params.get('peak')) cfg.peak = parseInt(params.get('peak'));
     if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
     if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
+    if (params.get('itemSizeB')) cfg.itemSizeB = parseInt(params.get('itemSizeB'));
+    if (params.get('ratio')) cfg.ratio = parseInt(params.get('ratio'));
     if (params.get('pricing')) cfg.pricing = params.get('pricing');
     if (params.get('regions')) cfg.regions = parseInt(params.get('regions'));
     if (params.get('daxNodes')) cfg.daxNodes = parseInt(params.get('daxNodes'));
@@ -35,6 +37,7 @@ export function updateQueryParams() {
         params.set('storageGB', cfg.storageGB);
         params.set('itemSizeB', cfg.itemSizeB);
         params.set('tableClass', cfg.tableClass);
+        params.set('ratio', cfg.ratio);
 
         if (cfg.pricing === 'demand') {
             params.delete('baseline');
