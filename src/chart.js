@@ -106,15 +106,16 @@ export const chart = new Chart(ctx, {
                     display: false
                 }
             }, y: {
-                type: 'logarithmic', title: {
+                type: 'linear', title: {
                     display: true, text: 'op/sec'
-                }, min: 1000, max: 10000000, ticks: {
+                }, min: 1000, max: 1000000, ticks: {
                     callback: function (value) {
                         if (value === 1000) return '1K';
                         if (value === 10000) return '10K';
+                        if (value === 50000) return '50K';
                         if (value === 100000) return '100K';
+                        if (value === 500000) return '500K';
                         if (value === 1000000) return '1M';
-                        if (value === 10000000) return '10M';
                         return null;
                     }
                 }
