@@ -177,36 +177,26 @@ function calculateTotalOpsSec() {
 
 function logCosts(scyllaResult, costRatio) {
     let logs = [
-        `itemSizeKB: ${cfg.itemSizeKB} KB`,
-        `storageGB: ${cfg.storageGB} GB`,
-        `totalOpsSec: ${cfg.totalOpsSec.toLocaleString(undefined, {
-        minimumFractionDigits: 0, maximumFractionDigits: 0
-    })}`,];
+        `Storage: $${cfg.dynamoCostStorage.toFixed(2)}`,];
 
     if (cfg.pricing === 'demand') {
         logs = logs.concat([
-            `dynamoCostDemandReads: $${cfg.dynamoCostDemandReads.toFixed(2)}`,
-            `dynamoCostDemandWrites: $${cfg.dynamoCostDemandWrites.toFixed(2)}`,
-            `dynamoCostDemand: $${cfg.dynamoCostDemand.toFixed(2)}`,]);
+            `Monthly writes: $${cfg.dynamoCostDemandWrites.toFixed(2)}`,
+            `Monthly reads: $${cfg.dynamoCostDemandReads.toFixed(2)}`]);
     } else {
         logs = logs.concat([
-            `dynamoCostMonthlyWCU: $${cfg.dynamoCostMonthlyWCU.toFixed(2)}`,
-            `dynamoCostUpfrontWCU: $${cfg.dynamoCostUpfrontWCU.toFixed(2)}`,
-            `dynamoCostMonthlyRCU: $${cfg.dynamoCostMonthlyRCU.toFixed(2)}`,
-            `dynamoCostUpfrontRCU: $${cfg.dynamoCostUpfrontRCU.toFixed(2)}`,]);
+            `Monthly writes: $${cfg.dynamoCostMonthlyWCU.toFixed(2)}`,
+            `Upfront writes (monthly): $${cfg.dynamoCostUpfrontWCU.toFixed(2)}`,
+            `Monthly reads: $${cfg.dynamoCostMonthlyRCU.toFixed(2)}`,
+            `Upfront reads (monthly): $${cfg.dynamoCostUpfrontRCU.toFixed(2)}`,]);
     }
 
     logs = logs.concat([
-        `dynamoCostNetwork: $${cfg.dynamoCostNetwork.toFixed(2)}`,
-        `dynamoCostReplication: $${cfg.dynamoCostReplication.toFixed(2)}`,
-        `dynamoDaxCost: $${cfg.dynamoDaxCost.toFixed(2)}`,
-        `dynamoCostStorage: $${cfg.dynamoCostStorage.toFixed(2)}`,
-        `dynamoCostTotal: $${cfg.dynamoCostTotal.toFixed(2)}`,
-        `scyllaCost: $${scyllaResult.scyllaCost.toFixed(2)}`,
-        `costRatio: ${costRatio}`,
-        `nodeCount: ${scyllaResult.nodeCount}`,
-        `family: ${scyllaResult.family}`]);
-
+        `Network transfer: $${cfg.dynamoCostNetwork.toFixed(2)}`,
+        `Replication: $${cfg.dynamoCostReplication.toFixed(2)}`,
+        `DAX: $${cfg.dynamoDaxCost.toFixed(2)}`,
+        `---: ---`,
+        `Total cost/month: $${cfg.dynamoCostTotal.toFixed(2)}`]);
     console.log("config", cfg);
     updateSavedCosts(logs);
 }

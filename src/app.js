@@ -187,6 +187,7 @@ document.getElementById('storageGB').addEventListener('input', (event) => {
 
 document.getElementById('storageDsp').innerText = document.getElementById('storageGB').value;
 
+toggleSection('costLink', 'costParams', '▲ Costs', '▼ Costs');
 toggleSection('tableLink', 'tableParams', '▲ Tables', '▼ Tables');
 toggleSection('storageLink', 'storageParams', '▲ Storage', '▼ Storage');
 toggleSection('consistencyLink', 'consistencyParams', '▲ Consistency', '▼ Consistency');

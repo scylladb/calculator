@@ -77,10 +77,10 @@ export function updateAll() {
 }
 
 export function updateSavedCosts(logs) {
-    const costDiffPanel = document.getElementById('costSavedTip');
+    const costDiffPanel = document.getElementById('costs');
     costDiffPanel.style.display = 'block';
     costDiffPanel.innerHTML = logs.map(log => {
         const [key, value] = log.split(': ');
-        return `<div class="cost-entry"><span class="cost-key">${key}:</span><span class="cost-value">${value}</span></div>`;
+        return `<div class="cost-entry"><span class="cost-key">${key}</span><span class="cost-value">${value}</span></div>`;
     }).join('');
 }
