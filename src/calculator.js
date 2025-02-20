@@ -192,8 +192,8 @@ function logCosts(scyllaResult, costRatio) {
     }
 
     logs = logs.concat([
+        `Global replication: $${cfg.dynamoCostReplication.toFixed(2)}`,
         `Network transfer: $${cfg.dynamoCostNetwork.toFixed(2)}`,
-        `Replication: $${cfg.dynamoCostReplication.toFixed(2)}`,
         `DAX: $${cfg.dynamoDaxCost.toFixed(2)}`,
         `---: ---`,
         `Total cost/month: $${cfg.dynamoCostTotal.toFixed(2)}`]);
