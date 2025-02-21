@@ -42,7 +42,6 @@ export function updateQueryParams() {
             params.delete('baseline');
             params.delete('peak');
             params.delete('peakWidth');
-            params.set('demand', cfg.demand);
         } else {
             params.delete('demand');
             params.set('baseline', cfg.baseline);
@@ -50,15 +49,15 @@ export function updateQueryParams() {
             params.set('peakWidth', cfg.peakWidth);
         }
 
-        if (cfg.daxNodes === 0) {
-            params.delete('daxNodes');
-            params.delete('daxInstanceClass');
+        if (cfg.cacheSizeGB === 0) {
+            params.delete('cacheSizeGB');
+            params.delete('cacheRatio');
         } else {
-            params.set('daxNodes', cfg.daxNodes);
-            params.set('daxInstanceClass', cfg.daxInstanceClass);
+            params.set('cacheSizeGB', cfg.cacheSizeGB);
+            params.set('cacheRatio', cfg.cacheRatio);
         }
 
-        if (cfg.regions === 0) {
+        if (cfg.regions === 1) {
             params.delete('regions');
         } else {
             params.set('regions', cfg.regions);
