@@ -22,7 +22,8 @@ export function getQueryParams() {
     if (params.get('ratio')) cfg.ratio = parseInt(params.get('ratio'));
     if (params.get('pricing')) cfg.pricing = params.get('pricing');
     if (params.get('regions')) cfg.regions = parseInt(params.get('regions'));
-    if (params.get('daxNodes')) cfg.daxNodes = parseInt(params.get('daxNodes'));
+    if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
+    if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
 }
 
 let debounceTimeout;
