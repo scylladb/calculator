@@ -88,7 +88,6 @@ export function toggleSection(linkId, sectionId, expandedText, collapsedText) {
     });
 }
 
-setupSliderInteraction('demandDsp', 'demandInp', 'demand', formatNumber);
 setupSliderInteraction('baselineDsp', 'baselineInp', 'baseline', formatNumber);
 setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
 setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
@@ -106,37 +105,23 @@ document.getElementById('chart').onclick = function (event) {
 };
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
-    const demandParams = document.getElementById('demandParams');
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
-        demandParams.style.display = 'block';
         provisionedParams.style.display = 'none';
-        chart.data.datasets[1].hidden = false;
-        chart.data.datasets[2].hidden = true;
         updateAll();
     }
 });
 
 document.querySelector('input[name="pricing"][value="provisioned"]').addEventListener('change', (event) => {
-    const demandParams = document.getElementById('demandParams');
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
-        demandParams.style.display = 'none';
         provisionedParams.style.display = 'block';
-        chart.data.datasets[1].hidden = true;
-        chart.data.datasets[2].hidden = false;
         updateAll();
     }
 });
 
 document.getElementById('tableClass').addEventListener('change', (event) => {
     cfg.tableClass = event.target.value;
-    updateAll();
-});
-
-document.getElementById('demand').addEventListener('input', (event) => {
-    cfg.demand = parseInt(event.target.value);
-    document.getElementById('demandDsp').innerText = formatNumber(cfg.demand);
     updateAll();
 });
 
@@ -233,7 +218,8 @@ export function updateReadConsistency() {
     } else if (eventuallyConsistent === 100) {
         display.innerText = `Eventually Consistent`;
     } else {
-        display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%, Transactional: ${transactional}%`;
+        // display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%, Transactional: ${transactional}%`;
+        display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%`;
     }
     updateAll();
 }
@@ -261,19 +247,12 @@ getQueryParams();
 
 if (cfg.pricing === 'demand') {
     document.querySelector('input[name="pricing"][value="demand"]').checked = true;
-    document.getElementById('demandParams').style.display = 'block';
     document.getElementById('provisionedParams').style.display = 'none';
-    chart.data.datasets[1].hidden = false;
-    chart.data.datasets[2].hidden = true;
 } else if (cfg.pricing === 'provisioned') {
     document.querySelector('input[name="pricing"][value="provisioned"]').checked = true;
-    document.getElementById('demandParams').style.display = 'none';
     document.getElementById('provisionedParams').style.display = 'block';
-    chart.data.datasets[1].hidden = true;
-    chart.data.datasets[2].hidden = false;
 }
 
-document.getElementById('demand').value = cfg.demand;
 document.getElementById('baseline').value = cfg.baseline;
 document.getElementById('peak').value = cfg.peak;
 document.getElementById('peakWidth').value = cfg.peakWidth;
@@ -283,7 +262,6 @@ document.getElementById('ratio').value = cfg.ratio;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 
-document.getElementById('demandDsp').innerText = formatNumber(cfg.demand);
 document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
 document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;

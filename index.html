@@ -14,7 +14,7 @@
 <body>
 <div class="container">
   <canvas id="chart" width="800" height="400"></canvas>
-  <div class="cost">
+  <div class="cost" style="display: none;">
     <p>
       <span id="costDiff">$0</span>
       <span id="costDiffMo">/mo</span>
@@ -32,60 +32,45 @@
     </label>
   </div>
 
-
   <div id="costParams">
     <span id="costs" class="costs"></span>
   </div>
   <a href="#" id="costLink">▲ Costs</a>
 
-  <div id="demandParams">
-    <div>
-      <label for="demand">On Demand:
-        <input type="text" id="demandInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="demandDsp" style="cursor: pointer;">50K</span> ops/sec
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the number of operations per second that your workload will use.</span>
+  <div>
+    <label for="baseline">Baseline:
+      <input type="text" id="baselineInp" style="display: none; width: 80px; cursor: pointer;">
+      <span id="baselineDsp">50K</span> ops/sec
+      <span class="info-icon">i
+                    <span class="tooltip-text">Enter the number of operations per second that your workload needs during off-peak periods.</span>
                 </span>
-      </label>
+    </label>
+    <input type="range" id="baseline" min="1000" max="1000000" step="1000" value="50000">
+  </div>
 
-      <input type="range" id="demand" min="1000" max="1000000" step="1000" value="50000">
-    </div>
+  <div>
+    <label for="peak">Peak:
+      <input type="text" id="peakInp" style="display: none; width: 80px; cursor: pointer;">
+      <span id="peakDsp">500K</span> ops/sec
+      <span class="info-icon">i
+                    <span class="tooltip-text">Enter the maximum number of operations per second that your workload needs during peak periods.</span>
+                </span>
+    </label>
+    <input type="range" id="peak" min="1000" max="1000000" step="1000" value="500000">
+  </div>
+
+  <div>
+    <label for="peakWidth">Peak:
+      <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
+      <span id="peakWidthDsp">1</span> hours per day
+      <span class="info-icon">i
+                    <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
+                </span>
+    </label>
+    <input type="range" id="peakWidth" min="1" max="24" value="1">
   </div>
 
   <div id="provisionedParams" style="display: none;">
-    <div>
-      <label for="baseline">Baseline:
-        <input type="text" id="baselineInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="baselineDsp">50K</span> ops/sec
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the number of operations per second that your workload needs during off-peak periods.</span>
-                </span>
-      </label>
-      <input type="range" id="baseline" min="1000" max="1000000" step="1000" value="50000">
-    </div>
-
-    <div>
-      <label for="peak">Peak:
-        <input type="text" id="peakInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="peakDsp">500K</span> ops/sec
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the maximum number of operations per second that your workload needs during peak periods.</span>
-                </span>
-      </label>
-      <input type="range" id="peak" min="1000" max="1000000" step="1000" value="500000">
-    </div>
-
-    <div>
-      <label for="peakWidth">Peak:
-        <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="peakWidthDsp">1</span> hours per day
-        <span class="info-icon">i
-                    <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
-                </span>
-      </label>
-      <input type="range" id="peakWidth" min="1" max="24" value="1">
-    </div>
-
     <div>
       <label for="reservedCapacity">Reserved Capacity:
         <input type="text" id="reservedCapacityInp" style="display: none; width: 80px; cursor: pointer;">
@@ -108,6 +93,17 @@
     <input type="range" id="ratio" min="0" max="100" step="1" value="50">
   </div>
 
+  <div>
+    <label for="itemSizeB">Operation Size:
+      <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
+      <span id="itemSizeDsp">1 KB</span>
+      <span class="info-icon">i
+            <span class="tooltip-text">Enter your average operation size (all attributes).</span>
+        </span>
+    </label>
+    <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
+  </div>
+
   <a href="#" id="tableLink">▼ Tables</a>
 
   <div id="tableParams" style="display: none;">
@@ -124,31 +120,20 @@
     </div>
 
     <div>
-      <label for="regions">Global Tables:
+      <label for="regions">Number of Data Centers:
         <input type="text" id="regionsInp" style="display: none; width: 80px; cursor: pointer;">
         <span id="regionsDsp">1</span>
         <span class="info-icon">i
             <span class="tooltip-text">Enter the number of additional regions where your data is replicated as a Global Table.</span>
         </span>
         </label>
-        <input type="range" id="regions" min="0" max="24" step="1" value="0">
+        <input type="range" id="regions" min="1" max="24" step="1" value="1">
     </div>
   </div>
 
   <a href="#" id="storageLink">▼ Storage</a>
 
   <div id="storageParams" style="display: none;">
-    <div>
-      <label for="itemSizeB">Item Size:
-        <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="itemSizeDsp">1 KB</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">Enter your average item size (all attributes).</span>
-        </span>
-      </label>
-      <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
-    </div>
-
     <div>
       <label for="storageGB">Storage:
         <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
@@ -161,7 +146,7 @@
     </div>
   </div>
 
-  <a href="#" id="consistencyLink" style="display: none;">▼ Consistency</a>
+  <a href="#" id="consistencyLink">▼ Consistency</a>
 
   <div id="consistencyParams" style="display: none;">
     <div style="display: none;">
@@ -177,11 +162,11 @@
     <div class="slider-container">
       <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
         <span class="info-icon">i
-            <span class="tooltip-text">Enter read operations as eventually consistent, strongly consistent and/or transactional as a percentage.</span>
+            <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent as a percentage.</span>
         </span>
       </label>
       <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
-      <input type="range" id="readTrans" class="slider" min="0" max="100" value="0">
+      <input type="range" id="readTrans" class="slider" min="0" max="100" value="0" style="display: none;">
     </div>
   </div>
 
@@ -221,4 +206,3 @@
 
 </body>
 </html>
-

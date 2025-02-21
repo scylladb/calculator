@@ -3,7 +3,7 @@ import {formatNumber, updateAll} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
-function generateProvisionedData(baseline, peak, peakWidth) {
+function generateData(baseline, peak, peakWidth) {
     const data = [];
     const peakStart = Math.floor((24 - peakWidth) / 2);
     const peakEnd = peakStart + peakWidth;
@@ -16,10 +16,6 @@ function generateProvisionedData(baseline, peak, peakWidth) {
         }
     }
     return data;
-}
-
-function generateOnDemandData() {
-    return Array.from({length: 25}, (_, i) => ({x: i, y: cfg.demand}));
 }
 
 function generateWorkloadData(workload) {
@@ -38,8 +34,7 @@ function generateWorkloadData(workload) {
 }
 
 export function updateChart() {
-    chart.data.datasets[1].data = generateOnDemandData();
-    chart.data.datasets[2].data = generateProvisionedData(cfg.baseline, cfg.peak, cfg.peakWidth);
+    chart.data.datasets[1].data = generateData(cfg.baseline, cfg.peak, cfg.peakWidth);
     chart.update();
 }
 
@@ -55,24 +50,15 @@ export const chart = new Chart(ctx, {
             borderDash: [4, 4],
             tension: 0.3
         }, {
-            label: 'On Demand',
-            data: generateOnDemandData(),
-            borderColor: '#0F1040',
-            backgroundColor: 'rgba(15,16,64,0.8)',
-            showLine: true,
-            pointRadius: 0,
-            fill: true,
-            tension: 0.1,
-        }, {
             label: 'Provisioned',
-            data: generateProvisionedData(),
+            data: generateData(),
             borderColor: '#0F1040',
             backgroundColor: 'rgba(15,16,64,0.8)',
             fill: true,
             tension: 0.1,
             showLine: true,
             pointRadius: 0,
-            hidden: true
+            hidden: false
         }]
     }, options: {
         plugins: {

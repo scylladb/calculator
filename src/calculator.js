@@ -73,12 +73,13 @@ function getRatioValues() {
 }
 
 function getDemandValues() {
-    cfg.demand = parseInt(document.getElementById('demand').value);
+    cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
+    cfg.peakHours = cfg.peakWidth * 30;
 }
 
 function getProvisionedValues() {
-    cfg.peakHours = cfg.peakWidth * 30;
     cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
+    cfg.peakHours = cfg.peakWidth * 30;
     cfg.reservedCapacity = parseInt(document.getElementById('reservedCapacity').value) / 100;
 }
 
@@ -102,7 +103,7 @@ export function calculateProvisionedCosts() {
     cfg.provisionedPeakWCUHours = Math.ceil(cfg.provisionedPeakWCU * cfg.peakHours);
     cfg.provisionedTotalWCUHours = Math.ceil(cfg.provisionedBaselineWCUHours + cfg.provisionedPeakWCUHours);
     cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    cfg.dynamoCostReplication = cfg.regions * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
+    cfg.dynamoCostReplication = (cfg.regions - 1) * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
     cfg.dynamoCostReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
     cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU + cfg.dynamoCostReplication;
     cfg.dynamoCostUpfrontWCU = cfg.reservedWCU * 1.50;
@@ -137,18 +138,18 @@ export function calculateProvisionedCosts() {
 export function calculateDemandCosts() {
     cfg.readRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB / 4.0);
     cfg.writeRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB);
-    cfg.numberReads = cfg.demand * cfg.readRatio * 3600 * cfg.hoursPerMonth;
+    cfg.numberReads = (cfg.baseline * cfg.readRatio * 3600 * cfg.baselineHours) + (cfg.peak * cfg.readRatio * 3600 * cfg.peakHours);
     cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem);
     cfg.dynamoCostDemandReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
-    cfg.numberWrites = cfg.demand * cfg.writeRatio * 3600 * cfg.hoursPerMonth;
+    cfg.numberWrites = (cfg.baseline * cfg.writeRatio * 3600 * cfg.baselineHours) + (cfg.peak * cfg.writeRatio * 3600 * cfg.peakHours);
     cfg.writeRequestUnits = (cfg.numberWrites * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem) +
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
     cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
-    cfg.dynamoCostReplication = cfg.regions * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
+    cfg.dynamoCostReplication = (cfg.regions -1) * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
 
     cfg.dynamoCostDemand = cfg.dynamoCostDemandReads + cfg.dynamoCostDemandWrites + cfg.dynamoCostReplication;
 }
@@ -156,7 +157,7 @@ export function calculateDemandCosts() {
 function calculateNetworkCosts() {
     cfg.totalReadsKB = cfg.readsOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalWritesKB = cfg.writesOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
-    cfg.totalReplicatedWritesGB =( cfg.regions * cfg.totalWritesKB) / 1024 / 1024;
+    cfg.totalReplicatedWritesGB =((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
     cfg.dynamoCostNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
@@ -170,12 +171,12 @@ export function calculateStorageCost() {
 }
 
 function calculateTotalOpsSec() {
-    cfg.readsOpsSec = cfg.pricing === 'demand' ? cfg.demand * cfg.readRatio : cfg.baseline *  cfg.readRatio;
-    cfg.writesOpsSec = cfg.pricing === 'demand' ? cfg.demand *  cfg.writeRatio : cfg.baseline *  cfg.writeRatio;
+    cfg.readsOpsSec = cfg.baseline *  cfg.readRatio;
+    cfg.writesOpsSec = cfg.baseline *  cfg.writeRatio;
     cfg.totalOpsSec = cfg.readsOpsSec + cfg.writesOpsSec;
 }
 
-function logCosts(scyllaResult, costRatio) {
+function logCosts() {
     let logs = [
         `Storage: $${cfg.dynamoCostStorage.toFixed(2)}`,];
 
@@ -197,7 +198,7 @@ function logCosts(scyllaResult, costRatio) {
         `DAX: $${cfg.dynamoDaxCost.toFixed(2)}`,
         `---: ---`,
         `Total cost/month: $${cfg.dynamoCostTotal.toFixed(2)}`]);
-    console.log("config", cfg);
+
     updateSavedCosts(logs);
 }
 
@@ -270,5 +271,5 @@ export function updateCosts() {
 
     document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
 
-    logCosts(scyllaResult, costRatio);
+    logCosts();
 }

@@ -14,7 +14,6 @@ export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
 
     if (params.get('workload')) cfg.workload = params.get('workload');
-    if (params.get('demand')) cfg.demand = parseInt(params.get('demand'));
     if (params.get('baseline')) cfg.baseline = parseInt(params.get('baseline'));
     if (params.get('peak')) cfg.peak = parseInt(params.get('peak'));
     if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
