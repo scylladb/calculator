@@ -94,7 +94,6 @@ setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => val
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
-setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
 document.getElementById('chart').onclick = function (event) {
     clickHandler(event);
@@ -238,8 +237,18 @@ readTrans.addEventListener('input', () => {
     updateReadConsistency();
 });
 
-document.getElementById('daxInstanceClass').addEventListener('change', (event) => {
-    cfg.daxInstanceClass = event.target.value;
+document.getElementById('cacheSize').addEventListener('input', (event) => {
+    const cacheSizeGB = parseInt(event.target.value);
+    document.getElementById('cacheSizeDsp').innerText = cacheSizeGB >= 1024 ? (cacheSizeGB / 1024).toFixed(2) + ' TB' : cacheSizeGB + ' GB';
+    cfg.cacheSizeGB = cacheSizeGB;
+    updateAll();
+});
+
+document.getElementById('cacheRatio').addEventListener('input', (event) => {
+    const cacheHitRatio = parseInt(event.target.value);
+    const cacheMissRatio = 100 - cacheHitRatio;
+    document.getElementById('cacheRatioDsp').innerText = `${cacheHitRatio}/${cacheMissRatio}`;
+    cfg.cacheRatio = cacheHitRatio;
     updateAll();
 });
 
@@ -260,7 +269,8 @@ document.getElementById('itemSizeB').value = cfg.itemSizeB;
 document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('ratio').value = cfg.ratio;
 document.getElementById('regions').value = cfg.regions;
-document.getElementById('daxNodes').value = cfg.daxNodes;
+document.getElementById('cacheSize').value = cfg.cacheSizeGB;
+document.getElementById('cacheRatio').value = cfg.cacheRatio;
 
 document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
@@ -269,6 +279,7 @@ document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('ratioDsp').innerText = `${cfg.ratio}/${100 - cfg.ratio}`;
 document.getElementById('regionsDsp').innerText = cfg.regions;
-document.getElementById('daxNodesDsp').innerText = cfg.daxNodes;
+document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
+document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 
 updateAll();

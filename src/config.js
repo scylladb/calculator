@@ -27,17 +27,19 @@ export const cfg = {
     // Data Transfer
     priceIntraRegPerGB: 0.02,
     // DAX Node Costs
+    cacheSizeGB:        0,
+    cacheRatio:         0,
     daxNodes:           0,
-    daxInstanceClassCosts: {
-    r5Large:            0.25500000,
-    r5XLarge:           0.50900000,
-    r52XLarge:          1.01700000,
-    r54XLarge:          2.03400000,
-    r58XLarge:          4.06900000,
-    r512XLarge:         6.11700000,
-    r516XLarge:         8.13700000,
-    r524XLarge:        12.23400000,
-    },
+    daxInstanceClassCosts: [
+        { instance: "dax.r5.large", memory: 16, nps: 75000, price: 0.25500000 },
+        { instance: "dax.r5.xlarge", memory: 32, nps: 150000, price: 0.50900000 },
+        { instance: "dax.r5.2xlarge", memory: 64, nps: 300000, price: 1.01700000 },
+        { instance: "dax.r5.4xlarge", memory: 128, nps: 600000, price: 2.03400000 },
+        { instance: "dax.r5.8xlarge", memory: 256, nps: 1000000, price: 4.06900000 },
+        { instance: "dax.r5.12xlarge", memory: 384, nps: 1000000, price: 6.12000000 },
+        { instance: "dax.r5.16xlarge", memory: 512, nps: 1000000, price: 8.13700000 },
+        { instance: "dax.r5.24xlarge", memory: 768, nps: 1000000, price: 12.24000000 },
+    ],
     scyllaPrices: [
         {
             family: "i4i", instance: "i4i.xlarge", baseline: 78000, peak: 120000, storage: 937, price: 3.325

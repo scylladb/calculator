@@ -174,32 +174,41 @@
 
   <div id="daxParams" style="display: none;">
     <div>
-      <label for="daxInstanceClass">Instance Class:
-        <select id="daxInstanceClass">
-          <option value="r5Large">dax.r5.large | 2vCPU 16GB RAM</option>
-          <option value="r5XLarge">dax.r5.xlarge | 4vCPU 32GB RAM</option>
-          <option value="r52XLarge">dax.r5.2xlarge | 8vCPU 64GB RAM</option>
-          <option value="r54XLarge">dax.r5.4xlarge | 16vCPU 128GB RAM</option>
-          <option value="r58XLarge">dax.r5.8xlarge | 32vCPU 256GB RAM</option>
-          <option value="r512XLarge">dax.r5.12xlarge | 48vCPU 384GB RAM</option>
-          <option value="r516XLarge">dax.r5.16xlarge | 64vCPU 512GB RAM</option>
-          <option value="r524XLarge">dax.r5.24xlarge | 96vCPU 768GB RAM</option>
-        </select>
+      <label for="cacheSize">Dataset Size:
+        <span id="cacheSizeDsp">0</span>
         <span class="info-icon">i
-          <span class="tooltip-text">Select the instance class for your workload.</span>
+            <span class="tooltip-text">Enter the dataset memory size that your cache will use.</span>
+        </span>
+      </label>
+      <input type="range" id="cacheSize" min="0" max="10240" step="64" value="0">
+    </div>
+
+    <div>
+      <label for="cacheRatio">Hit/Miss Ratio:
+        <span id="cacheRatioDsp">0/100</span>
+        <span class="info-icon">i
+            <span class="tooltip-text">Enter the hit miss ratio that your cache will use.</span>
+        </span>
+      </label>
+      <input type="range" id="cacheRatio" min="0" max="100" step="1" value="0">
+    </div>
+
+    <div>
+      <label>Instance Class:
+        <span id="daxInstanceClass">none</span>
+        <span class="info-icon">i
+            <span class="tooltip-text">This is the recommended instance class for your workload.</span>
         </span>
       </label>
     </div>
 
     <div>
-      <label for="daxNodes">Number of Nodes:
-        <input type="text" id="daxNodesInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="daxNodesDsp">0</span>
+      <label>Number of Nodes:
+        <span id="daxNodes">0</span>
         <span class="info-icon">i
-            <span class="tooltip-text">Enter the number of nodes for your workload.</span>
+            <span class="tooltip-text">This is the recommended minimum number of nodes for your workload.</span>
         </span>
       </label>
-      <input type="range" id="daxNodes" min="0" max="24" step="3" value="0">
     </div>
   </div>
 </div>

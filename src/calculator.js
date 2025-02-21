@@ -48,7 +48,6 @@ function getReplicatedRegions() {
 }
 
 function getDaxValues() {
-    cfg.daxNodes = parseInt(document.getElementById('daxNodes').value);
     cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
 }
 
@@ -161,9 +160,63 @@ function calculateNetworkCosts() {
     cfg.dynamoCostNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
+function findBestDaxCombination(targetRPS) {
+    let bestCombination = null;
+
+    cfg.daxInstanceClassCosts.forEach(instance => {
+        for (let nodes = 3; nodes <= 128; nodes += 3) { // Adjust the range as needed
+            const totalMemory = nodes * instance.memory;
+            const totalCost = nodes * instance.price;
+
+            if (totalMemory >= cfg.cacheSizeGB) {
+                if (!bestCombination || nodes < bestCombination.nodes ||
+                    (nodes === bestCombination.nodes && totalCost < bestCombination.totalCost)) {
+                    bestCombination = {
+                        instance: instance.instance,
+                        nodes: nodes,
+                        totalMemory: totalMemory,
+                        totalCost: totalCost,
+                        targetRPS: targetRPS
+                    };
+                }
+            }
+        }
+    });
+
+    return bestCombination;
+}
+
 function calculateDaxCosts() {
-    cfg.daxInstanceClassCost = cfg.daxInstanceClassCosts[cfg.daxInstanceClass];
-    cfg.dynamoDaxCost = cfg.daxNodes * cfg.hoursPerMonth * cfg.daxInstanceClassCost;
+    if (cfg.cacheSizeGB === 0) {
+        cfg.dynamoDaxCost = 0;
+        document.getElementById('daxInstanceClass').textContent = 'none';
+        document.getElementById('daxNodes').textContent = '0';
+        return;
+    }
+    let readRPS_CacheHit = cfg.baseline * cfg.ratio / 100 * cfg.cacheRatio / 100;
+    let readRPS_CacheMiss = cfg.baseline * cfg.ratio / 100 * (1 - cfg.cacheRatio / 100);
+    let readMissFactor = 1;
+    let size = cfg.itemSizeKB;
+    let writeRPS = cfg.writesOpsSec;
+    let writeFactor = 1;
+    let targetUtilization = 1 / 0.70;
+    let normalizedRPS = (readRPS_CacheHit * size) + (readRPS_CacheMiss * size * readMissFactor) + (writeRPS * writeFactor * size * 3);
+    let targetRPS = normalizedRPS * targetUtilization;
+    let bestCombination = findBestDaxCombination(targetRPS);
+
+    if (bestCombination) {
+        console.log(bestCombination);
+        cfg.daxInstanceClass = bestCombination.instance;
+        cfg.daxNodes = bestCombination.nodes;
+        cfg.daxInstanceClassCost = bestCombination.totalCost;
+        cfg.dynamoDaxCost = cfg.hoursPerMonth * cfg.daxInstanceClassCost;
+        document.getElementById('daxInstanceClass').textContent = bestCombination.instance;
+        document.getElementById('daxNodes').textContent = bestCombination.nodes;
+        cfg.dynamoCostDemandReads = cfg.dynamoCostDemandReads * (1 - cfg.cacheRatio / 100);
+        cfg.dynamoCostMonthlyRCU = cfg.dynamoCostMonthlyRCU * (1 - cfg.cacheRatio / 100);
+    } else {
+        console.error('No valid DAX combination found.');
+    }
 }
 
 export function calculateStorageCost() {
