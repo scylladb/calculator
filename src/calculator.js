@@ -231,26 +231,26 @@ function calculateTotalOpsSec() {
 
 function logCosts() {
     let logs = [
-        `Storage: $${cfg.dynamoCostStorage.toFixed(2)}`,];
+        `Storage: $${Math.floor(cfg.dynamoCostStorage).toLocaleString()}`,];
 
     if (cfg.pricing === 'demand') {
         logs = logs.concat([
-            `Monthly writes: $${cfg.dynamoCostDemandWrites.toFixed(2)}`,
-            `Monthly reads: $${cfg.dynamoCostDemandReads.toFixed(2)}`]);
+            `Monthly writes: $${Math.floor(cfg.dynamoCostDemandWrites).toLocaleString()}`,
+            `Monthly reads: $${Math.floor(cfg.dynamoCostDemandReads).toLocaleString()}`]);
     } else {
         logs = logs.concat([
-            `Monthly writes: $${cfg.dynamoCostMonthlyWCU.toFixed(2)}`,
-            `Upfront writes (monthly): $${cfg.dynamoCostUpfrontWCU.toFixed(2)}`,
-            `Monthly reads: $${cfg.dynamoCostMonthlyRCU.toFixed(2)}`,
-            `Upfront reads (monthly): $${cfg.dynamoCostUpfrontRCU.toFixed(2)}`,]);
+            `Monthly writes: $${Math.floor(cfg.dynamoCostMonthlyWCU).toLocaleString()}`,
+            `Upfront writes (monthly): $${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`,
+            `Monthly reads: $${Math.floor(cfg.dynamoCostMonthlyRCU).toLocaleString()}`,
+            `Upfront reads (monthly): $${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`,]);
     }
 
     logs = logs.concat([
-        `Global replication: $${cfg.dynamoCostReplication.toFixed(2)}`,
-        `Network transfer: $${cfg.dynamoCostNetwork.toFixed(2)}`,
-        `DAX: $${cfg.dynamoDaxCost.toFixed(2)}`,
+        `Global tables: $${Math.floor(cfg.dynamoCostReplication).toLocaleString()}`,
+        `Network transfer: $${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`,
+        `DAX: $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`,
         `---: ---`,
-        `Total cost/month: $${cfg.dynamoCostTotal.toFixed(2)}`]);
+        `Total cost/month: $${Math.floor(cfg.dynamoCostTotal).toLocaleString()}`]);
 
     updateSavedCosts(logs);
 }
