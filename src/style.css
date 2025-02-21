@@ -243,6 +243,14 @@ select:focus {
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
+.header {
+  font-size: 1.6em;
+  margin-bottom: 1.0rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .costs {
   display: flex;
   flex-direction: column;
@@ -255,6 +263,7 @@ select:focus {
   white-space: pre-wrap;
   margin: 0 auto;
   font-size: 1.2em;
+
 }
 
 .cost-entry {
