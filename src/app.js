@@ -135,6 +135,13 @@ document.getElementById('ratio').addEventListener('input', (event) => {
 document.getElementById('baseline').addEventListener('input', (event) => {
     cfg.baseline = parseInt(event.target.value);
     document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
+
+    if (cfg.peak < cfg.baseline) {
+        cfg.peak = cfg.baseline;
+        document.getElementById('peak').value = cfg.peak;
+        document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
+    }
+
     updateAll();
 });
 
@@ -145,7 +152,12 @@ document.getElementById('peakWidth').addEventListener('input', (event) => {
 });
 
 document.getElementById('peak').addEventListener('input', (event) => {
-    cfg.peak = parseInt(event.target.value);
+    let newPeak = parseInt(event.target.value);
+    if (newPeak < cfg.baseline) {
+        newPeak = cfg.baseline;
+        event.target.value = newPeak;
+    }
+    cfg.peak = newPeak;
     document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
     updateAll();
 });
