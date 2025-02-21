@@ -154,8 +154,9 @@ document.getElementById('peakWidth').addEventListener('input', (event) => {
 document.getElementById('peak').addEventListener('input', (event) => {
     let newPeak = parseInt(event.target.value);
     if (newPeak < cfg.baseline) {
-        newPeak = cfg.baseline;
-        event.target.value = newPeak;
+        cfg.baseline = newPeak;
+        document.getElementById('baseline').value = cfg.baseline;
+        document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
     }
     cfg.peak = newPeak;
     document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
