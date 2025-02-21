@@ -233,7 +233,8 @@ export function updateReadConsistency() {
     } else if (eventuallyConsistent === 100) {
         display.innerText = `Eventually Consistent`;
     } else {
-        display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%, Transactional: ${transactional}%`;
+        // display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%, Transactional: ${transactional}%`;
+        display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%`;
     }
     updateAll();
 }

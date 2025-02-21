@@ -161,7 +161,7 @@
     </div>
   </div>
 
-  <a href="#" id="consistencyLink" style="display: none;">▼ Consistency</a>
+  <a href="#" id="consistencyLink">▼ Consistency</a>
 
   <div id="consistencyParams" style="display: none;">
     <div style="display: none;">
@@ -177,11 +177,11 @@
     <div class="slider-container">
       <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
         <span class="info-icon">i
-            <span class="tooltip-text">Enter read operations as eventually consistent, strongly consistent and/or transactional as a percentage.</span>
+            <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent as a percentage.</span>
         </span>
       </label>
       <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
-      <input type="range" id="readTrans" class="slider" min="0" max="100" value="0">
+      <input type="range" id="readTrans" class="slider" min="0" max="100" value="0" style="display: none;">
     </div>
   </div>
 
