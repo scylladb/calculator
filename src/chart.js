@@ -94,7 +94,7 @@ export const chart = new Chart(ctx, {
             }, y: {
                 type: 'linear', title: {
                     display: true, text: 'op/sec'
-                }, min: 1000, max: 1000000, ticks: {
+                }, min: 1000, max: 2000000, ticks: {
                     callback: function (value) {
                         if (value === 1000) return '1K';
                         if (value === 10000) return '10K';
@@ -102,6 +102,7 @@ export const chart = new Chart(ctx, {
                         if (value === 100000) return '100K';
                         if (value === 500000) return '500K';
                         if (value === 1000000) return '1M';
+                        if (value === 2000000) return '2M';
                         return null;
                     }
                 }
