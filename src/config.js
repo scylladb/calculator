@@ -12,7 +12,7 @@ export const cfg = {
     pricePerRRU:        0.000000125,
     pricePerWRU:        0.000000625,
     pricePerRRU_IA:     0.000000155,
-    pricePerWRU_IA:     0.00000078,
+    pricePerWRU_IA:     0.000000780,
     // Provisioned
     pricePerRCU:        0.00013,
     pricePerRRCU:       0.000025,
