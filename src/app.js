@@ -205,6 +205,7 @@ document.getElementById('itemSizeB').addEventListener('input', function (event) 
     } else {
         displayValue = `${Math.floor(value / 1024)} KB`;
     }
+    cfg.itemSizeB = value;
     document.getElementById('itemSizeDsp').innerText = displayValue;
     updateAll();
 });
