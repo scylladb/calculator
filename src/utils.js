@@ -45,17 +45,9 @@ export function updateQueryParams() {
         params.set('itemSizeB', cfg.itemSizeB);
         params.set('tableClass', cfg.tableClass);
         params.set('ratio', cfg.ratio);
-
-        if (cfg.pricing === 'demand') {
-            params.delete('baseline');
-            params.delete('peak');
-            params.delete('peakWidth');
-        } else {
-            params.delete('demand');
-            params.set('baseline', cfg.baseline);
-            params.set('peak', cfg.peak);
-            params.set('peakWidth', cfg.peakWidth);
-        }
+        params.set('baseline', cfg.baseline);
+        params.set('peak', cfg.peak);
+        params.set('peakWidth', cfg.peakWidth);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
