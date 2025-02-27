@@ -1,6 +1,6 @@
 import {cfg} from './config.js';
 import {chart} from "./chart.js";
-import {formatNumber, getQueryParams, updateAll} from "./utils.js";
+import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
     const display = document.getElementById(displayId);
@@ -92,8 +92,7 @@ setupSliderInteraction('baselineDsp', 'baselineInp', 'baseline', formatNumber);
 setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
 setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
-setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => value >= 1024 ? (value / 1024).toFixed(2) + ' TB' : value + ' GB');
-setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
+setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', formatBytes);setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 
 document.getElementById('chart').onclick = function (event) {
     clickHandler(event);
@@ -178,7 +177,7 @@ document.getElementById('reservedCapacity').addEventListener('input', (event) =>
 
 document.getElementById('storageGB').addEventListener('input', (event) => {
     const storageGB = parseInt(event.target.value);
-    document.getElementById('storageDsp').innerText = storageGB >= 1024 ? (storageGB / 1024).toFixed(2) + ' TB' : storageGB + ' GB';
+    document.getElementById('storageDsp').innerText = formatBytes(storageGB * 1024 * 1024 * 1024);
     updateAll();
 });
 
