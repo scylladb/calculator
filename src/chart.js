@@ -35,6 +35,10 @@ function generateWorkloadData(workload) {
 
 export function updateChart() {
     chart.data.datasets[1].data = generateData(cfg.baseline, cfg.peak, cfg.peakWidth);
+    // Check if peak is close to the current y-axis max value
+    if (cfg.peak >= chart.options.scales.y.max * 0.98) {
+        chart.options.scales.y.max = cfg.peak * 1.2;
+    }
     chart.update();
 }
 
@@ -91,19 +95,24 @@ export const chart = new Chart(ctx, {
                     },
                     display: false
                 }
-            }, y: {
-                type: 'linear', title: {
-                    display: true, text: 'op/sec'
-                }, min: 1000, max: 2000000, ticks: {
-                    callback: function (value) {
-                        if (value === 1000) return '1K';
-                        if (value === 10000) return '10K';
-                        if (value === 50000) return '50K';
-                        if (value === 100000) return '100K';
-                        if (value === 500000) return '500K';
-                        if (value === 1000000) return '1M';
-                        if (value === 2000000) return '2M';
-                        return null;
+            },
+            y: {
+                type: 'linear',
+                title: {
+                    display: true,
+                    text: 'op/sec'
+                },
+                min: 1000,
+                max: cfg.peak * 2,
+                ticks: {
+                    callback: function (value, index, values) {
+                        if (value === values[values.length - 1].value) {
+                            return null; // Hide the max tick
+                        }
+                        if (value >= 1000 && value < 10000) return (value / 1000) + 'K';
+                        if (value >= 10000 && value < 1000000) return (value / 1000) + 'K';
+                        if (value >= 1000000) return (value / 1000000) + 'M';
+                        return value;
                     }
                 }
             }
