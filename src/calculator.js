@@ -231,45 +231,45 @@ function calculateTotalOpsSec() {
 
 function logCosts() {
     let logs = [
-        `Monthly storage cost: $${Math.floor(cfg.dynamoCostStorage).toLocaleString()}`,];
+        `Monthly storage cost: ${Math.floor(cfg.dynamoCostStorage).toLocaleString()}`,];
 
     if (cfg.pricing === 'demand') {
         logs = logs.concat([
-            `Monthly write cost: $${Math.floor(cfg.dynamoCostDemandWrites).toLocaleString()}`,
-            `Monthly read cost: $${Math.floor(cfg.dynamoCostDemandReads).toLocaleString()}`]);
+            `Monthly write cost: ${Math.floor(cfg.dynamoCostDemandWrites).toLocaleString()}`,
+            `Monthly read cost: ${Math.floor(cfg.dynamoCostDemandReads).toLocaleString()}`]);
     } else {
-        logs.push(`Monthly write cost: $${Math.floor(cfg.dynamoCostMonthlyWCU).toLocaleString()}`);
+        logs.push(`Monthly write cost: ${Math.floor(cfg.dynamoCostMonthlyWCU).toLocaleString()}`);
+
+        if (cfg.dynamoCostReplication !== 0) {
+            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.dynamoCostReplication).toLocaleString()}`);
+        }
 
         if (cfg.dynamoCostUpfrontWCU !== 0) {
-            logs.push(`Upfront write cost: $${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`);
+            logs.push(`Upfront write cost: ${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`);
         }
 
-        logs.push(`Monthly read cost: $${Math.floor(cfg.dynamoCostMonthlyRCU).toLocaleString()}`);
+        logs.push(`Monthly read cost: ${Math.floor(cfg.dynamoCostMonthlyRCU).toLocaleString()}`);
 
         if (cfg.dynamoCostUpfrontRCU !== 0) {
-            logs.push(`Upfront read cost: $${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`);
+            logs.push(`Upfront read cost: ${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`);
         }
-    }
-
-    if (cfg.dynamoCostReplication !== 0) {
-        logs.push(`Global tables: $${Math.floor(cfg.dynamoCostReplication).toLocaleString()}`);
     }
 
     if (cfg.dynamoCostNetwork !== 0) {
-        logs.push(`Network transfer: $${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`);
+        logs.push(`Monthly network cost: ${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`);
     }
 
     if (cfg.dynamoDaxCost !== 0) {
-        logs.push(`DAX: $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`);
+        logs.push(`Monthly DAX cost: ${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`);
     }
 
     logs.push(`---: ---`);
 
     if (cfg.dynamoCostTotalUpfront !== 0 && cfg.pricing === 'provisioned') {
-        logs.push(`Total upfront cost: $${Math.floor(cfg.dynamoCostTotalUpfront).toLocaleString()}`);
+        logs.push(`Total upfront cost: ${Math.floor(cfg.dynamoCostTotalUpfront).toLocaleString()}`);
     }
 
-    logs.push(`Total monthly cost: $${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`);
+    logs.push(`Total monthly cost: ${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`);
 
     updateSavedCosts(logs);
 }

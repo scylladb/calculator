@@ -263,7 +263,6 @@ select:focus {
   font-family: monospace;
   white-space: pre-wrap;
   margin: 0 auto;
-  font-size: 1.2em;
 }
 
 .cost-entry {
@@ -274,13 +273,26 @@ select:focus {
 }
 
 .cost-key {
-  color: var(--emphasisColor);
+  color: var(--textColor);
+  font-family: 'Roboto', sans-serif;
   text-align: left;
 }
 
-.cost-value {
-  color: var(--textColor);
+.dollar-sign {
+  text-align: left;
+}
+
+.number {
   text-align: right;
+  flex-grow: 1;
+}
+
+.cost-value {
+  display: flex;
+  justify-content: space-between;
+  width: 135px;
+  color: var(--emphasisColor);
+  font-size: 1.2em;
 }
 
 button {

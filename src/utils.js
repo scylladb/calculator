@@ -81,6 +81,9 @@ export function updateSavedCosts(logs) {
     costDiffPanel.style.display = 'block';
     costDiffPanel.innerHTML = logs.map(log => {
         const [key, value] = log.split(': ');
-        return `<div class="cost-entry"><span class="cost-key">${key}</span><span class="cost-value">${value}</span></div>`;
+        if (key === '---' && value === '---') {
+            return `<div class="cost-entry"><span class="cost-key"></span><span class="cost-value"><span class="dollar-sign"></span><span class="number">${value}</span></span></div>`;
+        }
+        return `<div class="cost-entry"><span class="cost-key">${key}</span><span class="cost-value"><span class="dollar-sign">$</span><span class="number">${value}</span></span></div>`;
     }).join('');
 }
