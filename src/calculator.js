@@ -245,14 +245,22 @@ function logCosts() {
             `Monthly reads (upfront): $${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`,]);
     }
 
+    if (cfg.dynamoCostReplication !== 0) {
+        logs.push(`Global tables: $${Math.floor(cfg.dynamoCostReplication).toLocaleString()}`);
+    }
+    if (cfg.dynamoCostNetwork !== 0) {
+        logs.push(`Network transfer: $${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`);
+    }
+    if (cfg.dynamoDaxCost !== 0) {
+        logs.push(`DAX: $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`);
+    }
+
     logs = logs.concat([
-        `Global tables: $${Math.floor(cfg.dynamoCostReplication).toLocaleString()}`,
-        `Network transfer: $${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`,
-        `DAX: $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`,
         `---: ---`,
         `Total upfront cost: $${Math.floor(cfg.dynamoCostTotalUpfront).toLocaleString()}`,
         `Total monthly cost: $${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`,
-        `Total monthly cost (averaged): $${Math.floor(cfg.dynamoCostTotalMonthlyAveraged).toLocaleString()}`]);
+        `Total monthly cost (averaged): $${Math.floor(cfg.dynamoCostTotalMonthlyAveraged).toLocaleString()}`,
+    ]);
 
     updateSavedCosts(logs);
 }
