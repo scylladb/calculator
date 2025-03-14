@@ -235,24 +235,30 @@ function logCosts() {
 
     if (cfg.pricing === 'demand') {
         logs = logs.concat([
-            `Monthly writes: $${Math.floor(cfg.dynamoCostDemandWrites).toLocaleString()}`,
-            `Monthly reads: $${Math.floor(cfg.dynamoCostDemandReads).toLocaleString()}`]);
+            `Monthly write cost (monthly): $${Math.floor(cfg.dynamoCostDemandWrites).toLocaleString()}`,
+            `Monthly read cost (monthly): $${Math.floor(cfg.dynamoCostDemandReads).toLocaleString()}`]);
     } else {
-        logs = logs.concat([
-            `Monthly writes: $${Math.floor(cfg.dynamoCostMonthlyWCU).toLocaleString()}`,
-            `Monthly writes (upfront): $${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`,
-            `Monthly reads: $${Math.floor(cfg.dynamoCostMonthlyRCU).toLocaleString()}`,
-            `Monthly reads (upfront): $${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`,]);
+        logs.push(`Monthly write cost (monthly): $${Math.floor(cfg.dynamoCostMonthlyWCU).toLocaleString()}`);
+
+        if (cfg.dynamoCostUpfrontWCU !== 0) {
+            logs.push(`Upfront write cost (upfront): $${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`);
+        }
+
+        logs.push(`Monthly read cost (monthly): $${Math.floor(cfg.dynamoCostMonthlyRCU).toLocaleString()}`);
+
+        if (cfg.dynamoCostUpfrontRCU !== 0) {
+            logs.push(`Upfront read cost (upfront): $${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`);
+        }
     }
 
     if (cfg.dynamoCostReplication !== 0) {
-        logs.push(`Global tables: $${Math.floor(cfg.dynamoCostReplication).toLocaleString()}`);
+        logs.push(`Global tables (monthly): $${Math.floor(cfg.dynamoCostReplication).toLocaleString()}`);
     }
     if (cfg.dynamoCostNetwork !== 0) {
-        logs.push(`Network transfer: $${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`);
+        logs.push(`Network transfer (monthly): $${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`);
     }
     if (cfg.dynamoDaxCost !== 0) {
-        logs.push(`DAX: $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`);
+        logs.push(`DAX (monthly): $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`);
     }
 
     logs = logs.concat([
