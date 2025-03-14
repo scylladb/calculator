@@ -79,7 +79,7 @@ function getDemandValues() {
 function getProvisionedValues() {
     cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
     cfg.peakHours = cfg.peakWidth * 30;
-    cfg.reserved = parseInt(document.getElementById('reservedCapacity').value) / 100;
+    cfg.reserved = parseInt(document.getElementById('reserved').value) / 100;
 }
 
 export function calculateProvisionedCosts() {
