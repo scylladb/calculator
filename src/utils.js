@@ -31,7 +31,7 @@ export function getQueryParams() {
     if (params.get('regions')) cfg.regions = parseInt(params.get('regions'));
     if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
-    if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
+    if (params.get('reserved')) cfg.reservedCapacity = parseInt(params.get('reserved'));
 }
 
 let debounceTimeout;
@@ -49,7 +49,7 @@ export function updateQueryParams() {
         params.set('baseline', cfg.baseline);
         params.set('peak', cfg.peak);
         params.set('peakWidth', cfg.peakWidth);
-        params.set('reserved', cfg.reserved);
+        params.set('reserved', cfg.reservedCapacity);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');

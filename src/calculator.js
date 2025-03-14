@@ -79,7 +79,7 @@ function getDemandValues() {
 function getProvisionedValues() {
     cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
     cfg.peakHours = cfg.peakWidth * 30;
-    cfg.reserved = parseInt(document.getElementById('reserved').value) / 100;
+    cfg.reservedCapacity = parseInt(document.getElementById('reserved').value) / 100;
 }
 
 export function calculateProvisionedCosts() {
@@ -89,7 +89,7 @@ export function calculateProvisionedCosts() {
     cfg.baselineWCUNonTransactional = cfg.baseline * cfg.writeRatio * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem;
     cfg.baselineWCUTransactional = cfg.baseline * cfg.writeRatio * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem;
     cfg.baselineWCUTotal = cfg.baselineWCUNonTransactional + cfg.baselineWCUTransactional;
-    cfg.reservedWCU = cfg.baselineWCUTotal * cfg.reserved;
+    cfg.reservedWCU = cfg.baselineWCUTotal * cfg.reservedCapacity;
     cfg.reservedWCU = Math.ceil(cfg.reservedWCU / 100.0) * 100;
     cfg.provisionedBaselineWCU = cfg.baselineWCUTotal - cfg.reservedWCU;
     cfg.provisionedBaselineWCU = Math.ceil(Math.max(cfg.provisionedBaselineWCU, 0));
@@ -111,7 +111,7 @@ export function calculateProvisionedCosts() {
     cfg.baselineRCUStronglyConsistent = cfg.baseline * cfg.readRatio * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem;
     cfg.baselineRCUTransactional = cfg.baseline * cfg.readRatio * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem;
     cfg.baselineRCUTotal = cfg.baselineRCUNonTransactional + cfg.baselineRCUStronglyConsistent + cfg.baselineRCUTransactional;
-    cfg.reservedRCU = cfg.baselineRCUTotal * cfg.reserved;
+    cfg.reservedRCU = cfg.baselineRCUTotal * cfg.reservedCapacity;
     cfg.reservedRCU = Math.ceil(cfg.reservedRCU / 100.0) * 100;
     cfg.provisionedBaselineRCU = cfg.baselineRCUTotal - cfg.reservedRCU;
     cfg.provisionedBaselineRCU = Math.ceil(Math.max(cfg.provisionedBaselineRCU, 0));

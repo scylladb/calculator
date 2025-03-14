@@ -170,8 +170,8 @@ document.getElementById('ratio').addEventListener('input', (event) => {
 });
 
 document.getElementById('reserved').addEventListener('input', (event) => {
-    cfg.reserved = parseInt(event.target.value);
-    document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
+    cfg.reservedCapacity = parseInt(event.target.value);
+    document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reservedCapacity)}%`;
     updateAll();
 });
 
