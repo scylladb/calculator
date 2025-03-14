@@ -32,6 +32,20 @@ export function getQueryParams() {
     if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
+
+    if (params.get('format') === 'json') {
+        updateAll();
+        const jsonResponse = JSON.stringify(cfg, null, 2);
+        const response = new Response(jsonResponse, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+        response.text().then(text => {
+            const blob = new Blob([text], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            window.location.href = url;
+        });
+        return;
+    }
 }
 
 let debounceTimeout;
