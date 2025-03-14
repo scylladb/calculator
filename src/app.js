@@ -169,9 +169,9 @@ document.getElementById('ratio').addEventListener('input', (event) => {
     updateAll();
 });
 
-document.getElementById('reservedCapacity').addEventListener('input', (event) => {
-    cfg.reservedCapacity = parseInt(event.target.value);
-    document.getElementById('reservedCapacityDsp').innerText = `${formatNumber(cfg.reservedCapacity)}%`;
+document.getElementById('reserved').addEventListener('input', (event) => {
+    cfg.reserved = parseInt(event.target.value);
+    document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
     updateAll();
 });
 

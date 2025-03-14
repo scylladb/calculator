@@ -48,6 +48,7 @@ export function updateQueryParams() {
         params.set('baseline', cfg.baseline);
         params.set('peak', cfg.peak);
         params.set('peakWidth', cfg.peakWidth);
+        params.set('reserved', cfg.reserved);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');

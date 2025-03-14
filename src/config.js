@@ -20,6 +20,8 @@ export const cfg = {
     pricePerRWCU:       0.000128,
     pricePerRCU_IA:     0.00016,
     pricePerWCU_IA:     0.00081,
+    // Reserved capacity
+    reserved:           0,
     // Replicated
     regions:  1,
     pricePerRWRU:       0.000000625,
