@@ -31,6 +31,7 @@ export function getQueryParams() {
     if (params.get('regions')) cfg.regions = parseInt(params.get('regions'));
     if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
+    if (params.get('reserved')) cfg.cacheRatio = parseInt(params.get('reserved'));
 }
 
 let debounceTimeout;
