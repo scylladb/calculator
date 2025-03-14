@@ -231,7 +231,7 @@ function calculateTotalOpsSec() {
 
 function logCosts() {
     let logs = [
-        `Storage: $${Math.floor(cfg.dynamoCostStorage).toLocaleString()}`,];
+        `Data storage cost (monthly): $${Math.floor(cfg.dynamoCostStorage).toLocaleString()}`,];
 
     if (cfg.pricing === 'demand') {
         logs = logs.concat([
