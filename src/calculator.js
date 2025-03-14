@@ -240,9 +240,9 @@ function logCosts() {
     } else {
         logs = logs.concat([
             `Monthly writes: $${Math.floor(cfg.dynamoCostMonthlyWCU).toLocaleString()}`,
-            `Upfront writes (monthly): $${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`,
+            `Monthly writes (upfront): $${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`,
             `Monthly reads: $${Math.floor(cfg.dynamoCostMonthlyRCU).toLocaleString()}`,
-            `Upfront reads (monthly): $${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`,]);
+            `Monthly reads (upfront): $${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`,]);
     }
 
     logs = logs.concat([
@@ -250,7 +250,8 @@ function logCosts() {
         `Network transfer: $${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`,
         `DAX: $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`,
         `---: ---`,
-        `Total cost/month: $${Math.floor(cfg.dynamoCostTotal).toLocaleString()}`]);
+        `Total upfront cost: $${Math.floor(cfg.dynamoCostTotalUpfront).toLocaleString()}`,
+        `Total monthly cost: $${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`]);
 
     updateSavedCosts(logs);
 }
@@ -311,11 +312,13 @@ export function updateCosts() {
     calculateNetworkCosts();
     calculateDaxCosts();
 
-    cfg.dynamoCostTotal = cfg.pricing === 'demand' ?
+    cfg.dynamoCostTotalMonthly = cfg.pricing === 'demand' ?
         cfg.dynamoCostDemand + cfg.dynamoCostStorage :
-        cfg.dynamoCostProvisioned + cfg.dynamoCostStorage;
+        cfg.dynamoCostProvisionedMonthly + cfg.dynamoCostStorage;
 
-    cfg.dynamoCostTotal = cfg.dynamoCostTotal + cfg.dynamoCostNetwork + cfg.dynamoCostReplication + cfg.dynamoDaxCost;
+    cfg.dynamoCostTotalUpfront = cfg.dynamoCostProvisionedUpfront;
+
+    cfg.dynamoCostTotalMonthlyAveraged = cfg.dynamoCostTotalMonthly + (cfg.dynamoCostTotalUpfront / 12) + cfg.dynamoCostNetwork + cfg.dynamoCostReplication + cfg.dynamoDaxCost;
 
     const scyllaResult = calculateScyllaCosts();
 
