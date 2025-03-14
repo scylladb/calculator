@@ -263,11 +263,12 @@ function logCosts() {
         logs.push(`DAX: $${Math.floor(cfg.dynamoDaxCost).toLocaleString()}`);
     }
 
+    logs.push(`---: ---`);
+
     if (cfg.dynamoCostTotalUpfront !== 0 && cfg.pricing === 'provisioned') {
         logs.push(`Total upfront cost: $${Math.floor(cfg.dynamoCostTotalUpfront).toLocaleString()}`);
     }
 
-    logs.push(`---: ---`);
     logs.push(`Total monthly cost: $${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`);
 
     updateSavedCosts(logs);
