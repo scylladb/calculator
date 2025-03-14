@@ -74,16 +74,19 @@ document.addEventListener('keyup', function(event) {
     }
 });
 
-export function toggleSection(linkId, sectionId, expandedText, collapsedText) {
+export function toggleSection(linkId, sectionId) {
+    document.getElementById(linkId).classList.add('foldable', 'collapsed');
     document.getElementById(linkId).addEventListener('click', function (event) {
         event.preventDefault();
         const section = document.getElementById(sectionId);
         if (section.style.display === 'none') {
             section.style.display = 'block';
-            this.textContent = expandedText;
+            this.classList.remove('collapsed');
+            this.classList.add('expanded');
         } else {
             section.style.display = 'none';
-            this.textContent = collapsedText;
+            this.classList.remove('expanded');
+            this.classList.add('collapsed');
         }
     });
 }
@@ -183,11 +186,12 @@ document.getElementById('storageGB').addEventListener('input', (event) => {
 
 document.getElementById('storageDsp').innerText = document.getElementById('storageGB').value;
 
-toggleSection('costLink', 'costParams', '▲ Costs', '▼ Costs');
-toggleSection('tableLink', 'tableParams', '▲ Tables', '▼ Tables');
-toggleSection('storageLink', 'storageParams', '▲ Storage', '▼ Storage');
-toggleSection('consistencyLink', 'consistencyParams', '▲ Consistency', '▼ Consistency');
-toggleSection('daxLink', 'daxParams', '▲ Accelerator (DAX)', '▼ Accelerator (DAX)');
+toggleSection('costLink', 'costParams');
+toggleSection('opsLink', 'opsParams');
+toggleSection('tableLink', 'tableParams');
+toggleSection('storageLink', 'storageParams');
+toggleSection('consistencyLink', 'consistencyParams');
+toggleSection('daxLink', 'daxParams');
 
 document.getElementById('itemSizeB').addEventListener('input', function (event) {
     const slider = event.target;

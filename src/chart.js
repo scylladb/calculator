@@ -42,8 +42,8 @@ export const chart = new Chart(ctx, {
     type: 'scatter', data: {
         datasets: [{
             label: "Workload",
-            borderColor: '#0F1040',
-            backgroundColor: 'rgba(170,170,170,0.5)',
+            borderColor: '#383D57',
+            backgroundColor: 'rgba(56,61,87,0.50)',
             data: generateWorkloadData(cfg.workload),
             fill: true,
             showLine: true,
@@ -52,8 +52,8 @@ export const chart = new Chart(ctx, {
         }, {
             label: 'Provisioned',
             data: generateData(),
-            borderColor: '#0F1040',
-            backgroundColor: 'rgba(15,16,64,0.8)',
+            borderColor: '#383D57',
+            backgroundColor: 'rgba(56,61,87,0.50)',
             fill: true,
             tension: 0.1,
             showLine: true,
