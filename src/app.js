@@ -170,8 +170,8 @@ document.getElementById('ratio').addEventListener('input', (event) => {
 });
 
 document.getElementById('reserved').addEventListener('input', (event) => {
-    cfg.reservedCapacity = parseInt(event.target.value);
-    document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reservedCapacity)}%`;
+    cfg.reserved = parseInt(event.target.value);
+    document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
     updateAll();
 });
 
@@ -284,6 +284,7 @@ document.getElementById('ratio').value = cfg.ratio;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
+document.getElementById('reserved').value = cfg.reserved;
 
 document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
