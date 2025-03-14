@@ -295,5 +295,6 @@ document.getElementById('ratioDsp').innerText = `${cfg.ratio}/${100 - cfg.ratio}
 document.getElementById('regionsDsp').innerText = cfg.regions;
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
+document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
 
 updateAll();
