@@ -83,6 +83,10 @@ input[type="range"] {
   transition: opacity .2s;
 }
 
+input[type="range"]:disabled {
+  background: darkgray;
+}
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -201,6 +205,9 @@ input[type="radio"]:checked::after {
   margin-left: -400px;
   opacity: 0;
   transition: opacity 0.3s;
+  font-size: 1.2em;
+  font-weight: normal;
+  line-height: normal;
 }
 
 .info-icon:hover .tooltip-text {

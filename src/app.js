@@ -123,6 +123,11 @@ document.querySelector('input[name="pricing"][value="provisioned"]').addEventLis
 
 document.getElementById('tableClass').addEventListener('change', (event) => {
     cfg.tableClass = event.target.value;
+    if (cfg.tableClass === 'infrequentAccess') {
+        document.getElementById('reserved').disabled = true;
+    } else {
+        document.getElementById('reserved').disabled = false;
+    }
     updateAll();
 });
 
