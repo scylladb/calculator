@@ -284,7 +284,7 @@ button {
   background: var(--emphasisColor);
   border-radius: 5px;
   color: var(--backgroundColor);
-  font-family: 'Roboto';
+  font-family: 'Roboto', serif;
   font-style: normal;
   font-weight: 500;
   font-size: 15px;
