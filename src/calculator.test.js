@@ -66,6 +66,7 @@ describe('calculateDemandCosts', () => {
     });
 
     it('should calculate the correct demand costs', () => {
+        // https://calculator.aws/#/estimate?id=9b4e4e2001b6ca5814d06f76346b4285ab3e6b4b
         calculateDemandCosts();
         calculateStorageCost();
 
@@ -107,6 +108,7 @@ describe('calculateProvisionedCosts', () => {
     });
 
     it('should calculate the correct provisioned costs', () => {
+        // https://calculator.aws/#/estimate?id=af7692f740cb3805a1604855478a753ccce36a91
         calculateProvisionedCosts();
         calculateStorageCost();
 
@@ -152,6 +154,7 @@ describe('calculateReservedCosts', () => {
     });
 
     it('should calculate the correct reserved costs', () => {
+        // https://calculator.aws/#/estimate?id=edc2264f3f8d69b642ef73e44225a2a130fdf9a3
         calculateProvisionedCosts();
         calculateStorageCost();
 
