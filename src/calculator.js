@@ -58,7 +58,8 @@ function getStorageValues() {
 }
 
 function getConsistencyValues() {
-    cfg.readStronglyConsistent = parseInt(document.getElementById('readConst').value) / 100;
+    cfg.readConst = parseInt(document.getElementById('readConst').value);
+    cfg.readStronglyConsistent = cfg.readConst / 100;
     cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
     cfg.readTransactional = parseInt(document.getElementById('readTrans').value) / 100;
     cfg.readNonTransactional = 1 - cfg.readTransactional;

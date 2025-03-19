@@ -8,6 +8,7 @@ export const cfg = {
     storageGB:          512,
     ratio:              50,
     tableClass:         'standard',
+    readConst:          100,
     // Demand
     pricePerRRU:        0.000000125,
     pricePerWRU:        0.000000625,

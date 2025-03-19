@@ -32,6 +32,7 @@ export function getQueryParams() {
     if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
+    if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
 
     if (params.get('format') === 'json') {
         updateAll();
@@ -64,6 +65,7 @@ export function updateQueryParams() {
         params.set('peak', cfg.peak);
         params.set('peakWidth', cfg.peakWidth);
         params.set('reserved', cfg.reserved);
+        params.set('readConst', cfg.readConst);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
