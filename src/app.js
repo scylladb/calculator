@@ -25,7 +25,6 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         display.style.display = 'inline';
     });
 
-    // change on text input
     input.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
             display.innerText = formatFunction(parseInt(event.target.value));
@@ -37,7 +36,6 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         }
     });
 
-    // change on slider movement
     slider.addEventListener('input', function (event) {
         display.innerText = formatFunction(parseInt(event.target.value));
         updateAll();
@@ -91,8 +89,8 @@ document.getElementById('tableClass').addEventListener('change', (event) => {
 
 document.getElementById('ratio').addEventListener('input', (event) => {
     cfg.ratio = parseInt(event.target.value);
-    const readRatio = cfg.ratio;
-    const writeRatio = 100 - readRatio;
+    const writeRatio = cfg.ratio;
+    const readRatio = 100 - writeRatio;
     document.getElementById('ratioDsp').innerText = `${readRatio}/${writeRatio}`;
     updateAll();
 });
@@ -258,7 +256,7 @@ document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
 document.getElementById('peakWidthDsp').innerText = cfg.peakWidth.toString();
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
-document.getElementById('ratioDsp').innerText = `${cfg.ratio}/${100 - cfg.ratio}`;
+document.getElementById('ratioDsp').innerText = `${100 - cfg.ratio}/${cfg.ratio}`;
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
