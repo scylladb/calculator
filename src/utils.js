@@ -1,4 +1,4 @@
-import { cfg } from './config.js';
+import {cfg} from './config.js';
 import {updateCosts} from "./calculator.js";
 import {updateChart} from "./chart.js";
 
@@ -13,7 +13,7 @@ export function formatNumber(num) {
 export function formatBytes(bytes) {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
     if (bytes === 0) return '0 B';
-    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
 }
 
@@ -42,10 +42,8 @@ export function getQueryParams() {
         });
         response.text().then(text => {
             const blob = new Blob([text], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            window.location.href = url;
+            window.location.href = URL.createObjectURL(blob);
         });
-        return;
     }
 }
 

@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {formatNumber, updateAll} from "./utils.js";
+import {formatNumber} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
