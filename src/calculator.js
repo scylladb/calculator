@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {updateSavedCosts} from "./utils.js";
+import {updateDisplayedCosts} from "./utils.js";
 
 function getPricing() {
     cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
@@ -238,7 +238,7 @@ function logCosts() {
 
     logs.push(`Total monthly cost: ${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`);
 
-    updateSavedCosts(logs);
+    updateDisplayedCosts(logs);
 }
 
 export function updateCosts() {

@@ -91,7 +91,7 @@ export function updateAll() {
     updateCosts();
 }
 
-export function updateSavedCosts(logs) {
+export function updateDisplayedCosts(logs) {
     const costDiffPanel = document.getElementById('costs');
     costDiffPanel.style.display = 'block';
     costDiffPanel.innerHTML = logs.map(log => {
