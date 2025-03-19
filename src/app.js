@@ -28,6 +28,8 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
 
     input.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
+            console.log("here");
+            updateAll();
             event.preventDefault();
             input.blur();
         }
@@ -38,18 +40,6 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         updateAll();
     });
 }
-
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Shift') {
-        document.getElementById('chart').style.cursor = 'copy';
-    }
-});
-
-document.addEventListener('keyup', function(event) {
-    if (event.key === 'Shift') {
-        document.getElementById('chart').style.cursor = 'default';
-    }
-});
 
 export function toggleSection(linkId, sectionId) {
     document.getElementById(linkId).classList.add('foldable', 'collapsed');
