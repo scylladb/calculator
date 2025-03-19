@@ -191,7 +191,7 @@ setupSliderInteraction('baselineDsp', 'baselineInp', 'baseline', formatNumber);
 setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
 setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
-setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', formatBytes);
+setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 
 toggleSection('costLink', 'costParams');
