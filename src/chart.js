@@ -18,23 +18,8 @@ function generateData(baseline, peak, peakWidth) {
     return data;
 }
 
-function generateWorkloadData(workload) {
-    switch (workload) {
-        case 'twiceDaily':
-            return [{x: 0, y: 5000}, {x: 6, y: 10000}, {x: 8, y: 100000}, {x: 10, y: 10000}, {x: 12, y: 5000}, {
-                x: 16,
-                y: 10000
-            }, {x: 18, y: 100000}, {x: 20, y: 10000}, {x: 24, y: 5000}];
-        case 'constant':
-            return Array.from({length: 25}, (_, i) => ({x: i, y: 50000}));
-        case 'morningPeak':
-        default:
-            return [];
-    }
-}
-
 export function updateChart() {
-    chart.data.datasets[1].data = generateData(cfg.baseline, cfg.peak, cfg.peakWidth);
+    chart.data.datasets[0].data = generateData(cfg.baseline, cfg.peak, cfg.peakWidth);
     // Check if peak is close to the current y-axis max value
     if (cfg.peak >= chart.options.scales.y.max * 0.98) {
         chart.options.scales.y.max = cfg.peak * 1.2;
@@ -45,16 +30,7 @@ export function updateChart() {
 export const chart = new Chart(ctx, {
     type: 'scatter', data: {
         datasets: [{
-            label: "Workload",
-            borderColor: '#383D57',
-            backgroundColor: 'rgba(56,61,87,0.50)',
-            data: generateWorkloadData(cfg.workload),
-            fill: true,
-            showLine: true,
-            borderDash: [4, 4],
-            tension: 0.3
-        }, {
-            label: 'Provisioned',
+            label: 'operations',
             data: generateData(),
             borderColor: '#383D57',
             backgroundColor: 'rgba(56,61,87,0.50)',
@@ -76,14 +52,6 @@ export const chart = new Chart(ctx, {
                         return 'Workload: ' + formatNumber(context.raw.y) + ' ops/sec';
                     }
                 }
-            }, dragData: {
-                round: 1, showTooltip: true, onDrag: function (e, datasetIndex, index, value) {
-                    value.x = Math.round(value.x);
-                    value.y = Math.round(value.y / 1000) * 1000;
-                }, onDragEnd: function (e, datasetIndex, index, value) {
-                    chart.update();
-                    updateAll();
-                }, dragX: true, dragY: true
             }
         }, scales: {
             x: {

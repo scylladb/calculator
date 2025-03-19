@@ -1,5 +1,5 @@
 import { cfg } from './config.js';
-import {updateCosts, updateOps} from "./calculator.js";
+import {updateCosts} from "./calculator.js";
 import {updateChart} from "./chart.js";
 
 export function formatNumber(num) {
@@ -88,7 +88,6 @@ export function updateQueryParams() {
 export function updateAll() {
     updateQueryParams();
     updateChart();
-    updateOps();
     updateCosts();
 }
 

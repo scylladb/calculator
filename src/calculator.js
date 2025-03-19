@@ -275,44 +275,6 @@ function logCosts() {
     updateSavedCosts(logs);
 }
 
-export function updateOps() {
-    const dataSeries0 = chart.data.datasets[0].data;
-    const visibleSeriesIndex = chart.data.datasets[1].hidden ? 2 : 1;
-    const dataVisibleSeries = chart.data.datasets[visibleSeriesIndex].data;
-
-    let totalOpsSeries0 = 0;
-    let totalOpsVisibleSeries = 0;
-
-    for (let i = 1; i < dataSeries0.length; i++) {
-        const x1 = dataSeries0[i - 1].x;
-        const y1 = dataSeries0[i - 1].y;
-        const x2 = dataSeries0[i].x;
-        const y2 = dataSeries0[i].y;
-
-        const integral = ((y1 + y2) / 2) * (x2 - x1) * 3600;
-        totalOpsSeries0 += integral;
-    }
-
-    for (let i = 1; i < dataVisibleSeries.length; i++) {
-        const x1 = dataVisibleSeries[i - 1].x;
-        const y1 = dataVisibleSeries[i - 1].y;
-        const x2 = dataVisibleSeries[i].x;
-        const y2 = dataVisibleSeries[i].y;
-
-        const integral = ((y1 + y2) / 2) * (x2 - x1) * 3600;
-        totalOpsVisibleSeries += integral;
-    }
-
-    const totalOpsInMillionsSeries0 = totalOpsSeries0 / 1000000;
-    const coveragePercentage = (totalOpsVisibleSeries / totalOpsSeries0) * 100;
-
-    if (totalOpsInMillionsSeries0 !== 0) {
-        chart.options.plugins.tooltip.callbacks.title = function () {
-            return `Total Workload: ${totalOpsInMillionsSeries0.toFixed(0)}M ops/month, Pricing coverage: ${coveragePercentage.toFixed(0)}%`;
-        };
-    }
-}
-
 export function updateCosts() {
     getPricing();
     getTableClass();
