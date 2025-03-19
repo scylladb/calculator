@@ -36,36 +36,6 @@ h3 {
   gap: 2px;
 }
 
-.cost {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-left: 3rem;
-  margin-top: -1rem;
-}
-
-.cost p {
-  display: flex;
-  align-items: baseline;
-  font-size: 3em;
-  margin: 0;
-}
-
-#costDiff {
-  font-size: 1.5em;
-  margin-right: 0.2rem;
-}
-
-#costDiffMo {
-  font-size: 0.5em;
-  vertical-align: middle;
-}
-
-#costSaved {
-  font-size: 1.5em;
-  margin-bottom: 1.0rem;
-}
-
 label {
   display: block;
   margin: 10px 0 5px;

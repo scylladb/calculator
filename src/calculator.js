@@ -1,39 +1,5 @@
 import {cfg} from './config.js';
-import {chart} from "./chart.js";
-import {formatNumber, updateSavedCosts} from "./utils.js";
-
-function getNodeCount(storageGB, storageLimit, totalOpsSec, baselineOpsSec) {
-    for (let nodes = 3; nodes < 1000; nodes += 3) {
-        const storageCondition = ((3 / nodes * storageGB) / storageLimit) <= 0.9;
-        const opsCondition = (baselineOpsSec / 3 * nodes) >= totalOpsSec;
-        if (storageCondition && opsCondition) {
-            return nodes;
-        }
-    }
-    return 3;
-}
-
-export function calculateScyllaCosts() {
-    const scyllaStorageGB = cfg.storageGB * 0.5;
-    const annualDiscount = 0.2;
-
-    const i4i_nodeCount = getNodeCount(scyllaStorageGB, cfg.scyllaPrices[0].storage, cfg.totalOpsSec, cfg.scyllaPrices[0].baseline);
-    const i3en_nodeCount = getNodeCount(scyllaStorageGB, cfg.scyllaPrices[1].storage, cfg.totalOpsSec, cfg.scyllaPrices[1].baseline);
-
-    const i4i_CostPerHour = cfg.scyllaPrices[0].price;
-    const i3en_CostPerHour = cfg.scyllaPrices[1].price;
-
-    const i4i_scyllaCost = (i4i_nodeCount / 3) * i4i_CostPerHour * 730 * (1 - annualDiscount);
-    const i3en_scyllaCost = (i3en_nodeCount / 3) * i3en_CostPerHour * 730 * (1 - annualDiscount);
-
-    const scyllaCost = i3en_scyllaCost <= i4i_scyllaCost ? i3en_scyllaCost : i4i_scyllaCost;
-    const family = i3en_scyllaCost <= i4i_scyllaCost ? 'i3en' : 'i4i';
-    const nodeCount = i3en_scyllaCost <= i4i_scyllaCost ? i3en_nodeCount : i4i_nodeCount;
-
-    return {
-        scyllaCost, nodeCount, family
-    };
-}
+import {updateSavedCosts} from "./utils.js";
 
 function getPricing() {
     cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
@@ -300,13 +266,6 @@ export function updateCosts() {
     cfg.dynamoCostTotalUpfront = cfg.dynamoCostProvisionedUpfront;
 
     cfg.dynamoCostTotalMonthlyAveraged = cfg.dynamoCostTotalMonthly + (cfg.dynamoCostTotalUpfront / 12) + cfg.dynamoCostNetwork + cfg.dynamoCostReplication + cfg.dynamoDaxCost;
-
-    const scyllaResult = calculateScyllaCosts();
-
-    const savings = cfg.dynamoCostTotal / 2;
-    const costRatio = (cfg.dynamoCostTotal / scyllaResult.scyllaCost).toFixed(1);
-
-    document.getElementById('costDiff').textContent = `$${formatNumber(savings)}`;
 
     logCosts();
 }

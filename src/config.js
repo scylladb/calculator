@@ -41,12 +41,5 @@ export const cfg = {
         { instance: "dax.r5.12xlarge", memory: 384, nps: 1000000, price: 6.12000000 },
         { instance: "dax.r5.16xlarge", memory: 512, nps: 1000000, price: 8.13700000 },
         { instance: "dax.r5.24xlarge", memory: 768, nps: 1000000, price: 12.24000000 },
-    ],
-    scyllaPrices: [
-        {
-            family: "i4i", instance: "i4i.xlarge", baseline: 78000, peak: 120000, storage: 937, price: 3.325
-        }, {
-            family: "i3en", instance: "i3en.xlarge", baseline: 39000, peak: 60000, storage: 2.44 * 1024, price: 4.378
-        }
     ]
 };
