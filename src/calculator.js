@@ -238,6 +238,8 @@ function logCosts() {
 
     logs.push(`Total monthly cost: ${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`);
 
+    console.log(cfg);
+
     updateDisplayedCosts(logs);
 }
 
