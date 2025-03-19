@@ -1,5 +1,4 @@
 import {cfg} from './config.js';
-import {chart} from "./chart.js";
 import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
@@ -9,14 +8,14 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
 
     display.addEventListener('click', function (event) {
         event.stopPropagation();
-        input.value = parseInt(slider.value);
+        input.value = parseInt(slider.value.toString());
         display.style.display = 'none';
         input.style.display = 'inline';
         setTimeout(() => input.focus(), 0);
     });
 
     input.addEventListener('blur', function () {
-        const newValue = parseInt(input.value);
+        const newValue = parseInt(input.value.toString());
         if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
             slider.value = newValue;
             display.innerText = formatFunction(newValue);
@@ -26,15 +25,19 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         display.style.display = 'inline';
     });
 
+    // change on text input
     input.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            console.log("here");
-            updateAll();
-            event.preventDefault();
+            display.innerText = formatFunction(parseInt(event.target.value));
+            setTimeout(() => {
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 0);
             input.blur();
+            updateAll();
         }
     });
 
+    // change on slider movement
     slider.addEventListener('input', function (event) {
         display.innerText = formatFunction(parseInt(event.target.value));
         updateAll();
@@ -82,11 +85,7 @@ document.querySelector('input[name="pricing"][value="provisioned"]').addEventLis
 
 document.getElementById('tableClass').addEventListener('change', (event) => {
     cfg.tableClass = event.target.value;
-    if (cfg.tableClass === 'infrequentAccess') {
-        document.getElementById('reserved').disabled = true;
-    } else {
-        document.getElementById('reserved').disabled = false;
-    }
+    document.getElementById('reserved').disabled = cfg.tableClass === 'infrequentAccess';
     updateAll();
 });
 
@@ -113,7 +112,7 @@ document.getElementById('baseline').addEventListener('input', (event) => {
 
 document.getElementById('peakWidth').addEventListener('input', (event) => {
     cfg.peakWidth = Math.max(1, parseInt(event.target.value));
-    document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
+    document.getElementById('peakWidthDsp').innerText = cfg.peakWidth.toString();
     updateAll();
 });
 
@@ -256,11 +255,11 @@ document.getElementById('reserved').value = cfg.reserved;
 
 document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
-document.getElementById('peakWidthDsp').innerText = cfg.peakWidth;
+document.getElementById('peakWidthDsp').innerText = cfg.peakWidth.toString();
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('ratioDsp').innerText = `${cfg.ratio}/${100 - cfg.ratio}`;
-document.getElementById('regionsDsp').innerText = cfg.regions;
+document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
