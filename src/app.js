@@ -171,8 +171,8 @@ document.getElementById('peak').addEventListener('input', (event) => {
 });
 
 document.getElementById('ratio').addEventListener('input', (event) => {
-    const readRatio = parseInt(event.target.value);
-    const writeRatio = 100 - readRatio;
+    const writeRatio = parseInt(event.target.value);
+    const readRatio = 100 - writeRatio;
     document.getElementById('ratioDsp').innerText = `${readRatio}/${writeRatio}`;
     updateAll();
 });

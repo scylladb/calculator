@@ -68,8 +68,8 @@ function getConsistencyValues() {
 }
 
 function getRatioValues() {
-    cfg.readRatio = parseInt(document.getElementById('ratio').value) / 100;
-    cfg.writeRatio = 1 - cfg.readRatio;
+    cfg.writeRatio = parseInt(document.getElementById('ratio').value) / 100;
+    cfg.readRatio = 1 - cfg.writeRatio;
 }
 
 function getDemandValues() {
