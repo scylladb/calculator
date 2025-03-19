@@ -1,236 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/style.css">
-  <link rel="icon" href="favicon.png" type="image/x-icon">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-   <script type="module" src="/src/app.js" defer></script>
-  <title>ScyllaDB | DynamoDB workload calculator</title>
-</head>
-<body>
-<div class="container">
-  <canvas id="chart" width="800" height="400"></canvas>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="/src/app.js" defer></script>
+    <title>ScyllaDB | DynamoDB workload calculator</title>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="chart" width="800" height="400"></canvas>
 
-  <span class="header">DynamoDB Cost Calculator
-  </span>
+      <span class="header">DynamoDB Cost Calculator
+      </span>
 
-  <a href="#" id="costLink" class="foldable expanded">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M441-120v-86q-53-12-91.5-46T293-348l74-30q15 48 44.5 73t77.5 25q41 0 69.5-18.5T587-356q0-35-22-55.5T463-458q-86-27-118-64.5T313-614q0-65 42-101t86-41v-84h80v84q50 8 82.5 36.5T651-650l-74 32q-12-32-34-48t-60-16q-44 0-67 19.5T393-614q0 33 30 52t104 40q69 20 104.5 63.5T667-358q0 71-42 108t-104 46v84h-80Z"/></svg>
-    Costs
-  </a>
+      <a href="#" id="costLink" class="foldable expanded">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M441-120v-86q-53-12-91.5-46T293-348l74-30q15 48 44.5 73t77.5 25q41 0 69.5-18.5T587-356q0-35-22-55.5T463-458q-86-27-118-64.5T313-614q0-65 42-101t86-41v-84h80v84q50 8 82.5 36.5T651-650l-74 32q-12-32-34-48t-60-16q-44 0-67 19.5T393-614q0 33 30 52t104 40q69 20 104.5 63.5T667-358q0 71-42 108t-104 46v84h-80Z"/></svg>
+        Costs
+      </a>
 
-  <div id="costParams">
-    <div class="radio-container">
-      <label>
-        <input type="radio" name="pricing" value="demand" checked> Demand
-      </label>
-      <label>
-        <input type="radio" name="pricing" value="provisioned"> Provisioned
-      </label>
-    </div>
+      <div id="costParams">
+        <div class="radio-container">
+          <label>
+            <input type="radio" name="pricing" value="demand" checked> Demand
+          </label>
+          <label>
+            <input type="radio" name="pricing" value="provisioned"> Provisioned
+          </label>
+        </div>
 
-    <span id="costs" class="costs"></span>
-  </div>
+        <span id="costs" class="costs"></span>
+      </div>
 
-  <a href="#" id="opsLink" class="foldable expanded">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M418-340q24 24 62 23.5t56-27.5l224-336-336 224q-27 18-28.5 55t22.5 61Zm62-460q59 0 113.5 16.5T696-734l-76 48q-33-17-68.5-25.5T480-720q-133 0-226.5 93.5T160-400q0 42 11.5 83t32.5 77h552q23-38 33.5-79t10.5-85q0-36-8.5-70T766-540l48-76q30 47 47.5 100T880-406q1 57-13 109t-41 99q-11 18-30 28t-40 10H204q-21 0-40-10t-30-28q-26-45-40-95.5T80-400q0-83 31.5-155.5t86-127Q252-737 325-768.5T480-800Zm7 313Z"/></svg>
-    &nbsp;Operations
-  </a>
+      <a href="#" id="opsLink" class="foldable expanded">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M418-340q24 24 62 23.5t56-27.5l224-336-336 224q-27 18-28.5 55t22.5 61Zm62-460q59 0 113.5 16.5T696-734l-76 48q-33-17-68.5-25.5T480-720q-133 0-226.5 93.5T160-400q0 42 11.5 83t32.5 77h552q23-38 33.5-79t10.5-85q0-36-8.5-70T766-540l48-76q30 47 47.5 100T880-406q1 57-13 109t-41 99q-11 18-30 28t-40 10H204q-21 0-40-10t-30-28q-26-45-40-95.5T80-400q0-83 31.5-155.5t86-127Q252-737 325-768.5T480-800Zm7 313Z"/></svg>
+        &nbsp;Operations
+      </a>
 
-  <div id="opsParams">
-    <div>
-      <label for="baseline">Baseline:
-        <input type="text" id="baselineInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="baselineDsp">50K</span> ops/sec
-        <span class="info-icon">i
-                      <span class="tooltip-text">Enter the number of operations per second that your workload needs during off-peak periods.</span>
-                  </span>
-      </label>
-      <input type="range" id="baseline" min="1000" max="2000000" step="1000" value="50000">
-    </div>
+      <div id="opsParams">
+        <div>
+          <label for="baseline">Baseline:
+            <input type="text" id="baselineInp" style="display: none; width: 80px; cursor: pointer;">
+            <span id="baselineDsp">50K</span> ops/sec
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter the number of operations per second that your workload needs during off-peak periods.</span>
+            </span>
+          </label>
+          <input type="range" id="baseline" min="1000" max="2000000" step="1000" value="50000">
+        </div>
 
-    <div>
-      <label for="peak">Peak:
-        <input type="text" id="peakInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="peakDsp">500K</span> ops/sec
-        <span class="info-icon">i
-                      <span class="tooltip-text">Enter the maximum number of operations per second that your workload needs during peak periods.</span>
-                  </span>
-      </label>
-      <input type="range" id="peak" min="1000" max="2000000" step="1000" value="500000">
-    </div>
+        <div>
+          <label for="peak">Peak:
+            <input type="text" id="peakInp" style="display: none; width: 80px; cursor: pointer;">
+            <span id="peakDsp">500K</span> ops/sec
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter the maximum number of operations per second that your workload needs during peak periods.</span>
+            </span>
+          </label>
+          <input type="range" id="peak" min="1000" max="2000000" step="1000" value="500000">
+        </div>
 
-    <div>
-      <label for="peakWidth">Peak:
-        <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="peakWidthDsp">1</span> hours per day
-        <span class="info-icon">i
-                      <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
-                  </span>
-      </label>
-      <input type="range" id="peakWidth" min="1" max="24" value="1">
-    </div>
+        <div>
+          <label for="peakWidth">Peak:
+            <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
+            <span id="peakWidthDsp">1</span> hours per day
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
+            </span>
+          </label>
+          <input type="range" id="peakWidth" min="1" max="24" value="1">
+        </div>
 
-    <div id="provisionedParams" style="display: none;">
-      <div>
-        <label for="reserved">Reserved Capacity:
-          <input type="text" id="reservedInp" style="display: none; width: 80px; cursor: pointer;">
-          <span id="reservedDsp">0%</span>
-          <span class="info-icon">i
-              <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
-          </span>
-        </label>
-        <input type="range" id="reserved" min="0" max="100" step="1" value="0">
+        <div id="provisionedParams" style="display: none;">
+          <div>
+            <label for="reserved">Reserved Capacity:
+              <input type="text" id="reservedInp" style="display: none; width: 80px; cursor: pointer;">
+              <span id="reservedDsp">0%</span>
+              <span class="info-icon">i
+                  <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+              </span>
+            </label>
+            <input type="range" id="reserved" min="0" max="100" step="1" value="0">
+          </div>
+        </div>
+
+        <div>
+          <label for="ratio">Read/Write Ratio:
+            <span id="ratioDsp">50/50</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
+            </span>
+          </label>
+          <input type="range" id="ratio" min="0" max="100" step="1" value="50">
+        </div>
+
+        <div>
+          <label for="itemSizeB">Operation Size:
+            <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
+            <span id="itemSizeDsp">1 KB</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter your average operation size (all attributes).</span>
+            </span>
+          </label>
+          <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
+        </div>
+      </div>
+
+      <a href="#" id="tableLink">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M760-200v-120H200v120h560Zm0-200v-160H200v160h560Zm0-240v-120H200v120h560ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
+        &nbsp;Tables
+      </a>
+
+      <div id="tableParams" style="display: none;">
+        <div>
+          <label for="tableClass">Table Class:
+            <select id="tableClass">
+              <option value="standard">Standard</option>
+              <option value="infrequentAccess">Infrequent Access</option>
+            </select>
+            <span class="info-icon">i
+              <span class="tooltip-text">Select the table class for your workload.</span>
+            </span>
+          </label>
+        </div>
+
+        <div>
+          <label for="regions">Number of Data Centers:
+            <input type="text" id="regionsInp" style="display: none; width: 80px; cursor: pointer;">
+            <span id="regionsDsp">1</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter the number of additional regions where your data is replicated as a Global Table.</span>
+            </span>
+            </label>
+            <input type="range" id="regions" min="1" max="24" step="1" value="1">
+        </div>
+      </div>
+
+      <a href="#" id="storageLink">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M280-280h160v-160H280v160Zm240 0h160v-160H520v160ZM280-520h160v-160H280v160Zm240 0h160v-160H520v160ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>
+        &nbsp;Storage
+      </a>
+
+      <div id="storageParams" style="display: none;">
+        <div>
+          <label for="storageGB">Storage:
+            <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
+            <span id="storageDsp">512 GB</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter your total data storage size.</span>
+            </span>
+          </label>
+          <input type="range" id="storageGB" min="128" max="1048576" step="128" value="512">
+        </div>
+      </div>
+
+      <a href="#" id="consistencyLink">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="m612-550 141-142-28-28-113 113-57-57-28 29 85 85ZM120-160v-80h480v80H120Zm520-280q-83 0-141.5-58.5T440-640q0-83 58.5-141.5T640-840q83 0 141.5 58.5T840-640q0 83-58.5 141.5T640-440Zm-520-40v-80h252q7 22 16 42t22 38H120Zm0 160v-80h376q23 14 49 23.5t55 13.5v43H120Z"/></svg>
+        &nbsp;Consistency
+      </a>
+
+      <div id="consistencyParams" style="display: none;">
+        <div style="display: none;">
+          <label for="writeTrans">Writes:
+            <span id="writeConsistencyDsp">Non Transactional</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter write operations create, update, or delete items as a non transactional percentage, or, coordinated, all-or-nothing write operations as a transactional percentage.</span>
+            </span>
+          </label>
+          <input type="range" id="writeTrans" min="0" max="100" step="1" value="0">
+        </div>
+
+        <div class="slider-container">
+          <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent as a percentage.</span>
+            </span>
+          </label>
+          <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
+          <input type="range" id="readTrans" class="slider" min="0" max="100" value="0" style="display: none;">
+        </div>
+      </div>
+
+      <a href="#" id="daxLink">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M482-160q-134 0-228-93t-94-227v-7l-64 64-56-56 160-160 160 160-56 56-64-64v7q0 100 70.5 170T482-240q26 0 51-6t49-18l60 60q-38 22-78 33t-82 11Zm278-161L600-481l56-56 64 64v-7q0-100-70.5-170T478-720q-26 0-51 6t-49 18l-60-60q38-22 78-33t82-11q134 0 228 93t94 227v7l64-64 56 56-160 160Z"/></svg>
+        &nbsp;Accelerator (DAX)
+      </a>
+
+      <div id="daxParams" style="display: none;">
+        <div>
+          <label for="cacheSize">Dataset Size:
+            <span id="cacheSizeDsp">0</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter the dataset memory size that your cache will use.</span>
+            </span>
+          </label>
+          <input type="range" id="cacheSize" min="0" max="10240" step="64" value="0">
+        </div>
+
+        <div>
+          <label for="cacheRatio">Hit/Miss Ratio:
+            <span id="cacheRatioDsp">0/100</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">Enter the hit miss ratio that your cache will use.</span>
+            </span>
+          </label>
+          <input type="range" id="cacheRatio" min="0" max="100" step="1" value="0">
+        </div>
+
+        <div>
+          <label>Instance Class:
+            <span id="daxInstanceClass">none</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+            </span>
+          </label>
+        </div>
+
+        <div>
+          <label>Number of Nodes:
+            <span id="daxNodes">0</span>
+            <span class="info-icon">i
+                <span class="tooltip-text">This is the recommended minimum number of nodes for your workload.</span>
+            </span>
+          </label>
+        </div>
       </div>
     </div>
-
-    <div>
-      <label for="ratio">Read/Write Ratio:
-        <span id="ratioDsp">50/50</span>
-        <span class="info-icon">i
-                      <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
-                  </span>
-      </label>
-      <input type="range" id="ratio" min="0" max="100" step="1" value="50">
-    </div>
-
-    <div>
-      <label for="itemSizeB">Operation Size:
-        <input type="text" id="itemSizeInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="itemSizeDsp">1 KB</span>
-        <span class="info-icon">i
-              <span class="tooltip-text">Enter your average operation size (all attributes).</span>
-          </span>
-      </label>
-      <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
-    </div>
-  </div>
-
-  <a href="#" id="tableLink">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M760-200v-120H200v120h560Zm0-200v-160H200v160h560Zm0-240v-120H200v120h560ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
-    &nbsp;Tables
-  </a>
-
-  <div id="tableParams" style="display: none;">
-    <div>
-      <label for="tableClass">Table Class:
-        <select id="tableClass">
-          <option value="standard">Standard</option>
-          <option value="infrequentAccess">Infrequent Access</option>
-        </select>
-        <span class="info-icon">i
-          <span class="tooltip-text">Select the table class for your workload.</span>
-        </span>
-      </label>
-    </div>
-
-    <div>
-      <label for="regions">Number of Data Centers:
-        <input type="text" id="regionsInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="regionsDsp">1</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">Enter the number of additional regions where your data is replicated as a Global Table.</span>
-        </span>
-        </label>
-        <input type="range" id="regions" min="1" max="24" step="1" value="1">
-    </div>
-  </div>
-
-  <a href="#" id="storageLink">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M280-280h160v-160H280v160Zm240 0h160v-160H520v160ZM280-520h160v-160H280v160Zm240 0h160v-160H520v160ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>
-    &nbsp;Storage
-  </a>
-
-  <div id="storageParams" style="display: none;">
-    <div>
-      <label for="storageGB">Storage:
-        <input type="text" id="storageInp" style="display: none; width: 80px; cursor: pointer;">
-        <span id="storageDsp">512 GB</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">Enter your total data storage size.</span>
-        </span>
-      </label>
-      <input type="range" id="storageGB" min="128" max="1048576" step="128" value="512">
-    </div>
-  </div>
-
-  <a href="#" id="consistencyLink">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="m612-550 141-142-28-28-113 113-57-57-28 29 85 85ZM120-160v-80h480v80H120Zm520-280q-83 0-141.5-58.5T440-640q0-83 58.5-141.5T640-840q83 0 141.5 58.5T840-640q0 83-58.5 141.5T640-440Zm-520-40v-80h252q7 22 16 42t22 38H120Zm0 160v-80h376q23 14 49 23.5t55 13.5v43H120Z"/></svg>
-    &nbsp;Consistency
-  </a>
-
-  <div id="consistencyParams" style="display: none;">
-    <div style="display: none;">
-      <label for="writeTrans">Writes:
-        <span id="writeConsistencyDsp">Non Transactional</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">Enter write operations create, update, or delete items as a non transactional percentage, or, coordinated, all-or-nothing write operations as a transactional percentage.</span>
-        </span>
-      </label>
-      <input type="range" id="writeTrans" min="0" max="100" step="1" value="0">
-    </div>
-
-    <div class="slider-container">
-      <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent as a percentage.</span>
-        </span>
-      </label>
-      <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
-      <input type="range" id="readTrans" class="slider" min="0" max="100" value="0" style="display: none;">
-    </div>
-  </div>
-
-  <a href="#" id="daxLink">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2196F3"><path d="M482-160q-134 0-228-93t-94-227v-7l-64 64-56-56 160-160 160 160-56 56-64-64v7q0 100 70.5 170T482-240q26 0 51-6t49-18l60 60q-38 22-78 33t-82 11Zm278-161L600-481l56-56 64 64v-7q0-100-70.5-170T478-720q-26 0-51 6t-49 18l-60-60q38-22 78-33t82-11q134 0 228 93t94 227v7l64-64 56 56-160 160Z"/></svg>
-    &nbsp;Accelerator (DAX)
-  </a>
-
-  <div id="daxParams" style="display: none;">
-    <div>
-      <label for="cacheSize">Dataset Size:
-        <span id="cacheSizeDsp">0</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">Enter the dataset memory size that your cache will use.</span>
-        </span>
-      </label>
-      <input type="range" id="cacheSize" min="0" max="10240" step="64" value="0">
-    </div>
-
-    <div>
-      <label for="cacheRatio">Hit/Miss Ratio:
-        <span id="cacheRatioDsp">0/100</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">Enter the hit miss ratio that your cache will use.</span>
-        </span>
-      </label>
-      <input type="range" id="cacheRatio" min="0" max="100" step="1" value="0">
-    </div>
-
-    <div>
-      <label>Instance Class:
-        <span id="daxInstanceClass">none</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">This is the recommended instance class for your workload.</span>
-        </span>
-      </label>
-    </div>
-
-    <div>
-      <label>Number of Nodes:
-        <span id="daxNodes">0</span>
-        <span class="info-icon">i
-            <span class="tooltip-text">This is the recommended minimum number of nodes for your workload.</span>
-        </span>
-      </label>
-    </div>
-  </div>
-</div>
-
-</body>
+  </body>
 </html>
