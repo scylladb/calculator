@@ -165,16 +165,6 @@
       </a>
 
       <div id="consistencyParams" style="display: none;">
-        <div style="display: none;">
-          <label for="writeTrans">Writes:
-            <span id="writeConsistencyDsp">Non Transactional</span>
-            <span class="info-icon">i
-                <span class="tooltip-text">Enter write operations create, update, or delete items as a non transactional percentage, or, coordinated, all-or-nothing write operations as a transactional percentage.</span>
-            </span>
-          </label>
-          <input type="range" id="writeTrans" min="0" max="100" step="1" value="0">
-        </div>
-
         <div class="slider-container">
           <label>Reads: <span id="readConstDsp">Strongly Consistent</span>
             <span class="info-icon">i
@@ -182,7 +172,6 @@
             </span>
           </label>
           <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
-          <input type="range" id="readTrans" class="slider" min="0" max="100" value="0" style="display: none;">
         </div>
       </div>
 

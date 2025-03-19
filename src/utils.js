@@ -57,28 +57,28 @@ export function updateQueryParams() {
         const params = new URLSearchParams(window.location.search);
 
         params.set('pricing', cfg.pricing);
-        params.set('storageGB', cfg.storageGB);
-        params.set('itemSizeB', cfg.itemSizeB);
+        params.set('storageGB', cfg.storageGB.toString());
+        params.set('itemSizeB', cfg.itemSizeB.toString());
         params.set('tableClass', cfg.tableClass);
-        params.set('ratio', cfg.ratio);
-        params.set('baseline', cfg.baseline);
-        params.set('peak', cfg.peak);
-        params.set('peakWidth', cfg.peakWidth);
-        params.set('reserved', cfg.reserved);
-        params.set('readConst', cfg.readConst);
+        params.set('ratio', cfg.ratio.toString());
+        params.set('baseline', cfg.baseline.toString());
+        params.set('peak', cfg.peak.toString());
+        params.set('peakWidth', cfg.peakWidth.toString());
+        params.set('reserved', cfg.reserved.toString());
+        params.set('readConst', cfg.readConst.toString());
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
             params.delete('cacheRatio');
         } else {
-            params.set('cacheSizeGB', cfg.cacheSizeGB);
-            params.set('cacheRatio', cfg.cacheRatio);
+            params.set('cacheSizeGB', cfg.cacheSizeGB.toString());
+            params.set('cacheRatio', cfg.cacheRatio.toString());
         }
 
         if (cfg.regions === 1) {
             params.delete('regions');
         } else {
-            params.set('regions', cfg.regions);
+            params.set('regions', cfg.regions.toString());
         }
 
         window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
@@ -92,9 +92,9 @@ export function updateAll() {
 }
 
 export function updateDisplayedCosts(logs) {
-    const costDiffPanel = document.getElementById('costs');
-    costDiffPanel.style.display = 'block';
-    costDiffPanel.innerHTML = logs.map(log => {
+    const costs = document.getElementById('costs');
+    costs.style.display = 'block';
+    costs.innerHTML = logs.map(log => {
         const [key, value] = log.split(': ');
         if (key === '---' && value === '---') {
             return `<div class="cost-entry"><span class="cost-key"></span><span class="cost-value"><span class="dollar-sign"></span><span class="number">${value}</span></span></div>`;

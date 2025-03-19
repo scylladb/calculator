@@ -27,9 +27,9 @@ function getConsistencyValues() {
     cfg.readConst = parseInt(document.getElementById('readConst').value);
     cfg.readStronglyConsistent = cfg.readConst / 100;
     cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
-    cfg.readTransactional = parseInt(document.getElementById('readTrans').value) / 100;
+    cfg.readTransactional = 0;
     cfg.readNonTransactional = 1 - cfg.readTransactional;
-    cfg.writeTransactional = parseInt(document.getElementById('writeTrans').value) / 100;
+    cfg.writeTransactional = 0;
     cfg.writeNonTransactional = 1 - cfg.writeTransactional;
 }
 

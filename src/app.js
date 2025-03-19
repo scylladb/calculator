@@ -59,12 +59,6 @@ export function toggleSection(linkId, sectionId) {
     });
 }
 
-setupSliderInteraction('baselineDsp', 'baselineInp', 'baseline', formatNumber);
-setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
-setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
-setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
-setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', formatBytes);setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
-
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
@@ -126,13 +120,6 @@ document.getElementById('peak').addEventListener('input', (event) => {
     updateAll();
 });
 
-document.getElementById('ratio').addEventListener('input', (event) => {
-    const writeRatio = parseInt(event.target.value);
-    const readRatio = 100 - writeRatio;
-    document.getElementById('ratioDsp').innerText = `${readRatio}/${writeRatio}`;
-    updateAll();
-});
-
 document.getElementById('reserved').addEventListener('input', (event) => {
     cfg.reserved = parseInt(event.target.value);
     document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
@@ -146,13 +133,6 @@ document.getElementById('storageGB').addEventListener('input', (event) => {
 });
 
 document.getElementById('storageDsp').innerText = document.getElementById('storageGB').value;
-
-toggleSection('costLink', 'costParams');
-toggleSection('opsLink', 'opsParams');
-toggleSection('tableLink', 'tableParams');
-toggleSection('storageLink', 'storageParams');
-toggleSection('consistencyLink', 'consistencyParams');
-toggleSection('daxLink', 'daxParams');
 
 document.getElementById('itemSizeB').addEventListener('input', function (event) {
     const slider = event.target;
@@ -175,44 +155,21 @@ document.getElementById('itemSizeB').addEventListener('input', function (event) 
     updateAll();
 });
 
-document.getElementById('writeTrans').addEventListener('input', (event) => {
-    const transactional = parseInt(event.target.value);
-    document.getElementById('writeConsistencyDsp').innerText = transactional === 0 ? 'Non Transactional' : transactional === 100 ? 'Transactional' : `${transactional}% Transactional (${100 - transactional}% Non Transactional)`;
-    updateAll();
-});
+document.getElementById('readConst').addEventListener('input', (event) => {
+    cfg.readConst = parseInt(event.target.value);
+    const strongConsistent = cfg.readConst;
+    const eventuallyConsistent = 100 - strongConsistent;
 
-export const readConst = document.getElementById('readConst');
-export const readTrans = document.getElementById('readTrans');
-const display = document.getElementById('readConstDsp');
-
-export function updateReadConsistency() {
-    const strongConsistent = parseInt(readConst.value);
-    let transactional = parseInt(readTrans.value);
-    let eventuallyConsistent = 100 - strongConsistent - transactional;
-
+    let readConstDsp = document.getElementById('readConstDsp');
     if (strongConsistent === 100) {
-        display.innerText = `Strongly Consistent`;
+        readConstDsp.innerText = `Strongly Consistent`;
     } else if (eventuallyConsistent === 100) {
-        display.innerText = `Eventually Consistent`;
+        readConstDsp.innerText = `Eventually Consistent`;
     } else {
-        // display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%, Transactional: ${transactional}%`;
-        display.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%`;
+        readConstDsp.innerText = `Strongly Consistent: ${strongConsistent}%, Eventually Consistent: ${eventuallyConsistent}%`;
     }
+
     updateAll();
-}
-
-readConst.addEventListener('input', () => {
-    if (parseInt(readConst.value) > 100 - parseInt(readTrans.value)) {
-        readTrans.value = 100 - readConst.value;
-    }
-    updateReadConsistency();
-});
-
-readTrans.addEventListener('input', () => {
-    if (100 - parseInt(readTrans.value) < parseInt(readConst.value)) {
-        readConst.value = 100 - readTrans.value;
-    }
-    updateReadConsistency();
 });
 
 document.getElementById('cacheSize').addEventListener('input', (event) => {
@@ -229,6 +186,20 @@ document.getElementById('cacheRatio').addEventListener('input', (event) => {
     cfg.cacheRatio = cacheHitRatio;
     updateAll();
 });
+
+setupSliderInteraction('baselineDsp', 'baselineInp', 'baseline', formatNumber);
+setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
+setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
+setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
+setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', formatBytes);
+setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
+
+toggleSection('costLink', 'costParams');
+toggleSection('opsLink', 'opsParams');
+toggleSection('tableLink', 'tableParams');
+toggleSection('storageLink', 'storageParams');
+toggleSection('consistencyLink', 'consistencyParams');
+toggleSection('daxLink', 'daxParams');
 
 getQueryParams();
 
@@ -250,6 +221,7 @@ document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
 document.getElementById('reserved').value = cfg.reserved;
+document.getElementById('readConst').value = cfg.readConst;
 
 document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
 document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
@@ -261,5 +233,6 @@ document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
+document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 
 updateAll();
