@@ -66,7 +66,8 @@ export function calculateProvisionedCosts() {
     cfg.totalWCUHours = Math.ceil(cfg.baselineWCUHours + cfg.peakWCUHours);
     cfg.costProvisionedWCU = cfg.totalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
     cfg.costReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
-    cfg.costMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.totalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+    cfg.replicatedWCUHours =  Math.ceil(cfg.baselineWCUTotal * cfg.baselineHoursWrites) + Math.ceil(cfg.peakWCUTotal * cfg.peakHoursWrites);
+    cfg.costMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.replicatedWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
     cfg.costMonthlyWCU = cfg.costProvisionedWCU + cfg.costReservedWCU;
     cfg.costUpfrontWCU = cfg.reservedWCU * 1.50;
 
