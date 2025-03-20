@@ -40,8 +40,8 @@ function getReservedValues() {
 function getHoursValues() {
     cfg.peakHoursReads = cfg.peakDurationReads * 30;
     cfg.peakHoursWrites = cfg.peakDurationWrites * 30;
-    cfg.peakHours = cfg.peakHoursReads + cfg.peakHoursWrites;
-    cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
+    cfg.baselineHoursReads = cfg.hoursPerMonth - cfg.peakHoursReads;
+    cfg.baselineHoursWrites = cfg.hoursPerMonth - cfg.peakHoursWrites;
     cfg.reserved = parseInt(document.getElementById('reserved').value);
 }
 
@@ -56,7 +56,7 @@ export function calculateProvisionedCosts() {
     cfg.reservedWCU = Math.ceil(cfg.reservedWCU / 100.0) * 100;
     cfg.provisionedBaselineWCU = cfg.baselineWCUTotal - cfg.reservedWCU;
     cfg.provisionedBaselineWCU = Math.ceil(Math.max(cfg.provisionedBaselineWCU, 0));
-    cfg.provisionedBaselineWCUHours = Math.ceil(cfg.provisionedBaselineWCU * cfg.baselineHours);
+    cfg.provisionedBaselineWCUHours = Math.ceil(cfg.provisionedBaselineWCU * cfg.baselineHoursWrites);
     cfg.peakWCUNonTransactional = cfg.peakWrites * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem;
     cfg.peakWCUTransactional = cfg.peakWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem;
     cfg.peakWCUTotal = cfg.peakWCUNonTransactional + cfg.peakWCUTransactional;
@@ -78,7 +78,7 @@ export function calculateProvisionedCosts() {
     cfg.reservedRCU = Math.ceil(cfg.reservedRCU / 100.0) * 100;
     cfg.provisionedBaselineRCU = cfg.baselineRCUTotal - cfg.reservedRCU;
     cfg.provisionedBaselineRCU = Math.ceil(Math.max(cfg.provisionedBaselineRCU, 0));
-    cfg.provisionedBaselineRCUHours = Math.ceil(cfg.provisionedBaselineRCU * cfg.baselineHours);
+    cfg.provisionedBaselineRCUHours = Math.ceil(cfg.provisionedBaselineRCU * cfg.baselineHoursReads);
     cfg.peakRCUNonTransactional = cfg.peakReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem;
     cfg.peakRCUStronglyConsistent = cfg.peakReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem;
     cfg.peakRCUTransactional = cfg.peakReads * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem;
@@ -100,13 +100,13 @@ export function calculateProvisionedCosts() {
 export function calculateDemandCosts() {
     cfg.readRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB / 4.0);
     cfg.writeRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB);
-    cfg.numberReads = (cfg.baselineReads * 3600 * cfg.baselineHours) + (cfg.peakReads * 3600 * cfg.peakHoursReads);
+    cfg.numberReads = (cfg.baselineReads * 3600 * cfg.baselineHoursReads) + (cfg.peakReads * 3600 * cfg.peakHoursReads);
     cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem);
     cfg.dynamoCostDemandReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
-    cfg.numberWrites = (cfg.baselineWrites * 3600 * cfg.baselineHours) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
+    cfg.numberWrites = (cfg.baselineWrites * 3600 * cfg.baselineHoursWrites) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
     cfg.writeRequestUnits = (cfg.numberWrites * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem) +
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
     cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
