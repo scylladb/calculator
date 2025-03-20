@@ -25,7 +25,8 @@ export function getQueryParams() {
     if (params.get('baselineWrites')) cfg.baselineWrites = parseInt(params.get('baselineWrites'));
     if (params.get('peakReads')) cfg.peakReads = parseInt(params.get('peakReads'));
     if (params.get('peakWrites')) cfg.peakWrites = parseInt(params.get('peakWrites'));
-    if (params.get('peakDuration')) cfg.peakDuration = parseInt(params.get('peakDuration'));
+    if (params.get('peakDurationReads')) cfg.peakDuration = parseInt(params.get('peakDurationReads'));
+    if (params.get('peakDurationWrites')) cfg.peakDuration = parseInt(params.get('peakDurationWrites'));
     if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
     if (params.get('itemSizeB')) cfg.itemSizeB = parseInt(params.get('itemSizeB'));
     if (params.get('pricing')) cfg.pricing = params.get('pricing');
