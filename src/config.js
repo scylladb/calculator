@@ -27,8 +27,8 @@ export const cfg = {
     reserved:           0,
     // Replicated
     regions:  1,
-    pricePerRWRU:       0.000000625,
-    pricePerRWRU_IA:    0.000000780,
+    pricePer_rWRU:       0.00065,
+    pricePer_rWRU_IA:    0.00081,
     // Data Transfer
     priceIntraRegPerGB: 0.02,
     // DAX Node Costs
