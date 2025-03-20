@@ -100,25 +100,25 @@ export function calculateProvisionedCosts() {
 export function calculateDemandCosts() {
     cfg.perItemRRU = Math.ceil(cfg.itemSizeKB / 4.0);
     cfg.perItemWRU = Math.ceil(cfg.itemSizeKB);
-    cfg.numberReads = (cfg.baselineReads * 3600 * cfg.baselineHoursReads) + (cfg.peakReads * 3600 * cfg.peakHoursReads);
-    cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU) +
-        (cfg.numberReads * cfg.readStronglyConsistent * cfg.perItemRRU) +
-        (cfg.numberReads * cfg.readTransactional * 2 * cfg.perItemRRU);
-    cfg.costDemandMonthlyReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
+    cfg.totalReads = (cfg.baselineReads * 3600 * cfg.baselineHoursReads) + (cfg.peakReads * 3600 * cfg.peakHoursReads);
+    cfg.totalRRU = (cfg.totalReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU) +
+        (cfg.totalReads * cfg.readStronglyConsistent * cfg.perItemRRU) +
+        (cfg.totalReads * cfg.readTransactional * 2 * cfg.perItemRRU);
+    cfg.costDemandMonthlyReads = cfg.totalRRU * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
-    cfg.numberWrites = (cfg.baselineWrites * 3600 * cfg.baselineHoursWrites) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
-    cfg.writeRequestUnits = (cfg.numberWrites * cfg.writeNonTransactional * cfg.perItemWRU) +
-        (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.perItemWRU);
-    cfg.costDemandMonthlyWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
+    cfg.totalWrites = (cfg.baselineWrites * 3600 * cfg.baselineHoursWrites) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
+    cfg.totalWRU = (cfg.totalWrites * cfg.writeNonTransactional * cfg.perItemWRU) +
+        (cfg.totalWrites * cfg.writeTransactional * 2 * cfg.perItemWRU);
+    cfg.costDemandMonthlyWrites = cfg.totalWRU * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
-    cfg.costDemandMonthlyReplicatedWRU = (cfg.regions - 1) * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
+    cfg.costDemandMonthlyReplicatedWRU = (cfg.regions - 1) * cfg.totalWRU * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
     cfg.costDemandMonthly = cfg.costDemandMonthlyReads + cfg.costDemandMonthlyWrites + cfg.costDemandMonthlyReplicatedWRU;
 }
 
 function calculateNetworkCosts() {
-    cfg.totalReadsKB = cfg.readsOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
-    cfg.totalWritesKB = cfg.writesOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
+    cfg.totalReadsKB = cfg.totalReadOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
+    cfg.totalWritesKB = cfg.totalWriteOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalReplicatedWritesGB =((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
     cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
@@ -160,7 +160,7 @@ function calculateDaxCosts() {
     let readRPS_CacheMiss = cfg.baselineReads * (1 - cfg.cacheRatio / 100);
     let readMissFactor = 1;
     let size = cfg.itemSizeKB;
-    let writeRPS = cfg.writesOpsSec;
+    let writeRPS = cfg.totalWriteOpsSec;
     let writeFactor = 1;
     let targetUtilization = 1 / 0.70;
     let normalizedRPS = (readRPS_CacheHit * size) + (readRPS_CacheMiss * size * readMissFactor) + (writeRPS * writeFactor * size * 3);
@@ -187,9 +187,9 @@ export function calculateStorageCost() {
 }
 
 function calculateTotalOpsSec() {
-    cfg.readsOpsSec = cfg.baselineReads;
-    cfg.writesOpsSec = cfg.baselineWrites;
-    cfg.totalOpsSec = cfg.readsOpsSec + cfg.writesOpsSec;
+    cfg.totalReadOpsSec = cfg.baselineReads;
+    cfg.totalWriteOpsSec = cfg.baselineWrites;
+    cfg.totalOpsSec = cfg.totalReadOpsSec + cfg.totalWriteOpsSec;
 }
 
 function logCosts() {
