@@ -199,8 +199,8 @@ function logCosts() {
     if (cfg.pricing === 'demand') {
         logs.push(`Monthly write cost: ${Math.floor(cfg.dynamoCostDemandMonthlyWrites).toLocaleString()}`);
 
-        if (cfg.dynamoCostMonthlyReplicatedWCU !== 0) {
-            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.dynamoCostMonthlyReplicatedWCU).toLocaleString()}`);
+        if (cfg.dynamoCostDemandMonthlyReplicatedWRU !== 0) {
+            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.dynamoCostDemandMonthlyReplicatedWRU).toLocaleString()}`);
         }
 
         logs.push(`Monthly read cost: ${Math.floor(cfg.dynamoCostDemandMonthlyReads).toLocaleString()}`);
