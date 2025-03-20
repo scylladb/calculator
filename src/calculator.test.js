@@ -15,25 +15,25 @@ jest.mock('./utils.js', () => ({
 describe('calculateStorageCost', () => {
     beforeEach(() => {
         cfg.storageGB = 0;
-        cfg.dynamoCostStorage = 0;
+        cfg.costStorage = 0;
     });
 
     it('should calculate the correct storage cost for given storageGB', () => {
         cfg.storageGB = 100;
         calculateStorageCost();
-        expect(cfg.dynamoCostStorage).toBe(25);
+        expect(cfg.costStorage).toBe(25);
     });
 
     it('should calculate the correct storage cost for zero storageGB', () => {
         cfg.storageGB = 0;
         calculateStorageCost();
-        expect(cfg.dynamoCostStorage).toBe(0);
+        expect(cfg.costStorage).toBe(0);
     });
 
     it('should calculate the correct storage cost for fractional storageGB', () => {
         cfg.storageGB = 50.5;
         calculateStorageCost();
-        expect(cfg.dynamoCostStorage).toBe(12.625);
+        expect(cfg.costStorage).toBe(12.625);
     });
 });
 
@@ -60,10 +60,10 @@ describe('calculateDemandCosts', () => {
         cfg.readNonTransactional = 1;
         cfg.writeTransactional = 0;
         cfg.writeNonTransactional = 1;
-        cfg.dynamoCostStorage = 0;
-        cfg.dynamoCostDemandMonthlyReads = 0;
-        cfg.dynamoCostDemandMonthlyWrites = 0;
-        cfg.dynamoCostTotal = 0;
+        cfg.costStorage = 0;
+        cfg.costDemandMonthlyReads = 0;
+        cfg.costDemandMonthlyWrites = 0;
+        cfg.costTotal = 0;
     });
 
     it('should calculate the correct demand costs', () => {
@@ -71,11 +71,11 @@ describe('calculateDemandCosts', () => {
         calculateDemandCosts();
         calculateStorageCost();
 
-        expect(cfg.dynamoCostStorage.toFixed(2)).toBe("512.00");
-        expect(cfg.dynamoCostDemandMonthlyReads.toFixed(2)).toBe( "26280.00");
-        expect(cfg.dynamoCostDemandMonthlyWrites.toFixed(2)).toBe("32850.00");
-        cfg.dynamoCostTotal = cfg.dynamoCostStorage + cfg.dynamoCostDemandMonthlyReads + cfg.dynamoCostDemandMonthlyWrites;
-        expect(cfg.dynamoCostTotal.toFixed(2)).toBe("59642.00");
+        expect(cfg.costStorage.toFixed(2)).toBe("512.00");
+        expect(cfg.costDemandMonthlyReads.toFixed(2)).toBe( "26280.00");
+        expect(cfg.costDemandMonthlyWrites.toFixed(2)).toBe("32850.00");
+        cfg.costTotal = cfg.costStorage + cfg.costDemandMonthlyReads + cfg.costDemandMonthlyWrites;
+        expect(cfg.costTotal.toFixed(2)).toBe("59642.00");
     });
 });
 
@@ -103,10 +103,10 @@ describe('calculateProvisionedCosts', () => {
         cfg.writeTransactional = 0;
         cfg.writeNonTransactional = 1;
         cfg.reserved = 0;
-        cfg.dynamoCostProvisionedRCU = 0;
-        cfg.dynamoCostProvisionedWCU = 0;
-        cfg.dynamoCostStorage = 0;
-        cfg.dynamoCostTotal = 0;
+        cfg.costProvisionedRCU = 0;
+        cfg.costProvisionedWCU = 0;
+        cfg.costStorage = 0;
+        cfg.costTotal = 0;
     });
 
     it('should calculate the correct provisioned costs', () => {
@@ -114,11 +114,11 @@ describe('calculateProvisionedCosts', () => {
         calculateProvisionedCosts();
         calculateStorageCost();
 
-        expect(cfg.dynamoCostStorage.toFixed(2)).toBe("512.00");
-        expect(cfg.dynamoCostProvisionedRCU.toFixed(2)).toBe( "8528.00");
-        expect(cfg.dynamoCostProvisionedWCU.toFixed(2)).toBe( "10660.00");
-        cfg.dynamoCostTotal = cfg.dynamoCostStorage + cfg.dynamoCostProvisionedRCU + cfg.dynamoCostProvisionedWCU;
-        expect(cfg.dynamoCostTotal.toFixed(2)).toBe("19700.00");
+        expect(cfg.costStorage.toFixed(2)).toBe("512.00");
+        expect(cfg.costProvisionedRCU.toFixed(2)).toBe( "8528.00");
+        expect(cfg.costProvisionedWCU.toFixed(2)).toBe( "10660.00");
+        cfg.costTotal = cfg.costStorage + cfg.costProvisionedRCU + cfg.costProvisionedWCU;
+        expect(cfg.costTotal.toFixed(2)).toBe("19700.00");
     });
 });
 
@@ -146,14 +146,14 @@ describe('calculateReservedCosts', () => {
         cfg.writeTransactional = 0;
         cfg.writeNonTransactional = 1;
         cfg.reserved = 100;
-        cfg.dynamoCostMonthlyRCU = 0;
-        cfg.dynamoCostUpfrontRCU = 0;
-        cfg.dynamoCostMonthlyWCU = 0;
-        cfg.dynamoCostUpfrontWCU = 0;
-        cfg.dynamoCostStorage = 0;
-        cfg.dynamoCostProvisionedMonthly = 0;
-        cfg.dynamoCostTotalMonthly = 0;
-        cfg.dynamoCostProvisionedUpfront = 0;
+        cfg.costMonthlyRCU = 0;
+        cfg.costUpfrontRCU = 0;
+        cfg.costMonthlyWCU = 0;
+        cfg.costUpfrontWCU = 0;
+        cfg.costStorage = 0;
+        cfg.costProvisionedMonthly = 0;
+        cfg.costTotalMonthly = 0;
+        cfg.costReservedUpfront = 0;
     });
 
     it('should calculate the correct reserved costs', () => {
@@ -161,15 +161,15 @@ describe('calculateReservedCosts', () => {
         calculateProvisionedCosts();
         calculateStorageCost();
 
-        cfg.dynamoCostTotalMonthly = cfg.dynamoCostProvisionedMonthly + cfg.dynamoCostStorage;
-        cfg.dynamoCostTotalUpfront = cfg.dynamoCostProvisionedUpfront;
+        cfg.costTotalMonthly = cfg.costProvisionedMonthly + cfg.costStorage;
+        cfg.costTotalUpfront = cfg.costReservedUpfront;
 
-        expect(cfg.dynamoCostStorage.toFixed(2)).toBe("512.00");
-        expect(cfg.dynamoCostMonthlyRCU.toFixed(2)).toBe( "2396.00");
-        expect(cfg.dynamoCostUpfrontRCU.toFixed(2)).toBe( "24000.00");
-        expect(cfg.dynamoCostMonthlyWCU.toFixed(2)).toBe( "3038.80");
-        expect(cfg.dynamoCostUpfrontWCU.toFixed(2)).toBe( "30000.00");
-        expect(cfg.dynamoCostTotalMonthly.toFixed(2)).toBe("5946.80");
-        expect(cfg.dynamoCostTotalUpfront.toFixed(2)).toBe("54000.00");
+        expect(cfg.costStorage.toFixed(2)).toBe("512.00");
+        expect(cfg.costMonthlyRCU.toFixed(2)).toBe( "2396.00");
+        expect(cfg.costUpfrontRCU.toFixed(2)).toBe( "24000.00");
+        expect(cfg.costMonthlyWCU.toFixed(2)).toBe( "3038.80");
+        expect(cfg.costUpfrontWCU.toFixed(2)).toBe( "30000.00");
+        expect(cfg.costTotalMonthly.toFixed(2)).toBe("5946.80");
+        expect(cfg.costTotalUpfront.toFixed(2)).toBe("54000.00");
     });
 });

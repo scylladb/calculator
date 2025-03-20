@@ -64,11 +64,11 @@ export function calculateProvisionedCosts() {
     cfg.provisionedPeakWCU = Math.ceil(Math.max(cfg.provisionedPeakWCU, 0));
     cfg.provisionedPeakWCUHours = Math.ceil(cfg.provisionedPeakWCU * cfg.peakHoursWrites);
     cfg.provisionedTotalWCUHours = Math.ceil(cfg.provisionedBaselineWCUHours + cfg.provisionedPeakWCUHours);
-    cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    cfg.dynamoCostReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
-    cfg.dynamoCostMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    cfg.dynamoCostMonthlyWCU = cfg.dynamoCostProvisionedWCU + cfg.dynamoCostReservedWCU;
-    cfg.dynamoCostUpfrontWCU = cfg.reservedWCU * 1.50;
+    cfg.costProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+    cfg.costReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
+    cfg.costMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+    cfg.costMonthlyWCU = cfg.costProvisionedWCU + cfg.costReservedWCU;
+    cfg.costUpfrontWCU = cfg.reservedWCU * 1.50;
 
     cfg.baselineRCUNonTransactional = cfg.baselineReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem;
     cfg.baselineRCUStronglyConsistent = cfg.baselineReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem;
@@ -87,14 +87,14 @@ export function calculateProvisionedCosts() {
     cfg.provisionedPeakRCU = Math.ceil(Math.max(cfg.provisionedPeakRCU, 0));
     cfg.provisionedPeakRCUHours = Math.ceil(cfg.provisionedPeakRCU * cfg.peakHoursReads);
     cfg.provisionedTotalRCUHours = Math.ceil(cfg.provisionedBaselineRCUHours + cfg.provisionedPeakRCUHours);
-    cfg.dynamoCostProvisionedRCU = cfg.provisionedTotalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
-    cfg.dynamoCostReservedRCU = cfg.reservedRCU * cfg.pricePerRRCU * cfg.hoursPerMonth;
-    cfg.dynamoCostMonthlyRCU = cfg.dynamoCostProvisionedRCU + cfg.dynamoCostReservedRCU;
-    cfg.dynamoCostUpfrontRCU = cfg.reservedRCU * 0.3;
+    cfg.costProvisionedRCU = cfg.provisionedTotalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
+    cfg.costReservedRCU = cfg.reservedRCU * cfg.pricePerRRCU * cfg.hoursPerMonth;
+    cfg.costMonthlyRCU = cfg.costProvisionedRCU + cfg.costReservedRCU;
+    cfg.costUpfrontRCU = cfg.reservedRCU * 0.3;
 
-    cfg.dynamoCostProvisionedMonthly = cfg.dynamoCostMonthlyWCU + cfg.dynamoCostMonthlyRCU + cfg.dynamoCostMonthlyReplicatedWCU;
-    cfg.dynamoCostProvisionedUpfront = cfg.dynamoCostUpfrontWCU + cfg.dynamoCostUpfrontRCU;
-    cfg.dynamoCostProvisioned = cfg.dynamoCostProvisionedMonthly + cfg.dynamoCostProvisionedUpfront / 12;
+    cfg.costProvisionedMonthly = cfg.costMonthlyWCU + cfg.costMonthlyRCU + cfg.costMonthlyReplicatedWCU;
+    cfg.costReservedUpfront = cfg.costUpfrontWCU + cfg.costUpfrontRCU;
+    cfg.costProvisioned = cfg.costProvisionedMonthly + cfg.costReservedUpfront / 12;
 }
 
 export function calculateDemandCosts() {
@@ -104,23 +104,23 @@ export function calculateDemandCosts() {
     cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem);
-    cfg.dynamoCostDemandMonthlyReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
+    cfg.costDemandMonthlyReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
     cfg.numberWrites = (cfg.baselineWrites * 3600 * cfg.baselineHoursWrites) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
     cfg.writeRequestUnits = (cfg.numberWrites * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem) +
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
-    cfg.dynamoCostDemandMonthlyWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
+    cfg.costDemandMonthlyWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
-    cfg.dynamoCostDemandMonthlyReplicatedWRU = (cfg.regions - 1) * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
+    cfg.costDemandMonthlyReplicatedWRU = (cfg.regions - 1) * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
-    cfg.dynamoCostDemandMonthly = cfg.dynamoCostDemandMonthlyReads + cfg.dynamoCostDemandMonthlyWrites + cfg.dynamoCostDemandMonthlyReplicatedWRU;
+    cfg.costDemandMonthly = cfg.costDemandMonthlyReads + cfg.costDemandMonthlyWrites + cfg.costDemandMonthlyReplicatedWRU;
 }
 
 function calculateNetworkCosts() {
     cfg.totalReadsKB = cfg.readsOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalWritesKB = cfg.writesOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalReplicatedWritesGB =((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
-    cfg.dynamoCostNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
+    cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
 function findBestDaxCombination(targetRPS) {
@@ -175,15 +175,15 @@ function calculateDaxCosts() {
         cfg.dynamoDaxCost = cfg.hoursPerMonth * cfg.daxInstanceClassCost;
         document.getElementById('daxInstanceClass').textContent = bestCombination.instance;
         document.getElementById('daxNodes').textContent = bestCombination.nodes;
-        cfg.dynamoCostDemandMonthlyReads = cfg.dynamoCostDemandMonthlyReads * (1 - cfg.cacheRatio / 100);
-        cfg.dynamoCostMonthlyRCU = cfg.dynamoCostMonthlyRCU * (1 - cfg.cacheRatio / 100);
+        cfg.costDemandMonthlyReads = cfg.costDemandMonthlyReads * (1 - cfg.cacheRatio / 100);
+        cfg.costMonthlyRCU = cfg.costMonthlyRCU * (1 - cfg.cacheRatio / 100);
     } else {
         console.error('No valid DAX combination found.');
     }
 }
 
 export function calculateStorageCost() {
-    cfg.dynamoCostStorage = cfg.storageGB * 0.25;
+    cfg.costStorage = cfg.storageGB * 0.25;
 }
 
 function calculateTotalOpsSec() {
@@ -194,36 +194,36 @@ function calculateTotalOpsSec() {
 
 function logCosts() {
     let logs = [
-        `Monthly storage cost: ${Math.floor(cfg.dynamoCostStorage).toLocaleString()}`,];
+        `Monthly storage cost: ${Math.floor(cfg.costStorage).toLocaleString()}`,];
 
     if (cfg.pricing === 'demand') {
-        logs.push(`Monthly write cost: ${Math.floor(cfg.dynamoCostDemandMonthlyWrites).toLocaleString()}`);
+        logs.push(`Monthly write cost: ${Math.floor(cfg.costDemandMonthlyWrites).toLocaleString()}`);
 
-        if (cfg.dynamoCostDemandMonthlyReplicatedWRU !== 0) {
-            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.dynamoCostDemandMonthlyReplicatedWRU).toLocaleString()}`);
+        if (cfg.costDemandMonthlyReplicatedWRU !== 0) {
+            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.costDemandMonthlyReplicatedWRU).toLocaleString()}`);
         }
 
-        logs.push(`Monthly read cost: ${Math.floor(cfg.dynamoCostDemandMonthlyReads).toLocaleString()}`);
+        logs.push(`Monthly read cost: ${Math.floor(cfg.costDemandMonthlyReads).toLocaleString()}`);
     } else {
-        logs.push(`Monthly write cost: ${Math.floor(cfg.dynamoCostMonthlyWCU).toLocaleString()}`);
+        logs.push(`Monthly write cost: ${Math.floor(cfg.costMonthlyWCU).toLocaleString()}`);
 
-        if (cfg.dynamoCostMonthlyReplicatedWCU !== 0) {
-            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.dynamoCostMonthlyReplicatedWCU).toLocaleString()}`);
+        if (cfg.costMonthlyReplicatedWCU !== 0) {
+            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.costMonthlyReplicatedWCU).toLocaleString()}`);
         }
 
-        if (cfg.dynamoCostUpfrontWCU !== 0) {
-            logs.push(`Upfront write cost: ${Math.floor(cfg.dynamoCostUpfrontWCU).toLocaleString()}`);
+        if (cfg.costUpfrontWCU !== 0) {
+            logs.push(`Upfront write cost: ${Math.floor(cfg.costUpfrontWCU).toLocaleString()}`);
         }
 
-        logs.push(`Monthly read cost: ${Math.floor(cfg.dynamoCostMonthlyRCU).toLocaleString()}`);
+        logs.push(`Monthly read cost: ${Math.floor(cfg.costMonthlyRCU).toLocaleString()}`);
 
-        if (cfg.dynamoCostUpfrontRCU !== 0) {
-            logs.push(`Upfront read cost: ${Math.floor(cfg.dynamoCostUpfrontRCU).toLocaleString()}`);
+        if (cfg.costUpfrontRCU !== 0) {
+            logs.push(`Upfront read cost: ${Math.floor(cfg.costUpfrontRCU).toLocaleString()}`);
         }
     }
 
-    if (cfg.dynamoCostNetwork !== 0) {
-        logs.push(`Monthly network cost: ${Math.floor(cfg.dynamoCostNetwork).toLocaleString()}`);
+    if (cfg.costNetwork !== 0) {
+        logs.push(`Monthly network cost: ${Math.floor(cfg.costNetwork).toLocaleString()}`);
     }
 
     if (cfg.dynamoDaxCost !== 0) {
@@ -232,11 +232,11 @@ function logCosts() {
 
     logs.push(`---: ---`);
 
-    if (cfg.dynamoCostTotalUpfront !== 0 && cfg.pricing === 'provisioned') {
-        logs.push(`Total upfront cost: ${Math.floor(cfg.dynamoCostTotalUpfront).toLocaleString()}`);
+    if (cfg.costTotalUpfront !== 0 && cfg.pricing === 'provisioned') {
+        logs.push(`Total upfront cost: ${Math.floor(cfg.costTotalUpfront).toLocaleString()}`);
     }
 
-    logs.push(`Total monthly cost: ${Math.floor(cfg.dynamoCostTotalMonthly).toLocaleString()}`);
+    logs.push(`Total monthly cost: ${Math.floor(cfg.costTotalMonthly).toLocaleString()}`);
 
     console.log(cfg);
 
@@ -260,13 +260,13 @@ export function updateCosts() {
     calculateNetworkCosts();
     calculateDaxCosts();
 
-    cfg.dynamoCostTotalMonthly = cfg.pricing === 'demand' ?
-        cfg.dynamoCostDemandMonthly + cfg.dynamoCostStorage :
-        cfg.dynamoCostProvisionedMonthly + cfg.dynamoCostStorage;
+    cfg.costTotalMonthly = cfg.pricing === 'demand' ?
+        cfg.costDemandMonthly + cfg.costStorage :
+        cfg.costProvisionedMonthly + cfg.costStorage;
 
-    cfg.dynamoCostTotalUpfront = cfg.dynamoCostProvisionedUpfront;
+    cfg.costTotalUpfront = cfg.costReservedUpfront;
 
-    cfg.dynamoCostTotalMonthlyAveraged = cfg.dynamoCostTotalMonthly + (cfg.dynamoCostTotalUpfront / 12) + cfg.dynamoCostNetwork + cfg.dynamoDaxCost;
+    cfg.costTotalMonthlyAveraged = cfg.costTotalMonthly + (cfg.costTotalUpfront / 12) + cfg.costNetwork + cfg.dynamoDaxCost;
 
     logCosts();
 }
