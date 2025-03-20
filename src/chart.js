@@ -72,7 +72,7 @@ export const chart = new Chart(ctx, {
                 type: 'linear',
                 title: {
                     display: true,
-                    text: 'op/sec'
+                    text: 'ops/sec'
                 },
                 min: 1000,
                 max: (cfg.peakReads + cfg.peakWrites) * 2,
