@@ -175,7 +175,7 @@ function calculateDaxCosts() {
         cfg.dynamoDaxCost = cfg.hoursPerMonth * cfg.daxInstanceClassCost;
         document.getElementById('daxInstanceClass').textContent = bestCombination.instance;
         document.getElementById('daxNodes').textContent = bestCombination.nodes;
-        cfg.dynamoCostDemandReads = cfg.dynamoCostDemandReads * (1 - cfg.cacheRatio / 100);
+        cfg.dynamoCostDemandMonthlyReads = cfg.dynamoCostDemandMonthlyReads * (1 - cfg.cacheRatio / 100);
         cfg.dynamoCostMonthlyRCU = cfg.dynamoCostMonthlyRCU * (1 - cfg.cacheRatio / 100);
     } else {
         console.error('No valid DAX combination found.');

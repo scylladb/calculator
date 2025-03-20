@@ -61,8 +61,8 @@ describe('calculateDemandCosts', () => {
         cfg.writeTransactional = 0;
         cfg.writeNonTransactional = 1;
         cfg.dynamoCostStorage = 0;
-        cfg.dynamoCostDemandReads = 0;
-        cfg.dynamoCostDemandWrites = 0;
+        cfg.dynamoCostDemandMonthlyReads = 0;
+        cfg.dynamoCostDemandMonthlyWrites = 0;
         cfg.dynamoCostTotal = 0;
     });
 
@@ -72,9 +72,9 @@ describe('calculateDemandCosts', () => {
         calculateStorageCost();
 
         expect(cfg.dynamoCostStorage.toFixed(2)).toBe("512.00");
-        expect(cfg.dynamoCostDemandReads.toFixed(2)).toBe( "26280.00");
-        expect(cfg.dynamoCostDemandWrites.toFixed(2)).toBe("32850.00");
-        cfg.dynamoCostTotal = cfg.dynamoCostStorage + cfg.dynamoCostDemandReads + cfg.dynamoCostDemandWrites;
+        expect(cfg.dynamoCostDemandMonthlyReads.toFixed(2)).toBe( "26280.00");
+        expect(cfg.dynamoCostDemandMonthlyWrites.toFixed(2)).toBe("32850.00");
+        cfg.dynamoCostTotal = cfg.dynamoCostStorage + cfg.dynamoCostDemandMonthlyReads + cfg.dynamoCostDemandMonthlyWrites;
         expect(cfg.dynamoCostTotal.toFixed(2)).toBe("59642.00");
     });
 });
