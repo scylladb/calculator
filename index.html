@@ -43,37 +43,63 @@
       </a>
 
       <div id="opsParams">
-        <div>
-          <label for="baseline">Baseline:
-            <input type="text" id="baselineInp" style="display: none; width: 80px; cursor: pointer;">
-            <span id="baselineDsp">50K</span> ops/sec
-            <span class="info-icon">i
-                <span class="tooltip-text">Enter the number of operations per second that your workload needs during off-peak periods.</span>
-            </span>
-          </label>
-          <input type="range" id="baseline" min="1000" max="2000000" step="1000" value="50000">
+        <div class="inline-container">
+          <div>
+            <label for="baselineReads">Baseline Reads:
+              <input type="text" id="baselineReadsInp" style="display: none; width: 80px; cursor: pointer;">
+              <span id="baselineReadsDsp">50K</span> ops/sec
+              <span class="info-icon">i
+                <span class="tooltip-text">Enter the number of read operations per second that your workload needs during off-peak periods.</span>
+              </span>
+            </label>
+            <input type="range" id="baselineReads" min="1000" max="2000000" step="1000" value="50000">
+          </div>
+
+          <div>
+            <label for="baselineWrites">Baseline Writes:
+              <input type="text" id="baselineWritesInp" style="display: none; width: 80px; cursor: pointer;">
+              <span id="baselineWritesDsp">50K</span> ops/sec
+              <span class="info-icon">i
+                <span class="tooltip-text">Enter the number of write operations per second that your workload needs during off-peak periods.</span>
+              </span>
+            </label>
+            <input type="range" id="baselineWrites" min="1000" max="2000000" step="1000" value="50000">
+          </div>
+        </div>
+
+        <div class="inline-container">
+          <div>
+            <label for="peakReads">Peak Reads:
+              <input type="text" id="peakReadsInp" style="display: none; width: 80px; cursor: pointer;">
+              <span id="peakReadsDsp">500K</span> ops/sec
+              <span class="info-icon">i
+                  <span class="tooltip-text">Enter the maximum number of read operations per second that your workload needs during peak periods.</span>
+              </span>
+            </label>
+            <input type="range" id="peakReads" min="1000" max="2000000" step="1000" value="500000">
+          </div>
+
+          <div>
+            <label for="peakReads">Peak Writes:
+              <input type="text" id="peakWritesInp" style="display: none; width: 80px; cursor: pointer;">
+              <span id="peakWritesDsp">500K</span> ops/sec
+              <span class="info-icon">i
+                  <span class="tooltip-text">Enter the maximum number of write operations per second that your workload needs during peak periods.</span>
+              </span>
+            </label>
+            <input type="range" id="peakWrites" min="1000" max="2000000" step="1000" value="500000">
+          </div>
         </div>
 
         <div>
-          <label for="peak">Peak:
-            <input type="text" id="peakInp" style="display: none; width: 80px; cursor: pointer;">
-            <span id="peakDsp">500K</span> ops/sec
-            <span class="info-icon">i
-                <span class="tooltip-text">Enter the maximum number of operations per second that your workload needs during peak periods.</span>
-            </span>
-          </label>
-          <input type="range" id="peak" min="1000" max="2000000" step="1000" value="500000">
-        </div>
-
-        <div>
-          <label for="peakWidth">Peak:
+          <label for="peakWidth">Peak Duration:
             <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
             <span id="peakWidthDsp">1</span> hours per day
             <span class="info-icon">i
                 <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
             </span>
           </label>
-          <input type="range" id="peakWidth" min="1" max="24" value="1">
+          <input type="range" id="peakWidth" min="0" max="24" value="1">
         </div>
 
         <div id="provisionedParams" style="display: none;">
@@ -87,16 +113,6 @@
             </label>
             <input type="range" id="reserved" min="0" max="100" step="1" value="0">
           </div>
-        </div>
-
-        <div>
-          <label for="ratio">Read/Write Ratio:
-            <span id="ratioDsp">50/50</span>
-            <span class="info-icon">i
-                <span class="tooltip-text">Enter the read write ratio that your workload will use.</span>
-            </span>
-          </label>
-          <input type="range" id="ratio" min="0" max="100" step="1" value="50">
         </div>
 
         <div>

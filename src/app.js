@@ -81,42 +81,59 @@ document.getElementById('tableClass').addEventListener('change', (event) => {
     updateAll();
 });
 
-document.getElementById('ratio').addEventListener('input', (event) => {
-    cfg.ratio = parseInt(event.target.value);
-    const writeRatio = cfg.ratio;
-    const readRatio = 100 - writeRatio;
-    document.getElementById('ratioDsp').innerText = `${readRatio}/${writeRatio}`;
+document.getElementById('baselineReads').addEventListener('input', (event) => {
+    cfg.baselineReads = parseInt(event.target.value);
+    document.getElementById('baselineReadsDsp').innerText = formatNumber(cfg.baselineReads);
+
+    if (cfg.peakReads < cfg.baselineReads) {
+        cfg.peakReads = cfg.baselineReads;
+        document.getElementById('peakReads').value = cfg.peakReads;
+        document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.peakReads);
+    }
+
     updateAll();
 });
 
-document.getElementById('baseline').addEventListener('input', (event) => {
-    cfg.baseline = parseInt(event.target.value);
-    document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
+document.getElementById('baselineWrites').addEventListener('input', (event) => {
+    cfg.baselineWrites = parseInt(event.target.value);
+    document.getElementById('baselineWritesDsp').innerText = formatNumber(cfg.baselineWrites);
 
-    if (cfg.peak < cfg.baseline) {
-        cfg.peak = cfg.baseline;
-        document.getElementById('peak').value = cfg.peak;
-        document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
+    if (cfg.peakWrites < cfg.baselineWrites) {
+        cfg.peakWrites = cfg.baselineWrites;
+        document.getElementById('peakWrites').value = cfg.peakWrites;
+        document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.peakWrites);
     }
 
+    updateAll();
+});
+
+document.getElementById('peakReads').addEventListener('input', (event) => {
+    let newPeak = parseInt(event.target.value);
+    if (newPeak < cfg.baselineReads) {
+        cfg.baselineReads = newPeak;
+        document.getElementById('baselineReads').value = cfg.baselineReads;
+        document.getElementById('baselineReadsDsp').innerText = formatNumber(cfg.baselineReads);
+    }
+    cfg.peakReads = newPeak;
+    document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.peakReads);
+    updateAll();
+});
+
+document.getElementById('peakWrites').addEventListener('input', (event) => {
+    let newPeak = parseInt(event.target.value);
+    if (newPeak < cfg.baselineWrites) {
+        cfg.baselineWrites = newPeak;
+        document.getElementById('baselineWrites').value = cfg.baselineWrites;
+        document.getElementById('baselineWritesDsp').innerText = formatNumber(cfg.baselineWrites);
+    }
+    cfg.peakWrites = newPeak;
+    document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.peakWrites);
     updateAll();
 });
 
 document.getElementById('peakWidth').addEventListener('input', (event) => {
-    cfg.peakWidth = Math.max(1, parseInt(event.target.value));
+    cfg.peakWidth = Math.max(0, parseInt(event.target.value));
     document.getElementById('peakWidthDsp').innerText = cfg.peakWidth.toString();
-    updateAll();
-});
-
-document.getElementById('peak').addEventListener('input', (event) => {
-    let newPeak = parseInt(event.target.value);
-    if (newPeak < cfg.baseline) {
-        cfg.baseline = newPeak;
-        document.getElementById('baseline').value = cfg.baseline;
-        document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
-    }
-    cfg.peak = newPeak;
-    document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
     updateAll();
 });
 
@@ -187,8 +204,10 @@ document.getElementById('cacheRatio').addEventListener('input', (event) => {
     updateAll();
 });
 
-setupSliderInteraction('baselineDsp', 'baselineInp', 'baseline', formatNumber);
-setupSliderInteraction('peakDsp', 'peakInp', 'peak', formatNumber);
+setupSliderInteraction('baselineReadsDsp', 'baselineReadsInp', 'baselineReads', formatNumber);
+setupSliderInteraction('baselineWritesDsp', 'baselineWritesInp', 'baselineWrites', formatNumber);
+setupSliderInteraction('peakReadsDsp', 'peakReadsInp', 'peakReads', formatNumber);
+setupSliderInteraction('peakWritesDsp', 'peakWritesInp', 'peakWrites', formatNumber);
 setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
@@ -211,24 +230,26 @@ if (cfg.pricing === 'demand') {
     document.getElementById('provisionedParams').style.display = 'block';
 }
 
-document.getElementById('baseline').value = cfg.baseline;
-document.getElementById('peak').value = cfg.peak;
+document.getElementById('baselineReads').value = cfg.baselineReads;
+document.getElementById('baselineWrites').value = cfg.baselineWrites;
+document.getElementById('peakReads').value = cfg.peakReads;
+document.getElementById('peakWrites').value = cfg.peakWrites;
 document.getElementById('peakWidth').value = cfg.peakWidth;
 document.getElementById('itemSizeB').value = cfg.itemSizeB;
 document.getElementById('storageGB').value = cfg.storageGB;
-document.getElementById('ratio').value = cfg.ratio;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
 document.getElementById('reserved').value = cfg.reserved;
 document.getElementById('readConst').value = cfg.readConst;
 
-document.getElementById('baselineDsp').innerText = formatNumber(cfg.baseline);
-document.getElementById('peakDsp').innerText = formatNumber(cfg.peak);
+document.getElementById('baselineReadsDsp').innerText = formatNumber(cfg.baselineReads);
+document.getElementById('baselineWritesDsp').innerText = formatNumber(cfg.baselineWrites);
+document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.peakReads);
+document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.peakWrites);
 document.getElementById('peakWidthDsp').innerText = cfg.peakWidth.toString();
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
-document.getElementById('ratioDsp').innerText = `${100 - cfg.ratio}/${cfg.ratio}`;
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;

@@ -1,7 +1,9 @@
 export const cfg = {
     pricing:            'demand',
-    baseline:           100000,
-    peak:               500000,
+    baselineReads:      100000,
+    baselineWrites:     100000,
+    peakReads:          500000,
+    peakWrites:         500000,
     peakWidth:          3,
     hoursPerMonth:      730,
     itemSizeB:          1024,

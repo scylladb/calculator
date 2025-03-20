@@ -9,20 +9,23 @@ function generateData(baseline, peak, peakWidth) {
     const peakEnd = peakStart + peakWidth;
 
     for (let hour = 0; hour <= 24; hour++) {
-        if (hour >= peakStart && hour < peakEnd) {
+        if (peakWidth > 0 && hour >= peakStart && hour < peakEnd) {
             data.push({x: hour, y: peak});
         } else {
             data.push({x: hour, y: baseline});
         }
     }
+
     return data;
 }
 
 export function updateChart() {
-    chart.data.datasets[0].data = generateData(cfg.baseline, cfg.peak, cfg.peakWidth);
+    let baseline = cfg.baselineReads + cfg.baselineWrites;
+    let peak = cfg.peakReads + cfg.peakWrites;
+    chart.data.datasets[0].data = generateData(baseline, peak, cfg.peakWidth);
     // Check if peak is close to the current y-axis max value
-    if (cfg.peak >= chart.options.scales.y.max * 0.98) {
-        chart.options.scales.y.max = cfg.peak * 1.2;
+    if (peak >= chart.options.scales.y.max * 0.98) {
+        chart.options.scales.y.max = peak * 1.2;
     }
     chart.update();
 }
@@ -71,7 +74,7 @@ export const chart = new Chart(ctx, {
                     text: 'op/sec'
                 },
                 min: 1000,
-                max: cfg.peak * 2,
+                max: (cfg.peakReads + cfg.peakWrites) * 2,
                 ticks: {
                     callback: function (value, index, values) {
                         if (value === values[values.length - 1].value) {

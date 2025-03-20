@@ -21,12 +21,13 @@ export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
 
     if (params.get('workload')) cfg.workload = params.get('workload');
-    if (params.get('baseline')) cfg.baseline = parseInt(params.get('baseline'));
-    if (params.get('peak')) cfg.peak = parseInt(params.get('peak'));
+    if (params.get('baselineReads')) cfg.baselineReads = parseInt(params.get('baselineReads'));
+    if (params.get('baselineWrites')) cfg.baselineWrites = parseInt(params.get('baselineWrites'));
+    if (params.get('peakReads')) cfg.peakReads = parseInt(params.get('peakReads'));
+    if (params.get('peakWrites')) cfg.peakWrites = parseInt(params.get('peakWrites'));
     if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
     if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
     if (params.get('itemSizeB')) cfg.itemSizeB = parseInt(params.get('itemSizeB'));
-    if (params.get('ratio')) cfg.ratio = parseInt(params.get('ratio'));
     if (params.get('pricing')) cfg.pricing = params.get('pricing');
     if (params.get('regions')) cfg.regions = parseInt(params.get('regions'));
     if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
@@ -59,8 +60,10 @@ export function updateQueryParams() {
         params.set('itemSizeB', cfg.itemSizeB.toString());
         params.set('tableClass', cfg.tableClass);
         params.set('ratio', cfg.ratio.toString());
-        params.set('baseline', cfg.baseline.toString());
-        params.set('peak', cfg.peak.toString());
+        params.set('baselineReads', cfg.baselineReads.toString());
+        params.set('baselineWrites', cfg.baselineWrites.toString());
+        params.set('peakReads', cfg.peakReads.toString());
+        params.set('peakWrites', cfg.peakWrites.toString());
         params.set('peakWidth', cfg.peakWidth.toString());
         params.set('reserved', cfg.reserved.toString());
         params.set('readConst', cfg.readConst.toString());
