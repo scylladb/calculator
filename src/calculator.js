@@ -111,9 +111,9 @@ export function calculateDemandCosts() {
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
     cfg.dynamoCostDemandMonthlyWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
-    cfg.dynamoCostDemandMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePer_rWRU : cfg.pricePer_rWRU_IA);
+    cfg.dynamoCostDemandMonthlyReplicatedWRU = (cfg.regions - 1) * cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePer_rWRU : cfg.pricePer_rWRU_IA);
 
-    cfg.dynamoCostDemandMonthly = cfg.dynamoCostDemandMonthlyReads + cfg.dynamoCostDemandMonthlyWrites + cfg.dynamoCostDemandMonthlyReplicatedWCU;
+    cfg.dynamoCostDemandMonthly = cfg.dynamoCostDemandMonthlyReads + cfg.dynamoCostDemandMonthlyWrites + cfg.dynamoCostDemandMonthlyReplicatedWRU;
 }
 
 function calculateNetworkCosts() {
