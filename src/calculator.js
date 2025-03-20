@@ -33,14 +33,15 @@ function getConsistencyValues() {
     cfg.writeNonTransactional = 1 - cfg.writeTransactional;
 }
 
-function getDemandValues() {
-    cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
-    cfg.peakHours = cfg.peakWidth * 30;
+function getReservedValues() {
+    cfg.reserved = parseInt(document.getElementById('reserved').value);
 }
 
-function getProvisionedValues() {
+function getHoursValues() {
+    cfg.peakHoursReads = cfg.peakDurationReads * 30;
+    cfg.peakHoursWrites = cfg.peakDurationWrites * 30;
+    cfg.peakHours = cfg.peakHoursReads + cfg.peakHoursWrites;
     cfg.baselineHours = cfg.hoursPerMonth - cfg.peakHours;
-    cfg.peakHours = cfg.peakWidth * 30;
     cfg.reserved = parseInt(document.getElementById('reserved').value);
 }
 
@@ -61,7 +62,7 @@ export function calculateProvisionedCosts() {
     cfg.peakWCUTotal = cfg.peakWCUNonTransactional + cfg.peakWCUTransactional;
     cfg.provisionedPeakWCU = cfg.peakWCUTotal - cfg.reservedWCU;
     cfg.provisionedPeakWCU = Math.ceil(Math.max(cfg.provisionedPeakWCU, 0));
-    cfg.provisionedPeakWCUHours = Math.ceil(cfg.provisionedPeakWCU * cfg.peakHours);
+    cfg.provisionedPeakWCUHours = Math.ceil(cfg.provisionedPeakWCU * cfg.peakHoursWrites);
     cfg.provisionedTotalWCUHours = Math.ceil(cfg.provisionedBaselineWCUHours + cfg.provisionedPeakWCUHours);
     cfg.dynamoCostProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
     cfg.dynamoCostReplication = (cfg.regions - 1) * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRWRU : cfg.pricePerRWRU_IA);
@@ -84,7 +85,7 @@ export function calculateProvisionedCosts() {
     cfg.peakRCUTotal = cfg.peakRCUNonTransactional + cfg.peakRCUStronglyConsistent + cfg.peakRCUTransactional;
     cfg.provisionedPeakRCU = cfg.peakRCUTotal - cfg.reservedRCU;
     cfg.provisionedPeakRCU = Math.ceil(Math.max(cfg.provisionedPeakRCU, 0));
-    cfg.provisionedPeakRCUHours = Math.ceil(cfg.provisionedPeakRCU * cfg.peakHours);
+    cfg.provisionedPeakRCUHours = Math.ceil(cfg.provisionedPeakRCU * cfg.peakHoursReads);
     cfg.provisionedTotalRCUHours = Math.ceil(cfg.provisionedBaselineRCUHours + cfg.provisionedPeakRCUHours);
     cfg.dynamoCostProvisionedRCU = cfg.provisionedTotalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
     cfg.dynamoCostReservedRCU = cfg.reservedRCU * cfg.pricePerRRCU * cfg.hoursPerMonth;
@@ -99,13 +100,13 @@ export function calculateProvisionedCosts() {
 export function calculateDemandCosts() {
     cfg.readRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB / 4.0);
     cfg.writeRequestUnitsPerItem = Math.ceil(cfg.itemSizeKB);
-    cfg.numberReads = (cfg.baselineReads * 3600 * cfg.baselineHours) + (cfg.peakReads * 3600 * cfg.peakHours);
+    cfg.numberReads = (cfg.baselineReads * 3600 * cfg.baselineHours) + (cfg.peakReads * 3600 * cfg.peakHoursReads);
     cfg.readRequestUnits = (cfg.numberReads * cfg.readEventuallyConsistent * 0.5 * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readStronglyConsistent * cfg.readRequestUnitsPerItem) +
         (cfg.numberReads * cfg.readTransactional * 2 * cfg.readRequestUnitsPerItem);
     cfg.dynamoCostDemandReads = cfg.readRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
-    cfg.numberWrites = (cfg.baselineWrites * 3600 * cfg.baselineHours) + (cfg.peakWrites * 3600 * cfg.peakHours);
+    cfg.numberWrites = (cfg.baselineWrites * 3600 * cfg.baselineHours) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
     cfg.writeRequestUnits = (cfg.numberWrites * cfg.writeNonTransactional * cfg.writeRequestUnitsPerItem) +
         (cfg.numberWrites * cfg.writeTransactional * 2 * cfg.writeRequestUnitsPerItem);
     cfg.dynamoCostDemandWrites = cfg.writeRequestUnits * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
@@ -244,8 +245,8 @@ export function updateCosts() {
     getReplicatedRegions()
     getStorageValues();
     getConsistencyValues();
-    getDemandValues();
-    getProvisionedValues();
+    getHoursValues();
+    getReservedValues();
     getDaxValues();
 
     calculateProvisionedCosts();

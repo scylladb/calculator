@@ -25,7 +25,7 @@ export function getQueryParams() {
     if (params.get('baselineWrites')) cfg.baselineWrites = parseInt(params.get('baselineWrites'));
     if (params.get('peakReads')) cfg.peakReads = parseInt(params.get('peakReads'));
     if (params.get('peakWrites')) cfg.peakWrites = parseInt(params.get('peakWrites'));
-    if (params.get('peakWidth')) cfg.peakWidth = parseInt(params.get('peakWidth'));
+    if (params.get('peakDuration')) cfg.peakDuration = parseInt(params.get('peakDuration'));
     if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
     if (params.get('itemSizeB')) cfg.itemSizeB = parseInt(params.get('itemSizeB'));
     if (params.get('pricing')) cfg.pricing = params.get('pricing');
@@ -64,7 +64,8 @@ export function updateQueryParams() {
         params.set('baselineWrites', cfg.baselineWrites.toString());
         params.set('peakReads', cfg.peakReads.toString());
         params.set('peakWrites', cfg.peakWrites.toString());
-        params.set('peakWidth', cfg.peakWidth.toString());
+        params.set('peakDurationReads', cfg.peakDurationReads.toString());
+        params.set('peakDurationWrites', cfg.peakDurationWrites.toString());
         params.set('reserved', cfg.reserved.toString());
         params.set('readConst', cfg.readConst.toString());
 

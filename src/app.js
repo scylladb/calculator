@@ -131,9 +131,15 @@ document.getElementById('peakWrites').addEventListener('input', (event) => {
     updateAll();
 });
 
-document.getElementById('peakWidth').addEventListener('input', (event) => {
-    cfg.peakWidth = Math.max(0, parseInt(event.target.value));
-    document.getElementById('peakWidthDsp').innerText = cfg.peakWidth.toString();
+document.getElementById('peakDurationReads').addEventListener('input', (event) => {
+    cfg.peakDurationReads = Math.max(0, parseInt(event.target.value));
+    document.getElementById('peakDurationReadsDsp').innerText = cfg.peakDurationReads.toString();
+    updateAll();
+});
+
+document.getElementById('peakDurationWrites').addEventListener('input', (event) => {
+    cfg.peakDurationWrites = Math.max(0, parseInt(event.target.value));
+    document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationReads.toString();
     updateAll();
 });
 
@@ -208,7 +214,8 @@ setupSliderInteraction('baselineReadsDsp', 'baselineReadsInp', 'baselineReads', 
 setupSliderInteraction('baselineWritesDsp', 'baselineWritesInp', 'baselineWrites', formatNumber);
 setupSliderInteraction('peakReadsDsp', 'peakReadsInp', 'peakReads', formatNumber);
 setupSliderInteraction('peakWritesDsp', 'peakWritesInp', 'peakWrites', formatNumber);
-setupSliderInteraction('peakWidthDsp', 'peakWidthInp', 'peakWidth', value => value);
+setupSliderInteraction('peakDurationReadsDsp', 'peakDurationReadsInp', 'peakDurationReads', value => value);
+setupSliderInteraction('peakDurationWritesDsp', 'peakDurationWritesInp', 'peakDurationWrites', value => value);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
@@ -234,7 +241,8 @@ document.getElementById('baselineReads').value = cfg.baselineReads;
 document.getElementById('baselineWrites').value = cfg.baselineWrites;
 document.getElementById('peakReads').value = cfg.peakReads;
 document.getElementById('peakWrites').value = cfg.peakWrites;
-document.getElementById('peakWidth').value = cfg.peakWidth;
+document.getElementById('peakDurationReads').value = cfg.peakDurationReads;
+document.getElementById('peakDurationWrites').value = cfg.peakDurationWrites;
 document.getElementById('itemSizeB').value = cfg.itemSizeB;
 document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('regions').value = cfg.regions;
@@ -247,7 +255,8 @@ document.getElementById('baselineReadsDsp').innerText = formatNumber(cfg.baselin
 document.getElementById('baselineWritesDsp').innerText = formatNumber(cfg.baselineWrites);
 document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.peakReads);
 document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.peakWrites);
-document.getElementById('peakWidthDsp').innerText = cfg.peakWidth.toString();
+document.getElementById('peakDurationReadsDsp').innerText = cfg.peakDurationReads.toString();
+document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationWrites.toString();
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();

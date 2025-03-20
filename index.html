@@ -45,7 +45,15 @@
       <div id="opsParams">
         <div class="inline-container">
           <div>
-            <label for="baselineReads">Baseline Reads:
+            <label>Reads</label>
+          </div>
+          <div>
+            <label>Writes</label>
+          </div>
+        </div>
+        <div class="inline-container">
+          <div>
+            <label for="baselineReads">Baseline:
               <input type="text" id="baselineReadsInp" style="display: none; width: 80px; cursor: pointer;">
               <span id="baselineReadsDsp">50K</span> ops/sec
               <span class="info-icon">i
@@ -56,7 +64,7 @@
           </div>
 
           <div>
-            <label for="baselineWrites">Baseline Writes:
+            <label for="baselineWrites">Baseline:
               <input type="text" id="baselineWritesInp" style="display: none; width: 80px; cursor: pointer;">
               <span id="baselineWritesDsp">50K</span> ops/sec
               <span class="info-icon">i
@@ -69,7 +77,7 @@
 
         <div class="inline-container">
           <div>
-            <label for="peakReads">Peak Reads:
+            <label for="peakReads">Peak:
               <input type="text" id="peakReadsInp" style="display: none; width: 80px; cursor: pointer;">
               <span id="peakReadsDsp">500K</span> ops/sec
               <span class="info-icon">i
@@ -80,7 +88,7 @@
           </div>
 
           <div>
-            <label for="peakReads">Peak Writes:
+            <label for="peakReads">Peak:
               <input type="text" id="peakWritesInp" style="display: none; width: 80px; cursor: pointer;">
               <span id="peakWritesDsp">500K</span> ops/sec
               <span class="info-icon">i
@@ -91,15 +99,27 @@
           </div>
         </div>
 
-        <div>
-          <label for="peakWidth">Peak Duration:
-            <input type="text" id="peakWidthInp" style="display: none; width: 80px; cursor: pointer;">
-            <span id="peakWidthDsp">1</span> hours per day
-            <span class="info-icon">i
-                <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
-            </span>
-          </label>
-          <input type="range" id="peakWidth" min="0" max="24" value="1">
+        <div class="inline-container">
+          <div>
+            <label for="peakDurationReads">Duration:
+              <input type="text" id="peakDurationReadsInp" style="display: none; width: 80px; cursor: pointer;">
+              <span id="peakDurationReadsDsp">1</span> hours per day
+              <span class="info-icon">i
+                  <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
+              </span>
+            </label>
+            <input type="range" id="peakDurationReads" min="0" max="24" value="1">
+          </div>
+          <div>
+            <label for="peakDurationWrites">Duration:
+              <input type="text" id="peakDurationWritesInp" style="display: none; width: 80px; cursor: pointer;">
+              <span id="peakDurationWritesDsp">1</span> hours per day
+              <span class="info-icon">i
+                  <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
+              </span>
+            </label>
+            <input type="range" id="peakDurationWrites" min="0" max="24" value="1">
+          </div>
         </div>
 
         <div id="provisionedParams" style="display: none;">

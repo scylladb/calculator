@@ -3,13 +3,13 @@ import {formatNumber} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
-function generateData(baseline, peak, peakWidth) {
+function generateData(baseline, peak, peakDuration) {
     const data = [];
-    const peakStart = Math.floor((24 - peakWidth) / 2);
-    const peakEnd = peakStart + peakWidth;
+    const peakStart = Math.floor((24 - peakDuration) / 2);
+    const peakEnd = peakStart + peakDuration;
 
     for (let hour = 0; hour <= 24; hour++) {
-        if (peakWidth > 0 && hour >= peakStart && hour < peakEnd) {
+        if (peakDuration > 0 && hour >= peakStart && hour < peakEnd) {
             data.push({x: hour, y: peak});
         } else {
             data.push({x: hour, y: baseline});
@@ -22,7 +22,8 @@ function generateData(baseline, peak, peakWidth) {
 export function updateChart() {
     let baseline = cfg.baselineReads + cfg.baselineWrites;
     let peak = cfg.peakReads + cfg.peakWrites;
-    chart.data.datasets[0].data = generateData(baseline, peak, cfg.peakWidth);
+    let width = Math.max(cfg.peakDurationReads, cfg.peakDurationWrites);
+    chart.data.datasets[0].data = generateData(baseline, peak, width);
     // Check if peak is close to the current y-axis max value
     if (peak >= chart.options.scales.y.max * 0.98) {
         chart.options.scales.y.max = peak * 1.2;
