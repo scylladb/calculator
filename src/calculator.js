@@ -63,10 +63,10 @@ export function calculateProvisionedCosts() {
     cfg.peakWCU = cfg.peakWCUTotal - cfg.reservedWCU;
     cfg.peakWCU = Math.ceil(Math.max(cfg.peakWCU, 0));
     cfg.peakWCUHours = Math.ceil(cfg.peakWCU * cfg.peakHoursWrites);
-    cfg.provisionedTotalWCUHours = Math.ceil(cfg.baselineWCUHours + cfg.peakWCUHours);
-    cfg.costProvisionedWCU = cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+    cfg.totalWCUHours = Math.ceil(cfg.baselineWCUHours + cfg.peakWCUHours);
+    cfg.costProvisionedWCU = cfg.totalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
     cfg.costReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
-    cfg.costMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.provisionedTotalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+    cfg.costMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.totalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
     cfg.costMonthlyWCU = cfg.costProvisionedWCU + cfg.costReservedWCU;
     cfg.costUpfrontWCU = cfg.reservedWCU * 1.50;
 
@@ -86,8 +86,8 @@ export function calculateProvisionedCosts() {
     cfg.peakRCU = cfg.peakRCUTotal - cfg.reservedRCU;
     cfg.peakRCU = Math.ceil(Math.max(cfg.peakRCU, 0));
     cfg.peakRCUHours = Math.ceil(cfg.peakRCU * cfg.peakHoursReads);
-    cfg.provisionedTotalRCUHours = Math.ceil(cfg.baselineRCUHours + cfg.peakRCUHours);
-    cfg.costProvisionedRCU = cfg.provisionedTotalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
+    cfg.totalRCUHours = Math.ceil(cfg.baselineRCUHours + cfg.peakRCUHours);
+    cfg.costProvisionedRCU = cfg.totalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
     cfg.costReservedRCU = cfg.reservedRCU * cfg.pricePerRRCU * cfg.hoursPerMonth;
     cfg.costMonthlyRCU = cfg.costProvisionedRCU + cfg.costReservedRCU;
     cfg.costUpfrontRCU = cfg.reservedRCU * 0.3;
