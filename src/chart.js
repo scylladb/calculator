@@ -20,7 +20,7 @@ function generateData(baseline, peak, peakDuration) {
 }
 
 export function updateChart() {
-    let maxPeak = cfg.peakReads + cfg.peakWrites;
+    let maxPeak = Math.max(cfg.peakReads, cfg.peakWrites);
     chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
     chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
     // Check if peak is close to the current y-axis max value
@@ -34,7 +34,7 @@ export const chart = new Chart(ctx, {
     type: 'scatter',
     data: {
         datasets: [{
-            label: 'reads',
+            label: 'Reads',
             data: generateData(),
             borderColor: '#383D57',
             backgroundColor: 'rgba(56,61,87,0.50)',
@@ -44,7 +44,7 @@ export const chart = new Chart(ctx, {
             pointRadius: 0,
             hidden: false
         },{
-            label: 'writes',
+            label: 'Writes',
             data: generateData(),
             borderColor: '#C14953',
             backgroundColor: 'rgba(193,73,83,0.5)',
