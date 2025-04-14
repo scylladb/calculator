@@ -36,8 +36,8 @@ export const chart = new Chart(ctx, {
         datasets: [{
             label: 'Reads',
             data: generateData(),
-            borderColor: '#383D57',
-            backgroundColor: 'rgba(56,61,87,0.50)',
+            borderColor: '#3572b3',
+            backgroundColor: 'rgba(53,114,179,0.7)',
             fill: true,
             tension: 0.1,
             showLine: true,
@@ -46,8 +46,8 @@ export const chart = new Chart(ctx, {
         },{
             label: 'Writes',
             data: generateData(),
-            borderColor: '#C14953',
-            backgroundColor: 'rgba(193,73,83,0.5)',
+            borderColor: '#ec853d',
+            backgroundColor: 'rgba(236,133,61,0.7)',
             fill: true,
             tension: 0.1,
             showLine: true,
