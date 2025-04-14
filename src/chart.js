@@ -20,24 +20,34 @@ function generateData(baseline, peak, peakDuration) {
 }
 
 export function updateChart() {
-    let baseline = cfg.baselineReads + cfg.baselineWrites;
-    let peak = cfg.peakReads + cfg.peakWrites;
-    let width = Math.max(cfg.peakDurationReads, cfg.peakDurationWrites);
-    chart.data.datasets[0].data = generateData(baseline, peak, width);
+    let maxPeak = cfg.peakReads + cfg.peakWrites;
+    chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
+    chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
     // Check if peak is close to the current y-axis max value
-    if (peak >= chart.options.scales.y.max * 0.98) {
-        chart.options.scales.y.max = peak * 1.2;
+    if (maxPeak >= chart.options.scales.y.max * 0.98) {
+        chart.options.scales.y.max = maxPeak * 1.2;
     }
     chart.update();
 }
 
 export const chart = new Chart(ctx, {
-    type: 'scatter', data: {
+    type: 'scatter',
+    data: {
         datasets: [{
-            label: 'operations',
+            label: 'reads',
             data: generateData(),
             borderColor: '#383D57',
             backgroundColor: 'rgba(56,61,87,0.50)',
+            fill: true,
+            tension: 0.1,
+            showLine: true,
+            pointRadius: 0,
+            hidden: false
+        },{
+            label: 'writes',
+            data: generateData(),
+            borderColor: '#C14953',
+            backgroundColor: 'rgba(193,73,83,0.5)',
             fill: true,
             tension: 0.1,
             showLine: true,
@@ -47,21 +57,28 @@ export const chart = new Chart(ctx, {
     }, options: {
         plugins: {
             legend: {
+                display: true
+            },
+            title: {
                 display: false
-            }, title: {
-                display: false
-            }, tooltip: {
+            },
+            tooltip: {
+                display: true,
                 callbacks: {
                     label: function (context) {
-                        return 'Workload: ' + formatNumber(context.raw.y) + ' ops/sec';
+                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
                     }
-                }
+                },
             }
         }, scales: {
             x: {
-                min: 0, max: 24, title: {
+                stacked: false,
+                min: 0,
+                max: 24,
+                title: {
                     display: false,
-                }, ticks: {
+                },
+                ticks: {
                     stepSize: 1, callback: function (value) {
                         return value.toString().padStart(2, '0') + ':00';
                     },
@@ -69,6 +86,7 @@ export const chart = new Chart(ctx, {
                 }
             },
             y: {
+                stacked: false,
                 type: 'linear',
                 title: {
                     display: true,
