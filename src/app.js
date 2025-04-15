@@ -132,13 +132,13 @@ document.getElementById('peakWrites').addEventListener('input', (event) => {
 });
 
 document.getElementById('peakDurationReads').addEventListener('input', (event) => {
-    cfg.peakDurationReads = Math.max(0, parseInt(event.target.value));
+    cfg.peakDurationReads = Math.max(0, parseFloat(event.target.value));
     document.getElementById('peakDurationReadsDsp').innerText = cfg.peakDurationReads.toString();
     updateAll();
 });
 
 document.getElementById('peakDurationWrites').addEventListener('input', (event) => {
-    cfg.peakDurationWrites = Math.max(0, parseInt(event.target.value));
+    cfg.peakDurationWrites = Math.max(0, parseFloat(event.target.value));
     document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationReads.toString();
     updateAll();
 });
