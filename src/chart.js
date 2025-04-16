@@ -47,7 +47,7 @@ export const chart = new Chart(ctx, {
             label: 'Writes',
             data: generateData(),
             borderColor: '#ec853d',
-            backgroundColor: 'rgba(236,133,61,0.7)',
+            backgroundColor: 'rgba(236,133,61,0.8)',
             fill: true,
             tension: 0.1,
             showLine: true,
