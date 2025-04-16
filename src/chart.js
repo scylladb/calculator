@@ -8,7 +8,7 @@ function generateData(baseline, peak, peakDuration) {
     const peakStart = Math.floor((24 - peakDuration) / 2);
     const peakEnd = peakStart + peakDuration;
 
-    for (let hour = 0; hour <= 24; hour++) {
+    for (let hour = 1; hour <= 24; hour++) {
         if (peakDuration > 0 && hour >= peakStart && hour < peakEnd) {
             data.push({x: hour, y: peak});
         } else {
@@ -73,7 +73,7 @@ export const chart = new Chart(ctx, {
         }, scales: {
             x: {
                 stacked: false,
-                min: 0,
+                min: 1,
                 max: 24,
                 title: {
                     display: false,
