@@ -37,7 +37,7 @@ export const chart = new Chart(ctx, {
             label: 'Reads',
             data: generateData(),
             borderColor: '#3572b3',
-            backgroundColor: 'rgba(53,114,179,0.7)',
+            backgroundColor: 'rgba(53,114,179,0.4)',
             fill: true,
             tension: 0.1,
             showLine: true,
