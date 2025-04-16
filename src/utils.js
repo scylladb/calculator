@@ -60,7 +60,6 @@ export function updateQueryParams() {
         params.set('storageGB', cfg.storageGB.toString());
         params.set('itemSizeB', cfg.itemSizeB.toString());
         params.set('tableClass', cfg.tableClass);
-        params.set('ratio', cfg.ratio.toString());
         params.set('baselineReads', cfg.baselineReads.toString());
         params.set('baselineWrites', cfg.baselineWrites.toString());
         params.set('peakReads', cfg.peakReads.toString());
