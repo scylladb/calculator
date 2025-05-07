@@ -6,12 +6,8 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     const input = document.getElementById(inputId);
     const slider = document.getElementById(sliderId);
 
-    display.addEventListener('click', function (event) {
-        event.stopPropagation();
+    input.addEventListener('mouseover', function (event) {
         input.value = parseInt(slider.value.toString());
-        display.style.display = 'none';
-        input.style.display = 'inline';
-        setTimeout(() => input.focus(), 0);
     });
 
     input.addEventListener('blur', function () {
@@ -21,8 +17,6 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
             display.innerText = formatFunction(newValue);
             updateAll();
         }
-        input.style.display = 'none';
-        display.style.display = 'inline';
     });
 
     input.addEventListener('keydown', function (event) {
@@ -42,22 +36,25 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-export function toggleSection(linkId, sectionId) {
-    document.getElementById(linkId).classList.add('foldable', 'collapsed');
-    document.getElementById(linkId).addEventListener('click', function (event) {
-        event.preventDefault();
-        const section = document.getElementById(sectionId);
-        if (section.style.display === 'none') {
-            section.style.display = 'block';
-            this.classList.remove('collapsed');
-            this.classList.add('expanded');
-        } else {
-            section.style.display = 'none';
-            this.classList.remove('expanded');
-            this.classList.add('collapsed');
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const tabLabels = document.querySelectorAll('.tab-label');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabLabels.forEach(tabLabel => {
+        tabLabel.addEventListener('click', function(e) {
+        e.preventDefault(); 
+        
+        tabLabels.forEach(tab => tab.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        this.classList.add('active');
+        
+        const tabContentId = this.getAttribute('href');
+        document.getElementById(tabContentId).classList.add('active');
+        });
     });
-}
+});
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
     const provisionedParams = document.getElementById('provisionedParams');
@@ -219,13 +216,6 @@ setupSliderInteraction('peakDurationWritesDsp', 'peakDurationWritesInp', 'peakDu
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
-
-toggleSection('costLink', 'costParams');
-toggleSection('opsLink', 'opsParams');
-toggleSection('tableLink', 'tableParams');
-toggleSection('storageLink', 'storageParams');
-toggleSection('consistencyLink', 'consistencyParams');
-toggleSection('daxLink', 'daxParams');
 
 getQueryParams();
 

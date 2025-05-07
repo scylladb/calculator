@@ -36,20 +36,25 @@ export const chart = new Chart(ctx, {
         datasets: [{
             label: 'Reads',
             data: generateData(),
-            borderColor: '#3572b3',
-            backgroundColor: 'rgba(53,114,179,0.4)',
+            borderColor: '#326DE6',
+            borderWidth: 3,
+            backgroundColor: pattern.draw('disc', '#326DE600', '#326DE699', 6),
             fill: true,
-            tension: 0.1,
+            tension: 0.5,
+            cubicInterpolationMode: 'monotone',
             showLine: true,
             pointRadius: 0,
             hidden: false
         },{
             label: 'Writes',
             data: generateData(),
-            borderColor: '#ec853d',
-            backgroundColor: 'rgba(236,133,61,0.8)',
+            borderColor: '#FF5500',
+            borderWidth: 2,
+            
+            backgroundColor: pattern.draw('line', '#ff550000', '#FF550099', 6),
             fill: true,
-            tension: 0.1,
+            tension: 0.5,
+            cubicInterpolationMode: 'monotone',
             showLine: true,
             pointRadius: 0,
             hidden: false
@@ -57,7 +62,8 @@ export const chart = new Chart(ctx, {
     }, options: {
         plugins: {
             legend: {
-                display: true
+                display: true,
+                position: 'bottom'
             },
             title: {
                 display: false
@@ -70,13 +76,21 @@ export const chart = new Chart(ctx, {
                     }
                 },
             }
-        }, scales: {
+        },
+        scales: {
             x: {
                 stacked: false,
                 min: 1,
                 max: 24,
                 title: {
                     display: false,
+                },
+                grid: {
+                    color: '#D8E5EB',
+                    lineWidth: 1,
+                    display: true,
+                    drawBorder: true,
+                    drawOnChartArea: true
                 },
                 ticks: {
                     stepSize: 1, callback: function (value) {
@@ -90,11 +104,24 @@ export const chart = new Chart(ctx, {
                 type: 'linear',
                 title: {
                     display: true,
-                    text: 'ops/sec'
+                    text: 'ops/sec',
+                    color: '#616D87', 
+                    font: {
+                        family: "'Roboto Flex', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+                        size: 15, 
+                        weight: 'normal'
+                    }
                 },
                 min: 1000,
                 max: (cfg.peakReads + cfg.peakWrites) * 2,
                 ticks: {
+                    color: '#616D87', // Tick text color
+                    font: {
+                        family: "'Roboto Flex', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif", 
+                        size: 13, 
+                        weight: 'normal' // Font weight (normal, bold, etc.)
+                    },
+                    padding: 5,
                     callback: function (value, index, values) {
                         if (value === values[values.length - 1].value) {
                             return null; // Hide the max tick

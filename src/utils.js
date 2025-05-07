@@ -95,12 +95,11 @@ export function updateAll() {
 
 export function updateDisplayedCosts(logs) {
     const costs = document.getElementById('costs');
-    costs.style.display = 'block';
     costs.innerHTML = logs.map(log => {
         const [key, value] = log.split(': ');
         if (key === '---' && value === '---') {
-            return `<div class="cost-entry"><span class="cost-key"></span><span class="cost-value"><span class="dollar-sign"></span><span class="number">${value}</span></span></div>`;
+            return `<hr>`;
         }
-        return `<div class="cost-entry"><span class="cost-key">${key}</span><span class="cost-value"><span class="dollar-sign">$</span><span class="number">${value}</span></span></div>`;
+        return `<div class="cost-entry ${key === 'Total monthly cost' ? ' total lead' : ''}""><span class="cost-key">${key}</span><span class="cost-value"><span class="dollar-sign">$</span><span class="number">${value}</span></span></div>`;
     }).join('');
 }
