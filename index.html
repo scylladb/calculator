@@ -24,20 +24,20 @@
     <div class="card">
       <header class="row">
         <div class="col">
-          <h2 class="title"><img src="./src/aws-dynamodb.svg" class="dynamo-logo"> DynamoDB Cost Calculator</h2>
+          <h2 class="title">
+            <img src="./src/aws-dynamodb.svg" class="dynamo-logo"> DynamoDB Cost Calculator
+          </h2>
         </div>
         <div class="col hstack gap-4 justify-content-end">
           <button class="btn btn-primary">
-            Share
-          </button>
+            <i class="icon-scale-up me-3"></i> Share
+            <!-- </button>
           <button class="btn btn-light">
-            Save Settings
+            Save Settings Preset
           </button>
-          <!--
           <button class="btn btn-light menu-button">
             <i class="icon-menu"></i>
-          </button>
-          -->
+          </button> -->
         </div>
       </header>
       <div class="row">
@@ -45,8 +45,6 @@
           <canvas id="chart" width="800" height="400"></canvas>
 
           <div id="costParams">
-            <div id="costs" class="costs"></div>
-
             <div class="radio-container">
               <label>
                 <input type="radio" name="pricing" value="demand" checked> Demand
@@ -55,14 +53,22 @@
                 <input type="radio" name="pricing" value="provisioned"> Provisioned
               </label>
             </div>
+            <div id="costs" class="costs"></div>
           </div>
+
         </div>
         <div class="col">
           <div class="tabs">
             <nav>
-              <a href="loadTabContent" class="tab-label active" id="loadTab">Load</a>
-              <a href="storageTabContent" class="tab-label" id="storageTab">Storage</a>
-              <a href="daxTabContent" class="tab-label" id="daxTab">DAX</a>
+              <a href="loadTabContent" class="tab-label active" id="loadTab">
+                <i class="icon-operations me-3"></i> Load
+              </a>
+              <a href="storageTabContent" class="tab-label" id="storageTab">
+                <i class="icon-storage me-3"></i> Storage
+              </a>
+              <a href="daxTabContent" class="tab-label" id="daxTab">
+                <i class="icon-rocket me-3"></i> Accelerator (DAX)
+              </a>
             </nav>
 
             <div class="tab-content active" id="loadTabContent">
@@ -76,7 +82,7 @@
                 <div class="row-sm">
 
                   <div class="col vstack gap-3">
-                    <h4>Reads</h4>
+                    <h4 class="reads">Reads</h4>
 
                     <div class="range-group">
                       <div class="range-group-top">
@@ -90,7 +96,8 @@
                             ops/sec
                           </div>
                         </div>
-                        <span class="info-icon">i
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
                           <span class="tooltip-text">Enter the number of read operations per second that your workload
                             needs
                             during
@@ -112,7 +119,8 @@
                             ops/sec
                           </div>
                         </div>
-                        <span class="info-icon">i
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
                           <span class="tooltip-text">Enter the maximum number of read operations per second that your
                             workload
                             needs
@@ -134,7 +142,8 @@
                             hours per day
                           </div>
                         </div>
-                        <span class="info-icon">i
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
                           <span class="tooltip-text">Enter the number of hours per day that your workload operates at
                             peak.</span>
                         </span>
@@ -145,7 +154,7 @@
                   </div>
 
                   <div class="col vstack gap-3">
-                    <h4>Writes</h4>
+                    <h4 class="writes">Writes</h4>
 
                     <div class="range-group">
                       <div class="range-group-top">
@@ -159,7 +168,8 @@
                             ops/sec
                           </div>
                         </div>
-                        <span class="info-icon">i
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
                           <span class="tooltip-text">Enter the number of write operations per second that your workload
                             needs
                             during
@@ -181,7 +191,8 @@
                             ops/sec
                           </div>
                         </div>
-                        <span class="info-icon">i
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
                           <span class="tooltip-text">Enter the maximum number of write operations per second that your
                             workload
                             needs during peak periods.</span>
@@ -202,7 +213,8 @@
                             hours per day
                           </div>
                         </div>
-                        <span class="info-icon">i
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
                           <span class="tooltip-text">Enter the number of hours per day that your workload operates at
                             peak.</span>
                         </span>
@@ -213,7 +225,7 @@
 
                 </div>
 
-
+                <hr>
 
                 <div id="provisionedParams" style="display: none;">
                   <div class="range-group">
@@ -221,14 +233,15 @@
                       <label for="reserved">Reserved Capacity:</label>
                       <div class="inline-input">
                         <div class="value">
-                          <input type="text" id="reservedInp">
+                          <input type="text" id="reservedInp"> <!-- Tim please look if this is used, if not remove-->
                           <span id="reservedDsp">0</span>
                         </div>
                         <div class="units">
 
                         </div>
                       </div>
-                      <span class="info-icon">i
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
                         <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved
                           capacity.
                           Reserved capacity can only be used with DynamoDB Standard table class.</span>
@@ -250,7 +263,8 @@
 
                       </div>
                     </div>
-                    <span class="info-icon">i
+                    <span class="info-icon">
+                      <i class="icon-info-outline"></i>
                       <span class="tooltip-text">Enter your average operation size (all attributes).</span>
                     </span>
                   </div>
@@ -269,7 +283,8 @@
                     <option value="standard">Standard</option>
                     <option value="infrequentAccess">Infrequent Access</option>
                   </select>
-                  <span class="info-icon">i
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
                     <span class="tooltip-text">Select the table class for your workload.</span>
                   </span>
                 </div>
@@ -286,7 +301,8 @@
                         hours per day
                       </div>
                     </div>
-                    <span class="info-icon">i
+                    <span class="info-icon">
+                      <i class="icon-info-outline"></i>
                       <span class="tooltip-text">Enter the number of additional regions where your data is replicated as
                         a Global Table.</span>
                     </span>
@@ -302,14 +318,15 @@
                   <div class="range-group-top">
                     <label for="storageGB">Storage:</label>
                     <div class="inline-input">
-                      <div class="value">
+                      <div class="value wide">
                         <input type="text" id="storageInp">
                         <span id="storageDsp">512 GB</span>
                       </div>
                       <div class="units">
                       </div>
                     </div>
-                    <span class="info-icon">i
+                    <span class="info-icon">
+                      <i class="icon-info-outline"></i>
                       <span class="tooltip-text">Enter your total data storage size.</span>
                     </span>
                   </div>
@@ -325,14 +342,14 @@
                   <div class="range-group-top">
                     <label>Reads: </label>
                     <div class="inline-input">
-                      <div class="value">
-                        <input type="text" id="storageInp">
+                      <div class="value fill">
                         <span id="readConstDsp">Strongly Consistent</span>
                       </div>
                       <div class="units">
                       </div>
                     </div>
-                    <span class="info-icon">i
+                    <span class="info-icon">
+                      <i class="icon-info-outline"></i>
                       <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
                         as a percentage.</span>
                     </span>
@@ -358,7 +375,8 @@
                       <div class="units">
                       </div>
                     </div>
-                    <span class="info-icon">i
+                    <span class="info-icon">
+                      <i class="icon-info-outline"></i>
                       <span class="tooltip-text">Enter the dataset memory size that your cache will use.</span>
                     </span>
                   </div>
@@ -375,31 +393,44 @@
                       <div class="units">
                       </div>
                     </div>
-                    <span class="info-icon">i
+                    <span class="info-icon">
+                      <i class="icon-info-outline"></i>
                       <span class="tooltip-text">Enter the hit miss ratio that your cache will use.</span>
                     </span>
                   </div>
                   <input type="range" id="cacheRatio" min="0" max="100" step="1" value="0">
                 </div>
 
+                <div class="row-sm">
 
-                <div>
-                  <label>Instance Class:
-                    <span id="daxInstanceClass">none</span>
-                    <span class="info-icon">i
-                      <span class="tooltip-text">This is the recommended instance class for your workload.</span>
-                    </span>
-                  </label>
-                </div>
+                  <div class="col">
 
-                <div>
-                  <label>Number of Nodes:
-                    <span id="daxNodes">0</span>
-                    <span class="info-icon">i
-                      <span class="tooltip-text">This is the recommended minimum number of nodes for your
-                        workload.</span>
-                    </span>
-                  </label>
+                    <label class="mb-2">Instance Class:</label>
+                    <div class="hstack gap-2">
+                      <div class="value flex-grow">
+                        <i class="icon-instance me-3"></i> <span id="daxInstanceClass">none</span>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="col">
+
+                    <label class="mb-2">Number of Nodes:</label>
+                    <div class="hstack gap-2">
+                      <div class="value flex-grow">
+                        <i class="icon-lan me-3"></i> <span id="daxNodes">0</span>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">This is the recommended minimum number of nodes for your
+                          workload.</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 

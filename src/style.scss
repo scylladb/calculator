@@ -1,5 +1,6 @@
 @import "variables";
 @import "utilities";
+@import "icons";
 
 :root {
   --inputColor: #383D57;
@@ -36,11 +37,15 @@ body {
   color: var(--text-color);
   justify-content: center;
   margin: 0;
-  padding: var(--spacer-sm);
+  padding: var(--spacer-xs);
   display: flex;
   min-height: calc(100vh - (2*var(--spacer-sm)));
   flex-direction: column;
   align-items: center;
+
+  @media (min-width: 768px) {
+    padding: var(--spacer-sm);
+  }
 
   &.standalone{
     color: var(--light);
@@ -93,6 +98,10 @@ small, .small {
   align-items: center;
   gap: var(--spacer-sm);
   align-self: stretch;
+
+  @media (min-width: 768px) {
+    padding: var(--spacer-md);
+  }
 }
 
 .title {
@@ -116,13 +125,16 @@ small, .small {
     align-items: start;
     justify-content: start;
     gap: var(--spacer-xs);
+    margin-left: var(--spacer-sm);
 
     label {
       display: flex;
       align-items: center;
+      cursor: pointer;
     }
 
     input[type="radio"] {
+      margin: 0;
       margin-right: 10px;
     }
   }
@@ -131,7 +143,6 @@ small, .small {
     display: flex;
     flex-direction: column;
     gap: var(--spacer-xs);
-    margin-left: var(--spacer-md);
     flex-grow: 1;
     max-width: 400px;
     min-width: 300px;
@@ -178,14 +189,15 @@ small, .small {
     .tab-label {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: baseline;
       color: var(--text-muted);
       border-bottom: 1px solid var(--border-color);
       flex-basis: 10px;
       flex-grow: 1;
       padding: var(--spacer-xs);
       transition: all .2s;
-
+      font-size: 1.1em;
+      font-weight: 500;
 
       &:hover {
         background-color: var(--light);
@@ -214,7 +226,7 @@ small, .small {
   .range-group-top {
     display: flex;
     align-items: baseline;
-    gap: var(--spacer-xs);
+    gap: var(--spacer-xxs);
     margin-bottom: -$spacer-xxs;
 
     label {
@@ -228,42 +240,63 @@ small, .small {
 
       .value {
         position: relative;
-        border-bottom: 1px solid var(--border-color);
+        width: 6em;
+        height: 32px;
+        display: flex;
+        justify-content: end;
 
+        &.wide {
+          width: 7em;
+        }
+
+        &.fill {
+          width: auto;
+        }
 
         input, span {
+          height: 31px;
           padding: var(--spacer-3xs) var(--spacer-xxs);
-          font-size: 1.2em;
           font-weight: 600;
           text-align: right;
+          box-sizing: border-box;
+        }
+
+        &:hover {
+          input {
+            max-width: 100%;
+          }
         }
 
         input {
-          width: 6em;
+          width: 100%;
+          max-width: 30%;
           box-shadow: none;
           border: 0;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid transparent;
           color: transparent;
           cursor: text;
+          transition: all .3s ease-out;
 
           &:hover, &:focus {
-            transition: color .2s;
             border-color: var(--active);
             color: var(--text-color);
+            max-width: 100%;
 
             &+span {
               opacity: 0;
             }
           }
+
+          &+span {
+            border-bottom: 1px solid var(--border-color);
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+          }
         }
         span {
-          pointer-events: none;
-          position: absolute;
-          left: 0;
-          top: 0;
-          right: 0;
-          transition: opacity .2s;
-
+          transition: opacity .3s;
         }
       }
       .units {
@@ -275,6 +308,15 @@ small, .small {
     .info-icon {
 
     }
+  }
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 600;
+
+  input, span {
+    font-size: 16px;
   }
 }
 
@@ -399,15 +441,15 @@ input[type="radio"] {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid var(--inputColor);
-  background-color: var(--backgroundColor);
+  border: 2px solid var(--secondary);
+  background-color: transparent;
   cursor: pointer;
   position: relative;
   margin-right: 10px;
 }
 
 input[type="radio"]:checked {
-  background-color: var(--backgroundColor);
+  border: 2px solid var(--primary);
 }
 
 input[type="radio"]:checked::after {
@@ -424,46 +466,47 @@ input[type="radio"]:checked::after {
 }
 
 .info-icon {
-  display: inline-block;
+  display: block;
   position: relative;
   cursor: pointer;
-  margin-right: 5px;
   font-weight: bold;
-  color: var(--text-color);
-  border: 1px solid var(--text-color);
+  color: var(--secondary-lighter);
   border-radius: 50%;
   padding: 1px;
-  width: 12px;
-  height: 12px;
+  width: var(--spacer-sm);
+  height: var(--spacer-sm);
   text-align: center;
-  line-height: 12px;
-  font-size: 12px;
+  
+  i {
+    font-size: 18px;
+  }
+
+  &:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .tooltip-text {
+    visibility: hidden;
+    width: 400px;
+    max-width: 90vw;
+    background-color: var(--dark);
+    color: var(--light);
+    text-align: center;
+    border-radius: var(--border-radius);
+    padding: var(--spacer-xs) var(--spacer-sm);
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    right: 20px;
+    opacity: 0;
+    transition: opacity 0.2s;    
+    font-size: 12px;
+    line-height: 1.4em;
+    font-weight: normal;
+  }
 }
 
-.tooltip-text {
-  visibility: hidden;
-  width: 400px;
-  max-width: 90vw;
-  background-color: var(--dark);
-  color: var(--light);
-  text-align: center;
-  border-radius: var(--border-radius);
-  padding: var(--spacer-xs) var(--spacer-sm);
-  position: absolute;
-  z-index: 1;
-  bottom: 0;
-  right: 20px;
-  opacity: 0;
-  transition: opacity 0.3s;
-  font-size: 1.2em;
-  font-weight: normal;
-  line-height: normal;
-}
-
-.info-icon:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
 
 
 

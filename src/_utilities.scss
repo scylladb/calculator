@@ -29,12 +29,17 @@ strong {
 //heading weight
 h1, h2, h3, h4, h5 {
     @include roboto-flex(600, 100, 30, 28);
-    background: -webkit-linear-gradient(45deg, $brand-gradient-dark 0%, $brand-gradient-cobalt-blue 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: #fff0;
     margin-bottom: var(--spacer-xxs);
+    color: $brand-gradient-dark;
+
+    &:not(.reads):not(.writes) {
+        background: -webkit-linear-gradient(45deg, $brand-gradient-dark 0%, $brand-gradient-cobalt-blue 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: #fff0;
+    }
 }
+
 
 .lead {
     font-size: var(--font-size-subtitle);
@@ -49,6 +54,7 @@ hr {
 
 label {
     font-weight: normal;
+    display: block;
 }
 
 a {
@@ -61,6 +67,13 @@ a {
     }
 }
 
+.reads {
+    color: var(--reads);
+}
+
+.writes {
+    color: var(--writes);
+}
 
 input {
     font-family: var(--font-family-primary);
@@ -118,6 +131,14 @@ $i: 0;
     margin: $value;
   }
 
+  .me-#{$i} {
+    margin-right: $value;
+  }
+
+  .mb-#{$i} {
+    margin-bottom: $value;
+  }
+
   $i: $i + 1;
 }
 
@@ -141,7 +162,7 @@ $i: 0;
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    gap: var(--spacer-md);
+    gap: var(--spacer-sm) var(--spacer-md);
 
     .col {
         min-width: $min-col-width;
@@ -151,10 +172,10 @@ $i: 0;
 }
 
 .row-sm {
-    gap: var(--spacer);
+    gap: var(--spacer-xs) var(--spacer);
 
     .col {
-        min-width: 150px;
+        min-width: 290px;
     }
 }
 
@@ -176,7 +197,7 @@ $i: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: var(--spacer-xxs) var(--spacer);
+    padding: var(--spacer-xxs) var(--spacer-sm);
     background: var(--light);
     border-radius: var(--border-radius);
     color: var(--secondary);
