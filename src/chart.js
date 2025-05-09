@@ -8,7 +8,7 @@ function generateData(baseline, peak, peakDuration) {
     const peakStart = Math.floor((24 - peakDuration) / 2);
     const peakEnd = peakStart + peakDuration;
 
-    for (let hour = 1; hour <= 24; hour++) {
+    for (let hour = 0; hour < 24; hour++) {
         if (peakDuration > 0 && hour >= peakStart && hour < peakEnd) {
             data.push({x: hour, y: peak});
         } else {
@@ -50,7 +50,7 @@ export const chart = new Chart(ctx, {
             data: generateData(),
             borderColor: '#FF5500',
             borderWidth: 2,
-            
+
             backgroundColor: pattern.draw('line', '#ff550000', '#FF550099', 6),
             fill: true,
             tension: 0.5,
@@ -80,8 +80,8 @@ export const chart = new Chart(ctx, {
         scales: {
             x: {
                 stacked: false,
-                min: 1,
-                max: 24,
+                min: 0,
+                max: 23,
                 title: {
                     display: false,
                 },
@@ -93,7 +93,9 @@ export const chart = new Chart(ctx, {
                     drawOnChartArea: true
                 },
                 ticks: {
-                    stepSize: 1, callback: function (value) {
+                    stepSize: 1,
+                    callback: function (value) {
+                        if (value === 23) return '00:00';
                         return value.toString().padStart(2, '0') + ':00';
                     },
                     display: false
