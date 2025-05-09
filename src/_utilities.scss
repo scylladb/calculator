@@ -1,0 +1,220 @@
+@mixin roboto-flex($weight, $width, $grade, $opsz: 14) {
+    font-weight: $weight;
+    font-style: normal;
+    font-variation-settings: 
+      "opsz" $opsz,
+      "slnt" 0, 
+      "wdth" $width, 
+      "GRAD" $grade, 
+      "XOPQ" 96, 
+      "XTRA" 468, 
+      "YOPQ" 79, 
+      "YTAS" 750, 
+      "YTDE" -203, 
+      "YTFI" 738, 
+      "YTLC" 514, 
+      "YTUC" 712;
+  }
+
+body {
+    font-size: var(--font-size-body);
+    font-family: var(--font-family-primary);
+    @include roboto-flex(400, 80, 0, 14);
+}
+
+strong {
+    @include roboto-flex(700, 100, 0, 14);
+}
+
+//heading weight
+h1, h2, h3, h4, h5 {
+    @include roboto-flex(600, 100, 30, 28);
+    margin-bottom: var(--spacer-xxs);
+    color: $brand-gradient-dark;
+
+    &:not(.reads):not(.writes) {
+        background: -webkit-linear-gradient(45deg, $brand-gradient-dark 0%, $brand-gradient-cobalt-blue 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: #fff0;
+    }
+}
+
+
+.lead {
+    font-size: var(--font-size-subtitle);
+    @include roboto-flex(300, 100, 0, 14);
+}
+
+hr {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+label {
+    font-weight: normal;
+    display: block;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: none;
+        color: var(--primary);
+    }
+}
+
+.reads {
+    color: var(--reads);
+}
+
+.writes {
+    color: var(--writes);
+}
+
+input {
+    font-family: var(--font-family-primary);
+
+    &[type="text"] {
+        outline: none;
+        border-color: transparent;
+        transition: border-color 0.2s;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &:focus {
+            border-color: var(--primary);
+        }
+    }
+}
+  
+select {
+    padding: var(--spacer-xxs) var(--spacer-xs);
+    font-size: var(--font-size-h4);
+    font-weight: 500;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: transparent;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+        &:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+//heading sizes
+@for $i from 1 through 6 {
+    h#{$i} {
+        font-size: var(--font-size-h#{$i});
+    }
+}
+
+
+$i: 0;
+@each $key, $value in $spacers {
+  .gap-#{$i} {
+    gap: $value;
+  }
+  .m-#{$i} {
+    margin: $value;
+  }
+
+  .me-#{$i} {
+    margin-right: $value;
+  }
+
+  .mb-#{$i} {
+    margin-bottom: $value;
+  }
+
+  $i: $i + 1;
+}
+
+.hstack, .vstack {
+    display: flex;
+}
+
+.vstack {
+    flex-direction: column;
+}
+
+.justify-content-end {
+    justify-content: end;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.row, .row-sm {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: var(--spacer-sm) var(--spacer-md);
+
+    .col {
+        min-width: $min-col-width;
+        flex-grow: 1;
+        flex-basis: 100px;
+    }
+}
+
+.row-sm {
+    gap: var(--spacer-xs) var(--spacer);
+
+    .col {
+        min-width: 290px;
+    }
+}
+
+@mixin ButtonVariant($color-name, $text-color) {
+    &.btn-#{$color-name} {
+        background-color: var(--#{$color-name});
+        color: var(--#{$text-color});
+        
+        &:hover {
+            background-color: var(--#{$color-name}-light);
+        }
+    }
+}
+
+.btn {
+    font-family: var(--font-family-primary);
+    @include roboto-flex(600, 90, 20, 7);
+    letter-spacing: .03em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacer-xxs) var(--spacer-sm);
+    background: var(--light);
+    border-radius: var(--border-radius);
+    color: var(--secondary);
+    font-style: normal;
+    font-size: var(--font-size-body);
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s;
+
+
+    &:hover {
+        background-color: var(--gray-200);
+        transition: none;
+    }
+
+    @include ButtonVariant("primary", "light");
+    @include ButtonVariant("secondary", "light");
+    
+}
+  

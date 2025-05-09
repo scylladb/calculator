@@ -1,0 +1,290 @@
+// Brand Colors - Grays
+$gray-white: #FFFFFF;
+$gray-50: #F7FAFC;
+$gray-100: #EDF5F7;
+$gray-200: #D8E5EB;
+$gray-300: #C3D5DE;
+$gray-400: #AEC0CF;
+$gray-500: #95A7BA;
+$gray-600: #7B8BA2;
+$gray-700: #616D87;
+$gray-800: #4B546F;
+$gray-900: #383D57;
+$gray-950: #2F324B;
+$gray-black: #23263B;
+
+// Brand Colors - Basic
+$brand-teal: #57D1E5;
+$brand-teal-intense: #00E5FF;
+$brand-teal-muted: #24D5F2;
+$brand-secondary: #3A2D55;
+$brand-navy-blue: #0F1040;
+$brand-cobalt-blue: #2618FA;
+$brand-blue: #326DE6;
+$brand-green: #10CB00;
+$brand-yellow: #FFD400;
+$brand-orange: #FF5500;
+$brand-red: #CE291F;
+$brand-violet: #C26AFF;
+$brand-pink: #FF2CDF;
+
+// Brand Colors - Gradients
+$brand-gradient-purple: #82368C;
+$brand-gradient-magenta: #E70D6F;
+$brand-gradient-orange: #E35A01;
+$brand-gradient-yellow: #FBAE17;
+$brand-gradient-teal: $brand-teal;
+$brand-gradient-cobalt-blue: #326DE6;
+$brand-gradient-navy-blue: #19237F;
+$brand-gradient-dark: $gray-black;
+
+// Semantic Colors
+$primary: $brand-teal;
+$secondary: $brand-secondary;
+$success: $brand-green;
+$info: $brand-blue;
+$warning: $brand-yellow;
+$danger: $brand-red;
+$light: $gray-100;
+$dark: $gray-black;
+
+// Sizes
+$spacer-0: 0px;
+$spacer-3xs: 5px;
+$spacer-xxs: 8px;
+$spacer-xs: 12px;
+$spacer-sm: 20px;
+$spacer: 32px;
+$spacer-md: 52px;
+$spacer-lg: 83px;
+$spacer-xl: 134px;
+$border-width: 1px;
+$border-radius-sm: 3px;
+$border-radius: $spacer-3xs;
+$border-radius-md: $spacer-xxs;
+
+$spacers: (
+  '0': $spacer-0,
+  '3xs': $spacer-3xs,
+  'xxs': $spacer-xxs,
+  'xs': $spacer-xs,
+  'sm': $spacer-sm,
+  'base': $spacer,
+  'md': $spacer-md,
+  'lg': $spacer-lg,
+  'xl': $spacer-xl
+);
+
+// Cloud Colors - Primary
+$cloud-primary: #2196F3;
+$cloud-primary-dark: #0288D1;
+$cloud-primary-light: #42A5F5;
+$cloud-primary-lighter: #B1DEFD;
+$cloud-primary-bg: #D6F0FF;
+$cloud-primary-border: rgba(33, 150, 243, 0.5);
+$cloud-primary-hover: rgba(33, 150, 243, 0.04);
+
+// Cloud Colors - Brand Primary
+$cloud-brand-primary: $primary;
+$cloud-brand-primary-dark: #27B6DB;
+$cloud-brand-primary-light: #5ADDF2;
+$cloud-brand-primary-lighter: #BAF3FC;
+$cloud-brand-primary-bg: #D9FAFF;
+$cloud-brand-primary-hover: rgba(87, 209, 229, 0.1);
+
+// Cloud Colors - Secondary
+$cloud-secondary: #4458A3;
+$cloud-secondary-dark: #33427A;
+$cloud-secondary-light: #6E86FA;
+$cloud-secondary-lighter: #C2CEFE;
+$cloud-secondary-bg: #DEE5FF;
+$cloud-secondary-border: rgba(68, 88, 163, 0.5);
+$cloud-secondary-hover: rgba(68, 88, 163, 0.04);
+
+// Cloud Colors - Success
+$cloud-success: #4CAF50;
+$cloud-success-dark: #36784C;
+$cloud-success-light: #77D464;
+$cloud-success-lighter: #CCF2CD;
+$cloud-success-bg: #E8FCF0;
+$cloud-success-border: rgba(76, 175, 80, 0.5);
+$cloud-success-hover: rgba(76, 175, 80, 0.04);
+
+// Cloud Colors - Info
+$cloud-info: $info;
+$cloud-info-dark: #3161C4;
+$cloud-info-light: #4DB5FF;
+$cloud-info-lighter: #C0E3FD;
+$cloud-info-bg: #E6F2FC;
+$cloud-info-border: rgba(50, 109, 230, 0.5);
+$cloud-info-hover: rgba(50, 109, 230, 0.04);
+
+// Cloud Colors - Warning
+$cloud-warning: #F79000;
+$cloud-warning-dark: #E46B1A;
+$cloud-warning-light: #FFBB33;
+$cloud-warning-lighter: #FDE8BB;
+$cloud-warning-bg: #FCF6E8;
+$cloud-warning-border: rgba(247, 144, 0, 0.5);
+$cloud-warning-hover: rgba(247, 144, 0, 0.04);
+
+// Cloud Colors - Error (Danger)
+$cloud-error: $danger;
+$cloud-error-dark: #942C2C;
+$cloud-error-light: #FF6857;
+$cloud-error-lighter: #FDCDC4;
+$cloud-error-bg: #FCEEE8;
+$cloud-error-border: rgba(206, 41, 31, 0.5);
+$cloud-error-hover: rgba(206, 41, 31, 0.04);
+
+// Cloud UI Elements
+$cloud-bg-color: #F6F8FF;
+$cloud-light: $light;
+$cloud-card-bg: $gray-white;
+$cloud-card-bg-dark: $gray-50;
+$cloud-well-bg: #F0F2F8;
+$cloud-code-bg: $gray-50;
+$cloud-border-color: #EEEEEE;
+$cloud-border-dark: #C6D5E1;
+$cloud-layout-border: #E7E7E7;
+$cloud-tooltip-bg: rgba(35, 38, 59, 0.85);
+$cloud-disabled-bg: $gray-200;
+$cloud-tooltip-text: $gray-200;
+$cloud-modal-backdrop: rgba(35, 38, 59, 0.5);
+
+// Cloud Text Colors
+$cloud-link-color: $cloud-primary-dark;
+$cloud-text-disabled: $gray-500;
+$cloud-text-muted: $gray-700;
+$cloud-text-color: $gray-800;
+$cloud-text-emphasis: $gray-900;
+$cloud-navbar-text-color: $gray-100;
+$cloud-alert-text: $gray-50;
+$cloud-alert-text-dark: $gray-800;
+$cloud-navbar-text-emphasis: $gray-white;
+$cloud-navbar-text-muted: $gray-200;
+
+// Fonts - Roboto
+$font-family-primary: "Roboto Flex", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+$font-family-code: "Source Code Pro", monospace;
+$font-size-h1: 34px;
+$font-size-h2: 27px;
+$font-size-h3: 21px;
+$font-size-h4: 17px;
+$font-size-h5: 14px;
+$font-size-h6: 10px;
+$font-size-body: $font-size-h5;
+$font-size-subtitle: $font-size-h4;
+$font-size-small: $font-size-h6;
+$font-size-small-label: 8px;
+$font-weight-headings: 600;
+$font-weight-body: 400;
+$font-weight-bold: 600;
+$font-weight-lead: 300;
+$font-weight-small-label: 500;
+
+
+//Calculator UI specific
+$min-col-width: 350px;
+
+
+  :root {
+    // Brand Colors - Grays
+    --gray-white: #{$gray-white};
+    --gray-50: #{$gray-50};
+    --gray-100: #{$gray-100};
+    --gray-200: #{$gray-200};
+    --gray-300: #{$gray-300};
+    --gray-400: #{$gray-400};
+    --gray-500: #{$gray-500};
+    --gray-600: #{$gray-600};
+    --gray-700: #{$gray-700};
+    --gray-800: #{$gray-800};
+    --gray-900: #{$gray-900};
+    --gray-950: #{$gray-950};
+    --gray-black: #{$gray-black};
+    
+
+    // Sizes
+    --spacer-0: #{$spacer-0};
+    --spacer-3xs: #{$spacer-3xs};
+    --spacer-xxs: #{$spacer-xxs};
+    --spacer-xs: #{$spacer-xs};
+    --spacer-sm: #{$spacer-sm};
+    --spacer: #{$spacer};
+    --spacer-md: #{$spacer-md};
+    --spacer-lg: #{$spacer-lg};
+    --spacer-xl: #{$spacer-xl};
+    --border-width: #{$border-width};
+    --border-radius-sm: #{$border-radius-sm};
+    --border-radius: #{$border-radius};
+    --border-radius-md: #{$border-radius-md};
+
+    /* Font Sizes */
+    --font-size-h1: #{$font-size-h1};
+    --font-size-h2: #{$font-size-h2};
+    --font-size-h3: #{$font-size-h3};
+    --font-size-h4: #{$font-size-h4};
+    --font-size-h5: #{$font-size-h5};
+    --font-size-h6: #{$font-size-h6};
+    --font-size-body: #{$font-size-body};
+    --font-size-subtitle: #{$font-size-subtitle};
+    --font-size-small: #{$font-size-small};
+    --font-size-small-label: #{$font-size-small-label};
+    
+    /* Font Weights */
+    --font-weight-headings: #{$font-weight-headings};
+    --font-weight-body: #{$font-weight-body};
+    --font-weight-bold: #{$font-weight-bold};
+    --font-weight-lead: #{$font-weight-lead};
+    --font-weight-small-label: #{$font-weight-small-label};
+    
+    // Semantic Colors
+    
+    --primary: #{$cloud-primary};
+    --primary-dark: #{$cloud-primary-dark};
+    --primary-light: #{$cloud-primary-light};
+    --primary-lighter: #{$cloud-primary-lighter};
+    --primary-bg: #{$cloud-primary-bg};
+    --primary-border: #{$cloud-primary-border};
+    --primary-hover: #{$cloud-primary-hover};
+
+    --secondary: #{$cloud-secondary};
+    --secondary-dark: #{$cloud-secondary-dark};
+    --secondary-light: #{$cloud-secondary-light};
+    --secondary-lighter: #{$cloud-secondary-lighter};
+    --secondary-bg: #{$cloud-secondary-bg};
+    --secondary-border: #{$cloud-secondary-border};
+    --secondary-hover: #{$cloud-secondary-hover};
+
+    --success: #{$cloud-success};
+    --info: #{$cloud-info};
+    --warning: #{$cloud-warning};
+    --error: #{$cloud-error};
+    --light: #{$light};
+    --dark: #{$dark};
+    
+    // Calculator UI 
+    
+    --bg-color: #{$gray-900};
+    --text-color: #{$cloud-text-color};
+    --text-muted: #{$cloud-text-muted};
+    --text-disabled: #{$cloud-text-disabled};
+    --text-emphasis: #{$cloud-text-emphasis};
+    --card-bg: #{$cloud-card-bg};
+    --border-color: #{$gray-200};
+    --border-color-dark: #{$gray-300};
+    --active: #{$brand-teal};
+    --disabled-bg: #{$cloud-disabled-bg};
+
+    --reads: #{$brand-blue};
+    --writes: #{$brand-orange};
+    
+    
+    // Fonts
+    --font-family-primary: #{$font-family-primary};
+    --font-family-code: #{$font-family-code};
+    --font-size-h1: #{$font-size-h1};
+    --font-size-body: #{$font-size-body};
+    
+  }
