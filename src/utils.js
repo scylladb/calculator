@@ -104,6 +104,14 @@ export function updateDisplayedCosts(logs) {
         if (key === '---' && value === '---') {
             return `<hr>`;
         }
-        return `<div class="cost-entry ${key === 'Total monthly cost' ? ' total lead' : ''}""><span class="cost-key">${key}</span><span class="cost-value"><span class="dollar-sign">$</span><span class="number">${value}</span></span></div>`;
+        return `
+    <div class="cost-entry ${/Total.+?cost/.test(key) ? ' total lead' : ''}">
+      <span class="cost-key">${key}</span>
+      <span class="cost-value">
+        <span class="dollar-sign">$</span>
+        <span class="number">${value}</span>
+      </span>
+    </div>
+  `;
     }).join('');
 }

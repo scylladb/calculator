@@ -234,10 +234,13 @@ function logCosts() {
     logs.push(`---: ---`);
 
     if (cfg.costTotalUpfront !== 0 && cfg.pricing === 'provisioned') {
+        logs.push(`Total monthly cost: ${Math.floor(cfg.costTotalMonthly).toLocaleString()}`);
         logs.push(`Total upfront cost: ${Math.floor(cfg.costTotalUpfront).toLocaleString()}`);
+        logs.push(`Total annual + upfront cost: ${Math.floor(cfg.costTotalUpfront + (cfg.costTotalMonthly * 12)).toLocaleString()}`);
+    } else {
+        logs.push(`Total monthly cost: ${Math.floor(cfg.costTotalMonthly).toLocaleString()}`);
+        logs.push(`Total annual cost: ${Math.floor(cfg.costTotalMonthly * 12).toLocaleString()}`);
     }
-
-    logs.push(`Total monthly cost: ${Math.floor(cfg.costTotalMonthly).toLocaleString()}`);
 
     console.log(cfg);
 
