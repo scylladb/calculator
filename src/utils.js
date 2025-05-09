@@ -36,6 +36,10 @@ export function getQueryParams() {
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
 
+    if (params.get('standalone') === 'false') {
+        document.body.classList.remove('standalone');
+    }
+
     if (params.get('format') === 'json') {
         updateAll();
         const jsonResponse = JSON.stringify(cfg, null, 2);
