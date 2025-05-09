@@ -213,6 +213,7 @@ setupSliderInteraction('peakReadsDsp', 'peakReadsInp', 'peakReads', formatNumber
 setupSliderInteraction('peakWritesDsp', 'peakWritesInp', 'peakWrites', formatNumber);
 setupSliderInteraction('peakDurationReadsDsp', 'peakDurationReadsInp', 'peakDurationReads', value => value);
 setupSliderInteraction('peakDurationWritesDsp', 'peakDurationWritesInp', 'peakDurationWrites', value => value);
+setupSliderInteraction('reservedDsp', 'reservedInp', 'reserved', value => `${value}%`);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
