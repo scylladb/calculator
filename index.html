@@ -270,6 +270,27 @@
                   </div>
                   <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
                 </div>
+
+                <div id="consistencyParams" class="vstack gap-3">
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label>Reads: </label>
+                      <div class="inline-input">
+                        <div class="value fill">
+                          <span id="readConstDsp">Strongly Consistent</span>
+                        </div>
+                        <div class="units">
+                        </div>
+                      </div>
+                      <span class="info-icon">
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
+                        as a percentage.</span>
+                    </span>
+                    </div>
+                    <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
+                  </div>
+                </div>
               </div>
 
             </div>
@@ -288,6 +309,8 @@
                     <span class="tooltip-text">Select the table class for your workload.</span>
                   </span>
                 </div>
+
+                <h4>Data Centers</h4>
 
                 <div class="range-group">
                   <div class="range-group-top">
@@ -331,30 +354,6 @@
                     </span>
                   </div>
                   <input type="range" id="storageGB" min="128" max="1048576" step="128" value="512">
-                </div>
-
-              </div>
-
-              <div id="consistencyParams" class="vstack gap-3">
-                <h4>Consistency</h4>
-
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label>Reads: </label>
-                    <div class="inline-input">
-                      <div class="value fill">
-                        <span id="readConstDsp">Strongly Consistent</span>
-                      </div>
-                      <div class="units">
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
-                        as a percentage.</span>
-                    </span>
-                  </div>
-                  <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
                 </div>
 
               </div>
