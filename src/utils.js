@@ -115,3 +115,63 @@ export function updateDisplayedCosts(logs) {
   `;
     }).join('');
 }
+
+// Share button selector
+const shareButton = document.getElementById('shareBtn');
+const copyLinkButton = document.getElementById('copyLinkBtn');
+const resultPara = document.querySelector('.result');
+
+// Function to build the shareable URL with query parameters
+function buildShareableURL() {
+    const currentURL = new URL(window.location.href);
+    const params = new URLSearchParams(window.location.search);
+    currentURL.search = params.toString();
+    return currentURL.toString();
+}
+
+// Data to share
+const shareData = {
+    title: 'ScyllaDB | DynamoDB Workload Calculator',
+    text: 'Check out this DynamoDB workload calculator powered by ScyllaDB!',
+    url: buildShareableURL(),
+};
+
+// Share button event listener
+shareButton.addEventListener('click', async () => {
+    try {
+        if (navigator.share) {
+            // Web Share API is supported
+            await navigator.share(shareData);
+            resultPara.textContent = 'Calculator shared successfully';
+        } else {
+            resultPara.textContent = 'Web Share API is not supported in your browser.';
+        }
+    } catch (err) {
+        console.log('Error sharing: ' + err.message);
+    }
+});
+
+// Copy link event listener
+copyLinkButton.addEventListener('click', () => {
+    const url = buildShareableURL();
+    navigator.clipboard.writeText(url)
+        .then(() => {
+            // Get the icon element
+            const icon = copyLinkButton.querySelector('i');
+            // Store the original classes
+            const originalClasses = [...icon.classList];
+
+            // Temporarily switch icon while keeping existing classes
+            icon.classList.remove('icon-copy');
+            icon.classList.add('icon-check-circle-outline');
+
+            // Revert icon after 2 seconds
+            setTimeout(() => {
+                icon.classList.remove('icon-check-circle-outline');
+                icon.classList.add(...originalClasses);
+            }, 2000);
+        })
+        .catch((err) => {
+            resultPara.textContent = 'Failed to copy: ' + err.message;
+        });
+});
