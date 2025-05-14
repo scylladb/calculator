@@ -24,6 +24,7 @@ export const cfg = {
     pricePerRCU_IA:     0.00016,
     pricePerWCU_IA:     0.00081,
     reserved:           0,
+    overprovisioned:    0,
     // Replicated
     regions:  1,
     // Data Transfer
