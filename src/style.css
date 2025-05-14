@@ -143,6 +143,17 @@ a:hover {
   color: var(--writes);
 }
 
+.dsp-container {
+  display: flex;
+  /*align-items: baseline;*/
+}
+
+.utilization:not(:empty) {
+  margin-left: -10px;
+  color: var(--warning);
+}
+
+
 input {
   font-family: var(--font-family-primary);
 }

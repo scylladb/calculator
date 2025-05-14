@@ -94,8 +94,10 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="baselineReadsInp">
-                            <span id="baselineReadsDsp">50K</span>
-                            <span id="baselineReadsDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
+                            <div class="dsp-container">
+                              <span id="baselineReadsDsp">50K</span>
+                              <span id="baselineReadsDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
+                            </div>
                           </div>
                           <div class="units">
                             ops/sec
@@ -118,8 +120,10 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="peakReadsInp">
-                            <span id="peakReadsDsp">500K</span>
-                            <span id="peakReadsDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
+                            <div class="dsp-container">
+                              <span id="peakReadsDsp">500K</span>
+                              <span id="peakReadsDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
+                            </div>
                           </div>
                           <div class="units">
                             ops/sec
@@ -168,8 +172,10 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="baselineWritesInp">
-                            <span id="baselineWritesDsp">50K</span>
-                            <span id="baselineWritesDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
+                            <div class="dsp-container">
+                              <span id="baselineWritesDsp">50K</span>
+                              <span id="baselineWritesDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
+                            </div>
                           </div>
                           <div class="units">
                             ops/sec
@@ -192,8 +198,10 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="peakWritesInp">
-                            <span id="peakWritesDsp">500K</span>
-                            <span id="peakWritesDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
+                            <div class="dsp-container">
+                              <span id="peakWritesDsp">500K</span>
+                              <span id="peakWritesDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
+                            </div>
                           </div>
                           <div class="units">
                             ops/sec
@@ -239,11 +247,11 @@
 
                   <div class="range-group">
                     <div class="range-group-top">
-                      <label for="overprovisioned">Overprovisioned:</label>
+                      <label for="utilization">Target Utilization:</label>
                       <div class="inline-input">
                         <div class="value">
-                          <input type="text" id="overprovisionedInp">
-                          <span id="overprovisionedDsp">0</span>
+                          <input type="text" id="utilizationInp">
+                          <span id="utilizationDsp">0</span>
                         </div>
                         <div class="units">
 
@@ -254,7 +262,7 @@
                         <span class="tooltip-text">Enter the percentage of operations to overprovision.</span>
                       </span>
                     </div>
-                    <input type="range" id="overprovisioned" min="0" max="100" step="1" value="0">
+                    <input type="range" id="utilization" min="0" max="200" step="1" value="70">
                   </div>
 
                   <div class="range-group">
