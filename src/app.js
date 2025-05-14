@@ -95,10 +95,10 @@ export function setupOverprovisionInteraction(baselineReadId, baselineWriteId, p
         peakRead.value = newPeakRead;
         peakWrite.value = newPeakWrite;
 
-        document.getElementById('baselineReadsDsp').innerText = formatNumber(newBaselineRead);
-        document.getElementById('baselineWritesDsp').innerText = formatNumber(newBaselineWrite);
-        document.getElementById('peakReadsDsp').innerText = formatNumber(newPeakRead);
-        document.getElementById('peakWritesDsp').innerText = formatNumber(newPeakWrite);
+        document.getElementById('baselineReadsDspOverprovisioned').innerText = formatNumber(newBaselineRead - originalBaselineRead);
+        document.getElementById('baselineWritesDspOverprovisioned').innerText = formatNumber(newBaselineWrite - originalBaselineWrite);
+        document.getElementById('peakReadsDspOverprovisioned').innerText = formatNumber(newPeakRead - originalPeakRead);
+        document.getElementById('peakWritesDspOverprovisioned').innerText = formatNumber(newPeakWrite - originalPeakWrite);
 
         // Update cfg values as well
         cfg.baselineReads = newBaselineRead;
