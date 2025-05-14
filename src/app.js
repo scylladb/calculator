@@ -36,20 +36,94 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
+export function setupOverprovisionInteraction(baselineReadId, baselineWriteId, peakReadId, peakWriteId) {
+    const display = document.getElementById('overprovisionedDsp');
+    const input = document.getElementById('overprovisionedInp');
+    const slider = document.getElementById('overprovisioned');
+    const baselineRead = document.getElementById(baselineReadId);
+    const baselineWrite = document.getElementById(baselineWriteId);
+    const peakRead = document.getElementById(peakReadId);
+    const peakWrite = document.getElementById(peakWriteId);
+
+    // Store the original values
+    const originalBaselineRead = parseInt(cfg.baselineReads);
+    const originalBaselineWrite = parseInt(cfg.baselineWrites);
+    const originalPeakRead = parseInt(cfg.peakReads);
+    const originalPeakWrite = parseInt(cfg.peakWrites);
+
+    input.addEventListener('mouseover', function (event) {
+        input.value = parseInt(slider.value.toString());
+    });
+
+    input.addEventListener('blur', function () {
+        const newValue = parseInt(input.value.toString());
+        if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
+            slider.value = newValue;
+            display.innerText = `${newValue}%`;
+            updateAll();
+        }
+    });
+
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
+            display.innerText = `${parseInt(event.target.value)}%`;
+            setTimeout(() => {
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 0);
+            input.blur();
+            updateAll();
+        }
+    });
+
+    // Synchronize display value on slider change
+    slider.addEventListener('input', function (event) {
+        const currentValue = parseInt(event.target.value);
+        display.innerText = `${currentValue}%`;
+
+        // Calculate the multiplier
+        const multiplier = 1 + (currentValue / 100);
+
+        // Always adjust relative to the original values
+        const newBaselineRead = Math.floor(originalBaselineRead * multiplier);
+        const newBaselineWrite = Math.floor(originalBaselineWrite * multiplier);
+        const newPeakRead = Math.floor(originalPeakRead * multiplier);
+        const newPeakWrite = Math.floor(originalPeakWrite * multiplier);
+
+        // Update the fields
+        baselineRead.value = newBaselineRead;
+        baselineWrite.value = newBaselineWrite;
+        peakRead.value = newPeakRead;
+        peakWrite.value = newPeakWrite;
+
+        document.getElementById('baselineReadsDsp').innerText = formatNumber(newBaselineRead);
+        document.getElementById('baselineWritesDsp').innerText = formatNumber(newBaselineWrite);
+        document.getElementById('peakReadsDsp').innerText = formatNumber(newPeakRead);
+        document.getElementById('peakWritesDsp').innerText = formatNumber(newPeakWrite);
+
+        // Update cfg values as well
+        cfg.baselineReads = newBaselineRead;
+        cfg.baselineWrites = newBaselineWrite;
+        cfg.peakReads = newPeakRead;
+        cfg.peakWrites = newPeakWrite;
+
+        updateAll();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    
+
     const tabLabels = document.querySelectorAll('.tab-label');
     const tabContents = document.querySelectorAll('.tab-content');
 
     tabLabels.forEach(tabLabel => {
         tabLabel.addEventListener('click', function(e) {
-        e.preventDefault(); 
-        
+        e.preventDefault();
+
         tabLabels.forEach(tab => tab.classList.remove('active'));
         tabContents.forEach(content => content.classList.remove('active'));
-        
+
         this.classList.add('active');
-        
+
         const tabContentId = this.getAttribute('href');
         document.getElementById(tabContentId).classList.add('active');
         });
@@ -140,6 +214,12 @@ document.getElementById('peakDurationWrites').addEventListener('input', (event) 
     updateAll();
 });
 
+document.getElementById('overprovisioned').addEventListener('input', (event) => {
+    cfg.overprovisioned = parseInt(event.target.value);
+    document.getElementById('overprovisionedDsp').innerText = `${formatNumber(cfg.overprovisioned)}%`;
+    updateAll();
+});
+
 document.getElementById('reserved').addEventListener('input', (event) => {
     cfg.reserved = parseInt(event.target.value);
     document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
@@ -218,6 +298,8 @@ setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 
+setupOverprovisionInteraction( 'baselineReads', 'baselineWrites', 'peakReads', 'peakWrites');
+
 getQueryParams();
 
 if (cfg.pricing === 'demand') {
@@ -239,6 +321,7 @@ document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
+document.getElementById('overprovisioned').value = cfg.overprovisioned;
 document.getElementById('reserved').value = cfg.reserved;
 document.getElementById('readConst').value = cfg.readConst;
 
@@ -254,6 +337,7 @@ document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
+document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 
 updateAll();
