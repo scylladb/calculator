@@ -94,11 +94,9 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="baselineReadsInp">
-                            <div class="dsp-container">
-                              <span id="baselineReadsDsp">50K</span>
-                              <span id="baselineReadsDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
-                            </div>
+                            <span id="baselineReadsDsp">50K</span>
                           </div>
+                          <span id="baselineReadsDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -120,11 +118,9 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="peakReadsInp">
-                            <div class="dsp-container">
-                              <span id="peakReadsDsp">500K</span>
-                              <span id="peakReadsDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
-                            </div>
+                            <span id="peakReadsDsp">500K</span>
                           </div>
+                          <span id="peakReadsDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -172,11 +168,9 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="baselineWritesInp">
-                            <div class="dsp-container">
-                              <span id="baselineWritesDsp">50K</span>
-                              <span id="baselineWritesDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
-                            </div>
+                            <span id="baselineWritesDsp">50K</span>
                           </div>
+                          <span id="baselineWritesDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -198,11 +192,9 @@
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="peakWritesInp">
-                            <div class="dsp-container">
-                              <span id="peakWritesDsp">500K</span>
-                              <span id="peakWritesDspUtilization" class="utilization"></span> <!-- TODO: Rafal style-->
-                            </div>
+                            <span id="peakWritesDsp">500K</span>
                           </div>
+                          <span id="peakWritesDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -247,7 +239,7 @@
 
                   <div class="range-group">
                     <div class="range-group-top">
-                      <label for="utilization">Target Utilization:</label>
+                      <label for="utilization" id="targetUtilization">Target Utilization:</label>
                       <div class="inline-input">
                         <div class="value">
                           <input type="text" id="utilizationInp">

@@ -36,44 +36,19 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-export function setupOverprovisionInteraction(baselineReadId, baselineWriteId, peakReadId, peakWriteId) {
+export function setupOverprovisionInteraction() {
     const display = document.getElementById('utilizationDsp');
-    const input = document.getElementById('utilizationInp');
     const slider = document.getElementById('utilization');
-    const baselineRead = document.getElementById(baselineReadId);
-    const baselineWrite = document.getElementById(baselineWriteId);
-    const peakRead = document.getElementById(peakReadId);
-    const peakWrite = document.getElementById(peakWriteId);
+    const baselineRead = document.getElementById('baselineReads');
+    const baselineWrite = document.getElementById('baselineWrites');
+    const peakRead = document.getElementById(   'peakReads');
+    const peakWrite = document.getElementById('peakWrites');
 
     // Store the original values
     const originalBaselineRead = parseInt(cfg.baselineReads);
     const originalBaselineWrite = parseInt(cfg.baselineWrites);
     const originalPeakRead = parseInt(cfg.peakReads);
     const originalPeakWrite = parseInt(cfg.peakWrites);
-
-    input.addEventListener('mouseover', function (event) {
-        input.value = parseInt(slider.value.toString());
-    });
-
-    input.addEventListener('blur', function () {
-        const newValue = parseInt(input.value.toString());
-        if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
-            slider.value = newValue;
-            display.innerText = `${newValue}%`;
-            updateAll();
-        }
-    });
-
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            display.innerText = `${parseInt(event.target.value)}%`;
-            setTimeout(() => {
-                slider.dispatchEvent(new Event('input', { bubbles: true }));
-            }, 0);
-            input.blur();
-            updateAll();
-        }
-    });
 
     // Synchronize display value on slider change
     slider.addEventListener('input', function (event) {
@@ -110,11 +85,21 @@ export function setupOverprovisionInteraction(baselineReadId, baselineWriteId, p
             document.getElementById('baselineWritesDspUtilization').innerText = '+' + formatNumber(baselineWritesDspUtilizationOps);
             document.getElementById('peakReadsDspUtilization').innerText = '+' + formatNumber(peakReadsDspUtilizationOps);
             document.getElementById('peakWritesDspUtilization').innerText = '+' + formatNumber(peakWritesDspUtilizationOps);
+            document.getElementById('baselineReadsDsp').innerText = formatNumber(newBaselineRead);
+            document.getElementById('baselineWritesDsp').innerText = formatNumber(newBaselineWrite);
+            document.getElementById('peakReadsDsp').innerText = formatNumber(newPeakRead);
+            document.getElementById('peakWritesDsp').innerText = formatNumber(newPeakWrite);
+            document.getElementById('targetUtilization').classList.add('utilization');
         } else {
             document.getElementById('baselineReadsDspUtilization').innerText = '';
             document.getElementById('baselineWritesDspUtilization').innerText = '';
             document.getElementById('peakReadsDspUtilization').innerText = '';
             document.getElementById('peakWritesDspUtilization').innerText = '';
+            document.getElementById('baselineReadsDsp').innerText = formatNumber(originalBaselineRead);
+            document.getElementById('baselineWritesDsp').innerText = formatNumber(originalBaselineWrite);
+            document.getElementById('peakReadsDsp').innerText = formatNumber(originalPeakRead);
+            document.getElementById('peakWritesDsp').innerText = formatNumber(originalPeakWrite);
+            document.getElementById('targetUtilization').classList.remove('utilization');
         }
 
         // Update cfg values as well
@@ -315,7 +300,7 @@ setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 
-setupOverprovisionInteraction( 'baselineReads', 'baselineWrites', 'peakReads', 'peakWrites');
+setupOverprovisionInteraction();
 
 getQueryParams();
 
