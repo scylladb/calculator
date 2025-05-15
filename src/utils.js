@@ -7,6 +7,7 @@ export function formatNumber(num) {
     if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
     if (num >= 1e3) return (num / 1e3).toFixed(0) + 'K';
     if (num >= 1) return num.toFixed(0);
+    if (num === 0) return "";
     return num.toString();
 }
 
@@ -34,7 +35,7 @@ export function getQueryParams() {
     if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
-    if (params.get('overprovisioned')) cfg.overprovisioned = parseInt(params.get('overprovisioned'));
+    if (params.get('utilization')) cfg.utilization = parseInt(params.get('utilization'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
 
     if (params.get('standalone') === 'false') {
@@ -72,7 +73,7 @@ export function updateQueryParams() {
         params.set('peakDurationReads', cfg.peakDurationReads.toString());
         params.set('peakDurationWrites', cfg.peakDurationWrites.toString());
         params.set('reserved', cfg.reserved.toString());
-        params.set('overprovisioned', cfg.overprovisioned.toString());
+        params.set('utilization', cfg.utilization.toString());
         params.set('readConst', cfg.readConst.toString());
 
         if (cfg.cacheSizeGB === 0) {

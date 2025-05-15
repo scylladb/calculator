@@ -36,14 +36,13 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-export function setupOverprovisionInteraction(baselineReadId, baselineWriteId, peakReadId, peakWriteId) {
-    const display = document.getElementById('overprovisionedDsp');
-    const input = document.getElementById('overprovisionedInp');
-    const slider = document.getElementById('overprovisioned');
-    const baselineRead = document.getElementById(baselineReadId);
-    const baselineWrite = document.getElementById(baselineWriteId);
-    const peakRead = document.getElementById(peakReadId);
-    const peakWrite = document.getElementById(peakWriteId);
+export function setupOverprovisionInteraction() {
+    const display = document.getElementById('utilizationDsp');
+    const slider = document.getElementById('utilization');
+    const baselineRead = document.getElementById('baselineReads');
+    const baselineWrite = document.getElementById('baselineWrites');
+    const peakRead = document.getElementById(   'peakReads');
+    const peakWrite = document.getElementById('peakWrites');
 
     // Store the original values
     const originalBaselineRead = parseInt(cfg.baselineReads);
@@ -51,37 +50,16 @@ export function setupOverprovisionInteraction(baselineReadId, baselineWriteId, p
     const originalPeakRead = parseInt(cfg.peakReads);
     const originalPeakWrite = parseInt(cfg.peakWrites);
 
-    input.addEventListener('mouseover', function (event) {
-        input.value = parseInt(slider.value.toString());
-    });
-
-    input.addEventListener('blur', function () {
-        const newValue = parseInt(input.value.toString());
-        if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
-            slider.value = newValue;
-            display.innerText = `${newValue}%`;
-            updateAll();
-        }
-    });
-
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            display.innerText = `${parseInt(event.target.value)}%`;
-            setTimeout(() => {
-                slider.dispatchEvent(new Event('input', { bubbles: true }));
-            }, 0);
-            input.blur();
-            updateAll();
-        }
-    });
-
     // Synchronize display value on slider change
     slider.addEventListener('input', function (event) {
         const currentValue = parseInt(event.target.value);
         display.innerText = `${currentValue}%`;
 
-        // Calculate the multiplier
-        const multiplier = 1 + (currentValue / 100);
+        // If utilization is 70% or less, multiplier is 1
+        // If utilization is greater than 70%, apply the increase formula
+        const multiplier = currentValue > 70 ? 1 + ((currentValue - 70) / 100) : 1;
+
+        console.log(`Utilization multiplier: ${multiplier} (Current Value: ${currentValue})`);
 
         // Always adjust relative to the original values
         const newBaselineRead = Math.floor(originalBaselineRead * multiplier);
@@ -95,10 +73,34 @@ export function setupOverprovisionInteraction(baselineReadId, baselineWriteId, p
         peakRead.value = newPeakRead;
         peakWrite.value = newPeakWrite;
 
-        document.getElementById('baselineReadsDspOverprovisioned').innerText = formatNumber(newBaselineRead - originalBaselineRead);
-        document.getElementById('baselineWritesDspOverprovisioned').innerText = formatNumber(newBaselineWrite - originalBaselineWrite);
-        document.getElementById('peakReadsDspOverprovisioned').innerText = formatNumber(newPeakRead - originalPeakRead);
-        document.getElementById('peakWritesDspOverprovisioned').innerText = formatNumber(newPeakWrite - originalPeakWrite);
+        // Calculate differences
+        let baselineReadsDspUtilizationOps = newBaselineRead - originalBaselineRead;
+        let baselineWritesDspUtilizationOps = newBaselineWrite - originalBaselineWrite;
+        let peakReadsDspUtilizationOps = newPeakRead - originalPeakRead;
+        let peakWritesDspUtilizationOps = newPeakWrite - originalPeakWrite;
+
+        // Update the display elements
+        if(multiplier > 1){
+            document.getElementById('baselineReadsDspUtilization').innerText = '+' + formatNumber(baselineReadsDspUtilizationOps);
+            document.getElementById('baselineWritesDspUtilization').innerText = '+' + formatNumber(baselineWritesDspUtilizationOps);
+            document.getElementById('peakReadsDspUtilization').innerText = '+' + formatNumber(peakReadsDspUtilizationOps);
+            document.getElementById('peakWritesDspUtilization').innerText = '+' + formatNumber(peakWritesDspUtilizationOps);
+            document.getElementById('baselineReadsDsp').innerText = formatNumber(newBaselineRead);
+            document.getElementById('baselineWritesDsp').innerText = formatNumber(newBaselineWrite);
+            document.getElementById('peakReadsDsp').innerText = formatNumber(newPeakRead);
+            document.getElementById('peakWritesDsp').innerText = formatNumber(newPeakWrite);
+            document.getElementById('targetUtilization').classList.add('utilization');
+        } else {
+            document.getElementById('baselineReadsDspUtilization').innerText = '';
+            document.getElementById('baselineWritesDspUtilization').innerText = '';
+            document.getElementById('peakReadsDspUtilization').innerText = '';
+            document.getElementById('peakWritesDspUtilization').innerText = '';
+            document.getElementById('baselineReadsDsp').innerText = formatNumber(originalBaselineRead);
+            document.getElementById('baselineWritesDsp').innerText = formatNumber(originalBaselineWrite);
+            document.getElementById('peakReadsDsp').innerText = formatNumber(originalPeakRead);
+            document.getElementById('peakWritesDsp').innerText = formatNumber(originalPeakWrite);
+            document.getElementById('targetUtilization').classList.remove('utilization');
+        }
 
         // Update cfg values as well
         cfg.baselineReads = newBaselineRead;
@@ -134,6 +136,9 @@ document.querySelector('input[name="pricing"][value="demand"]').addEventListener
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
         provisionedParams.style.display = 'none';
+        document.querySelectorAll('.utilization').forEach(element => {
+            element.style.display = 'none';
+        });
         updateAll();
     }
 });
@@ -142,6 +147,9 @@ document.querySelector('input[name="pricing"][value="provisioned"]').addEventLis
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
         provisionedParams.style.display = 'block';
+        document.querySelectorAll('.utilization').forEach(element => {
+            element.style.display = 'block';
+        });
         updateAll();
     }
 });
@@ -214,9 +222,9 @@ document.getElementById('peakDurationWrites').addEventListener('input', (event) 
     updateAll();
 });
 
-document.getElementById('overprovisioned').addEventListener('input', (event) => {
-    cfg.overprovisioned = parseInt(event.target.value);
-    document.getElementById('overprovisionedDsp').innerText = `${formatNumber(cfg.overprovisioned)}%`;
+document.getElementById('utilization').addEventListener('input', (event) => {
+    cfg.utilization = parseInt(event.target.value);
+    document.getElementById('utilizationDsp').innerText = `${formatNumber(cfg.utilization)}%`;
     updateAll();
 });
 
@@ -298,7 +306,7 @@ setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 
-setupOverprovisionInteraction( 'baselineReads', 'baselineWrites', 'peakReads', 'peakWrites');
+setupOverprovisionInteraction();
 
 getQueryParams();
 
@@ -321,7 +329,7 @@ document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
-document.getElementById('overprovisioned').value = cfg.overprovisioned;
+document.getElementById('utilization').value = cfg.utilization;
 document.getElementById('reserved').value = cfg.reserved;
 document.getElementById('readConst').value = cfg.readConst;
 
@@ -337,7 +345,7 @@ document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
-document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
+document.getElementById('utilizationDsp').innerText = `${cfg.utilization}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 
 updateAll();

@@ -95,8 +95,8 @@
                           <div class="value">
                             <input type="text" id="baselineReadsInp">
                             <span id="baselineReadsDsp">50K</span>
-                            <span id="baselineReadsDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
                           </div>
+                          <span id="baselineReadsDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -119,8 +119,8 @@
                           <div class="value">
                             <input type="text" id="peakReadsInp">
                             <span id="peakReadsDsp">500K</span>
-                            <span id="peakReadsDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
                           </div>
+                          <span id="peakReadsDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -169,8 +169,8 @@
                           <div class="value">
                             <input type="text" id="baselineWritesInp">
                             <span id="baselineWritesDsp">50K</span>
-                            <span id="baselineWritesDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
                           </div>
+                          <span id="baselineWritesDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -193,8 +193,8 @@
                           <div class="value">
                             <input type="text" id="peakWritesInp">
                             <span id="peakWritesDsp">500K</span>
-                            <span id="peakWritesDspOverprovisioned" style="color: transparent; padding-right: 100px"></span> <!-- TODO: Rafal style-->
                           </div>
+                          <span id="peakWritesDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -230,98 +230,96 @@
                       <input type="range" id="peakDurationWrites" min="0" max="24" value="1">
                     </div>
                   </div>
-
                 </div>
 
                 <hr>
 
                 <div id="provisionedParams" style="display: none;">
-
-                  <div class="range-group">
-                    <div class="range-group-top">
-                      <label for="overprovisioned">Overprovisioned:</label>
-                      <div class="inline-input">
-                        <div class="value">
-                          <input type="text" id="overprovisionedInp">
-                          <span id="overprovisionedDsp">0</span>
+                  <div class="row-sm">
+                    <div class="col vstack gap-3">
+                      <div class="range-group">
+                        <div class="range-group-top">
+                          <label for="utilization" id="targetUtilization">Target Utilization:</label>
+                          <div class="inline-input">
+                            <div class="value">
+                              <input type="text" id="utilizationInp">
+                              <span id="utilizationDsp">0</span>
+                            </div>
+                            <div class="units">
+                            </div>
+                          </div>
+                          <span class="info-icon">
+                            <i class="icon-info-outline"></i>
+                            <span class="tooltip-text">Target utilization to avoid Throttled Requests. Increasing this will automatically provision more ops/sec.</span>
+                          </span>
                         </div>
-                        <div class="units">
-
-                        </div>
+                        <input type="range" id="utilization" min="0" max="200" step="1" value="70">
                       </div>
-                      <span class="info-icon">
-                        <i class="icon-info-outline"></i>
-                        <span class="tooltip-text">Enter the percentage of operations to overprovision.</span>
-                      </span>
                     </div>
-                    <input type="range" id="overprovisioned" min="0" max="100" step="1" value="0">
-                  </div>
 
-                  <div class="range-group">
-                    <div class="range-group-top">
-                      <label for="reserved">Reserved Capacity:</label>
-                      <div class="inline-input">
-                        <div class="value">
-                          <input type="text" id="reservedInp">
-                          <span id="reservedDsp">0</span>
+                    <div class="col vstack gap-3">
+                      <div class="range-group">
+                        <div class="range-group-top">
+                          <label for="reserved">Reserved Capacity:</label>
+                          <div class="inline-input">
+                            <div class="value">
+                              <input type="text" id="reservedInp">
+                              <span id="reservedDsp">0</span>
+                            </div>
+                            <div class="units">
+                            </div>
+                          </div>
+                          <span class="info-icon">
+                            <i class="icon-info-outline"></i>
+                            <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+                          </span>
                         </div>
-                        <div class="units">
-
-                        </div>
+                        <input type="range" id="reserved" min="0" max="100" step="1" value="0">
                       </div>
-                      <span class="info-icon">
-                        <i class="icon-info-outline"></i>
-                        <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved
-                          capacity.
-                          Reserved capacity can only be used with DynamoDB Standard table class.</span>
-                      </span>
                     </div>
-                    <input type="range" id="reserved" min="0" max="100" step="1" value="0">
                   </div>
-
-
                 </div>
 
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="itemSizeB">Operation Size:</label>
-                    <div class="inline-input">
-                      <div class="value">
-                        <input type="text" id="itemSizeInp">
-                        <span id="itemSizeDsp">1 </span>
-                      </div>
-                      <div class="units">
-
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter your average operation size (all attributes).</span>
-                    </span>
-                  </div>
-                  <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
-                </div>
-
-                <div id="storageParams" class="vstack gap-3">
-                  <div class="range-group">
-                    <div class="range-group-top">
-                      <label for="storageGB">Storage:</label>
-                      <div class="inline-input">
-                        <div class="value wide">
-                          <input type="text" id="storageInp">
-                          <span id="storageDsp">512 GB</span>
+                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="itemSizeB">Operation Size:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="itemSizeInp">
+                            <span id="itemSizeDsp">1 </span>
+                          </div>
+                          <div class="units"></div>
                         </div>
-                        <div class="units">
-                        </div>
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter your average operation size (all attributes).</span>
+                        </span>
                       </div>
-                      <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter your total data storage size.</span>
-                    </span>
+                      <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
                     </div>
-                    <input type="range" id="storageGB" min="128" max="1048576" step="128" value="512">
                   </div>
 
+                  <div class="col vstack gap-3">
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="storageGB">Storage:</label>
+                        <div class="inline-input">
+                          <div class="value wide">
+                            <input type="text" id="storageInp">
+                            <span id="storageDsp">512 GB</span>
+                          </div>
+                          <div class="units"></div>
+                        </div>
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter your total data storage size.</span>
+                        </span>
+                      </div>
+                      <input type="range" id="storageGB" min="128" max="1048576" step="128" value="512">
+                    </div>
+                  </div>
                 </div>
 
                 <div id="consistencyParams" class="vstack gap-3">
