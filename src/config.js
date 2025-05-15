@@ -15,6 +15,7 @@ export const cfg = {
     storageGB: 512,
     tableClass: 'standard',
     readConst: 100,
+
     // Utilization
     utilization: 70,
     multiplier: 1,
@@ -24,6 +25,7 @@ export const cfg = {
     pricePerWRU: 0.000000625,
     pricePerRRU_IA: 0.000000155,
     pricePerWRU_IA: 0.000000780,
+
     // Provisioned
     pricePerRCU: 0.00013,
     pricePerRRCU: 0.000025,
@@ -35,8 +37,10 @@ export const cfg = {
 
     // Replicated
     regions: 1,
+
     // Data Transfer
     priceIntraRegPerGB: 0.02,
+
     // DAX Node Costs
     cacheSizeGB: 0,
     cacheRatio: 0,
@@ -50,5 +54,8 @@ export const cfg = {
         {instance: "dax.r5.12xlarge", memory: 384, nps: 1000000, price: 6.12000000},
         {instance: "dax.r5.16xlarge", memory: 512, nps: 1000000, price: 8.13700000},
         {instance: "dax.r5.24xlarge", memory: 768, nps: 1000000, price: 12.24000000},
-    ]
+    ],
+
+    // Other
+    override: false
 };

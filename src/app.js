@@ -6,6 +6,10 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     const input = document.getElementById(inputId);
     const slider = document.getElementById(sliderId);
 
+    slider.addEventListener('mousedown', function () {
+        cfg.override = true;
+    });
+
     input.addEventListener('mouseover', function (event) {
         input.value = parseInt(slider.value.toString());
     });
@@ -26,6 +30,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
                 slider.dispatchEvent(new Event('input', { bubbles: true }));
             }, 0);
             input.blur();
+            cfg.override = true;
             updateAll();
         }
     });
@@ -279,6 +284,7 @@ document.getElementById('cacheSize').addEventListener('input', (event) => {
     const cacheSizeGB = parseInt(event.target.value);
     document.getElementById('cacheSizeDsp').innerText = cacheSizeGB >= 1024 ? (cacheSizeGB / 1024).toFixed(2) + ' TB' : cacheSizeGB + ' GB';
     cfg.cacheSizeGB = cacheSizeGB;
+    cfg.override = false;
     updateAll();
 });
 
@@ -287,6 +293,18 @@ document.getElementById('cacheRatio').addEventListener('input', (event) => {
     const cacheMissRatio = 100 - cacheHitRatio;
     document.getElementById('cacheRatioDsp').innerText = `${cacheHitRatio}/${cacheMissRatio}`;
     cfg.cacheRatio = cacheHitRatio;
+    cfg.override = false;
+    updateAll();
+});
+
+document.getElementById('daxNodes').addEventListener('input', (event) => {
+    cfg.daxNodes = parseInt(event.target.value);
+    document.getElementById('daxNodesDsp').innerText = `${formatNumber(cfg.daxNodes)}`;
+    updateAll();
+});
+
+document.getElementById('daxInstanceClass').addEventListener('change', (event) => {
+    cfg.daxInstanceClass = event.target.value;
     updateAll();
 });
 
@@ -300,6 +318,7 @@ setupSliderInteraction('reservedDsp', 'reservedInp', 'reserved', value => `${val
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
+setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
 setupSliderInteractionUtilization();
 

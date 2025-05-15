@@ -151,12 +151,19 @@ function findBestDaxCombination(targetRPS) {
 }
 
 function calculateDaxCosts() {
-    if (cfg.cacheSizeGB === 0) {
-        cfg.dynamoDaxCost = 0;
-        document.getElementById('daxInstanceClass').textContent = 'none';
-        document.getElementById('daxNodes').textContent = '0';
+    if(cfg.override) {
+        cfg.daxInstanceClassCost = cfg.daxInstanceClassCosts.find(instance => instance.instance === cfg.daxInstanceClass).price * cfg.daxNodes;
+        cfg.dynamoDaxCost = cfg.hoursPerMonth * cfg.daxInstanceClassCost;
         return;
     }
+
+    if (cfg.cacheSizeGB === 0) {
+        cfg.dynamoDaxCost = 0;
+        document.getElementById('daxNodesDsp').innerText = '0';
+        document.getElementById('daxNodes').value = '0';
+        return;
+    }
+
     let readRPS_CacheHit = cfg.baselineReads * cfg.cacheRatio / 100;
     let readRPS_CacheMiss = cfg.baselineReads * (1 - cfg.cacheRatio / 100);
     let readMissFactor = 1;
@@ -169,13 +176,13 @@ function calculateDaxCosts() {
     let bestCombination = findBestDaxCombination(targetRPS);
 
     if (bestCombination) {
-        console.log(bestCombination);
         cfg.daxInstanceClass = bestCombination.instance;
         cfg.daxNodes = bestCombination.nodes;
         cfg.daxInstanceClassCost = bestCombination.totalCost;
         cfg.dynamoDaxCost = cfg.hoursPerMonth * cfg.daxInstanceClassCost;
-        document.getElementById('daxInstanceClass').textContent = bestCombination.instance;
-        document.getElementById('daxNodes').textContent = bestCombination.nodes;
+        document.getElementById('daxInstanceClass').value = bestCombination.instance;
+        document.getElementById('daxNodes').value = bestCombination.nodes;
+        document.getElementById('daxNodesDsp').innerText = bestCombination.nodes;
         cfg.costDemandMonthlyReads = cfg.costDemandMonthlyReads * (1 - cfg.cacheRatio / 100);
         cfg.costMonthlyRCU = cfg.costMonthlyRCU * (1 - cfg.cacheRatio / 100);
     } else {
@@ -242,7 +249,7 @@ function logCosts() {
         logs.push(`Total annual cost: ${Math.floor(cfg.costTotalMonthly * 12).toLocaleString()}`);
     }
 
-    console.log(cfg);
+    //console.log(cfg);
 
     updateDisplayedCosts(logs);
 }
@@ -265,12 +272,10 @@ export function updateCosts() {
     calculateDaxCosts();
 
     cfg.costTotalMonthly = cfg.pricing === 'demand' ?
-        cfg.costDemandMonthly + cfg.costStorage :
-        cfg.costProvisionedMonthly + cfg.costStorage;
+        cfg.costDemandMonthly + cfg.costStorage + cfg.costNetwork + cfg.dynamoDaxCost :
+        cfg.costProvisionedMonthly + cfg.costStorage + cfg.costNetwork + cfg.dynamoDaxCost;
 
     cfg.costTotalUpfront = cfg.costReservedUpfront;
-
-    cfg.costTotalMonthlyAveraged = cfg.costTotalMonthly + (cfg.costTotalUpfront / 12) + cfg.costNetwork + cfg.dynamoDaxCost;
 
     logCosts();
 }

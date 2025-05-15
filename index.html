@@ -390,7 +390,7 @@
 
 
               <div id="daxParams" class="vstack gap-3">
-                <h4>DynamoDB Accelerator (DAX)</h4>
+                <h4>Cache Configuration</h4>
 
                 <div class="range-group">
                   <div class="range-group-top">
@@ -428,36 +428,44 @@
                   <input type="range" id="cacheRatio" min="0" max="100" step="1" value="0">
                 </div>
 
-                <div class="row-sm">
-                  <div class="col">
-                    <label class="mb-2">Instance Class:</label>
-                    <div class="hstack gap-2">
-                      <div class="value flex-grow">
-                        <i class="icon-instance me-3"></i> <span id="daxInstanceClass">none</span>
+                <h4>Recommended Instances</h4>
+                <div class="range-group">
+                  <div class="range-group-top">
+                    <label for="daxNodes">Number of Nodes:</label>
+                    <div class="inline-input">
+                      <div class="value">
+                        <input type="text" id="daxNodesInp">
+                        <span id="daxNodesDsp">0</span>
                       </div>
-                      <span class="info-icon">
-                        <i class="icon-info-outline"></i>
-                        <span class="tooltip-text">This is the recommended instance class for your workload.</span>
-                      </span>
+                      <div class="units">
+                      </div>
                     </div>
+                    <span class="info-icon">
+                  <i class="icon-info-outline"></i>
+                  <span class="tooltip-text">This is the recommended number of nodes for your workload.</span>
+                </span>
                   </div>
+                  <input type="range" id="daxNodes" min="0" max="48" step="1" value="0">
+                </div>
 
-                  <div class="col">
-                    <label class="mb-2">Number of Nodes:</label>
-                    <div class="hstack gap-2">
-                      <div class="value flex-grow">
-                        <i class="icon-lan me-3"></i> <span id="daxNodes">0</span>
-                      </div>
-                      <span class="info-icon">
-                        <i class="icon-info-outline"></i>
-                        <span class="tooltip-text">This is the recommended minimum number of nodes for your
-                          workload.</span>
-                      </span>
-                    </div>
-                  </div>
+                <div class="hstack gap-3 align-items-center">
+                  <label for="daxInstanceClass" class="flex-grow">Instance Class:</label>
+                  <select id="daxInstanceClass">
+                    <option value="dax.r5.large">dax.r5.large</option>
+                    <option value="dax.r5.xlarge">dax.r5.xlarge</option>
+                    <option value="dax.r5.2xlarge">dax.r5.2xlarge</option>
+                    <option value="dax.r5.4xlarge">dax.r5.4xlarge</option>
+                    <option value="dax.r5.8xlarge">dax.r5.8xlarge</option>
+                    <option value="dax.r5.12xlarge">dax.r5.12xlarge</option>
+                    <option value="dax.r5.16xlarge">dax.r5.16xlarge</option>
+                    <option value="dax.r5.24xlarge">dax.r5.24xlarge</option>
+                  </select>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+                  </span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
