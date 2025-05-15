@@ -66,19 +66,31 @@ export function updateUtilization() {
     cfg.peakReadsTotal = Math.floor(cfg.peakReads * cfg.multiplier);
     cfg.peakWritesTotal = Math.floor(cfg.peakWrites * cfg.multiplier);
 
+
     // Update the display elements
     if (cfg.multiplier > 1) {
         document.getElementById('baselineReadsDspUtilization').innerText = '+' + formatNumber(cfg.baselineReadsTotal - cfg.baselineReads);
         document.getElementById('baselineWritesDspUtilization').innerText = '+' + formatNumber(cfg.baselineWritesTotal - cfg.baselineWrites);
         document.getElementById('peakReadsDspUtilization').innerText = '+' + formatNumber(cfg.peakReadsTotal - cfg.peakReads);
         document.getElementById('peakWritesDspUtilization').innerText = '+' + formatNumber(cfg.peakWritesTotal - cfg.peakWrites);
-        document.getElementById('targetUtilization').classList.add('utilization');
+
+        document.querySelectorAll('.utilization').forEach(element => {
+            element.classList.remove('medium', 'high');
+
+            if (cfg.multiplier > 1 && cfg.multiplier <= 1.24) {
+                element.classList.add('medium');
+            } else if (cfg.multiplier > 1.24) {
+                element.classList.add('high');
+            }
+        });
     } else {
         document.getElementById('baselineReadsDspUtilization').innerText = '';
         document.getElementById('baselineWritesDspUtilization').innerText = '';
         document.getElementById('peakReadsDspUtilization').innerText = '';
         document.getElementById('peakWritesDspUtilization').innerText = '';
-        document.getElementById('targetUtilization').classList.remove('utilization');
+        document.querySelectorAll('.utilization').forEach(element => {
+            element.classList.remove('medium', 'high');
+        });
     }
 }
 

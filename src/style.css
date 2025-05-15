@@ -143,9 +143,14 @@ a:hover {
   color: var(--writes);
 }
 
-.utilization:not(:empty) {
-  color: var(--warning);
+.utilization {
   font-weight: 600;
+}
+.utilization.medium {
+  color: #F79000;
+}
+.utilization.high {
+  color: #CE291F;
 }
 
 input {
