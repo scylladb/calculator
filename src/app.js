@@ -55,6 +55,10 @@ export function updateUtilization() {
     // If utilization is greater than 70%, apply the increase formula
     cfg.multiplier = targetUtilization > 70 ? 1 + ((targetUtilization - 70) / 100) : 1;
 
+    if (pricing === 'demand') {
+        cfg.multiplier = 1;
+    }
+
     // Always adjust relative to the original values
     cfg.baselineReadsTotal = Math.floor(cfg.baselineReads * cfg.multiplier);
     cfg.baselineWritesTotal = Math.floor(cfg.baselineWrites * cfg.multiplier);
@@ -62,7 +66,7 @@ export function updateUtilization() {
     cfg.peakWritesTotal = Math.floor(cfg.peakWrites * cfg.multiplier);
 
     // Update the display elements
-    if (cfg.multiplier > 1 && pricing === 'provisioned') {
+    if (cfg.multiplier > 1) {
         document.getElementById('baselineReadsDspUtilization').innerText = '+' + formatNumber(cfg.baselineReadsTotal - cfg.baselineReads);
         document.getElementById('baselineWritesDspUtilization').innerText = '+' + formatNumber(cfg.baselineWritesTotal - cfg.baselineWrites);
         document.getElementById('peakReadsDspUtilization').innerText = '+' + formatNumber(cfg.peakReadsTotal - cfg.peakReads);
