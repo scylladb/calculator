@@ -6,6 +6,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     const input = document.getElementById(inputId);
     const slider = document.getElementById(sliderId);
 
+    // Set override when the slider is manually changed by hand
     slider.addEventListener('mousedown', function () {
         cfg.override = true;
     });
