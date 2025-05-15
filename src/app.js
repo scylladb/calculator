@@ -136,6 +136,9 @@ document.querySelector('input[name="pricing"][value="demand"]').addEventListener
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
         provisionedParams.style.display = 'none';
+        document.querySelectorAll('.utilization').forEach(element => {
+            element.style.display = 'none';
+        });
         updateAll();
     }
 });
@@ -144,6 +147,9 @@ document.querySelector('input[name="pricing"][value="provisioned"]').addEventLis
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
         provisionedParams.style.display = 'block';
+        document.querySelectorAll('.utilization').forEach(element => {
+            element.style.display = 'block';
+        });
         updateAll();
     }
 });
