@@ -39,6 +39,12 @@ export function getQueryParams() {
     if (params.get('utilization')) cfg.utilization = parseInt(params.get('utilization'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
 
+    if(params.get('daxNodes')) {
+        cfg.daxNodes = parseInt(params.get('daxNodes'));
+        cfg.daxInstanceClass = params.get('daxInstanceClass');
+        cfg.override = true;
+    }
+
     cfg.multiplier = cfg.utilization > 70 ? 1 + ((cfg.utilization - 70) / 100) : 1;
     cfg.baselineReadsTotal = cfg.baselineReads * cfg.multiplier;
     cfg.baselineWritesTotal = cfg.baselineWrites * cfg.multiplier;
@@ -89,6 +95,14 @@ export function updateQueryParams() {
         } else {
             params.set('cacheSizeGB', cfg.cacheSizeGB.toString());
             params.set('cacheRatio', cfg.cacheRatio.toString());
+        }
+
+        if (cfg.daxNodes === 0) {
+            params.delete('daxNodes');
+            params.delete('daxInstanceClass');
+        } else {
+            params.set('daxNodes', cfg.daxNodes.toString());
+            params.set('daxInstanceClass', cfg.daxInstanceClass);
         }
 
         if (cfg.regions === 1) {

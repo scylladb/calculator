@@ -346,6 +346,8 @@ document.getElementById('cacheRatio').value = cfg.cacheRatio;
 document.getElementById('utilization').value = cfg.utilization;
 document.getElementById('reserved').value = cfg.reserved;
 document.getElementById('readConst').value = cfg.readConst;
+document.getElementById('daxNodes').value = cfg.daxNodes;
+document.getElementById('daxInstanceClass').value = cfg.daxInstanceClass;
 
 document.getElementById('baselineReadsDsp').innerText = formatNumber(cfg.baselineReads);
 document.getElementById('baselineWritesDsp').innerText = formatNumber(cfg.baselineWrites);
@@ -361,5 +363,6 @@ document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - 
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
 document.getElementById('utilizationDsp').innerText = `${cfg.utilization}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
+document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
 updateAll();

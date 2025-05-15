@@ -45,6 +45,7 @@ export const cfg = {
     cacheSizeGB: 0,
     cacheRatio: 0,
     daxNodes: 0,
+    daxInstanceClass: 'dax.r5.large',
     daxInstanceClassCosts: [
         {instance: "dax.r5.large", memory: 16, nps: 75000, price: 0.25500000},
         {instance: "dax.r5.xlarge", memory: 32, nps: 150000, price: 0.50900000},
