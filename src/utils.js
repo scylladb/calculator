@@ -1,6 +1,7 @@
 import {cfg} from './config.js';
 import {updateCosts} from "./calculator.js";
 import {updateChart} from "./chart.js";
+import {updateUtilization} from "./app.js";
 
 export function formatNumber(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(0) + 'B';
@@ -96,6 +97,7 @@ export function updateQueryParams() {
 
 export function updateAll() {
     updateQueryParams();
+    updateUtilization();
     updateChart();
     updateCosts();
 }
