@@ -88,7 +88,7 @@ small, .small {
 
 .card {
   background-color:  var(--card-bg);
-  padding: var(--spacer);
+  padding: var(--spacer-sm);
   border-radius: var(--border-radius-md);
   box-shadow: 0px var(--spacer-xs) var(--spacer) -1px rgba(12, 19, 37, 0.50);
   color: var(--text-color);
@@ -98,6 +98,10 @@ small, .small {
   align-items: center;
   gap: var(--spacer-sm);
   align-self: stretch;
+
+  @media (min-width: 320px) {
+    padding: var(--spacer);
+  }
 
   @media (min-width: 768px) {
     padding: var(--spacer-md);
@@ -125,7 +129,6 @@ small, .small {
     align-items: start;
     justify-content: start;
     gap: var(--spacer-xs);
-    margin-left: var(--spacer-sm);
 
     label {
       display: flex;
@@ -198,6 +201,9 @@ small, .small {
       transition: all .2s;
       font-size: 1.1em;
       font-weight: 500;
+      flex-wrap: wrap;
+      text-align: center;
+      gap: var(--spacer-3xs) var(--spacer-xs);
 
       &:hover {
         background-color: var(--light);
@@ -324,17 +330,15 @@ $range-thumb-width: $spacer-sm;
 $range-thumb-height: $spacer-sm;
 $range-track-height: 3px;
 
-input[type="range"] {
+input[type=range] {
   -webkit-appearance: none;
-  width: 100%;
   height: $spacer-md;
   border-radius: 4px;
   padding: 0;
   background: transparent;
   outline: none;
   appearance: none;
-
-
+  width: 100%;
 
   &:hover {
     &::-webkit-slider-thumb {
@@ -436,7 +440,7 @@ input[type="range"] {
 
 }
 
-input[type="radio"] {
+input[type=radio] {
   appearance: none;
   width: 20px;
   height: 20px;

@@ -162,12 +162,19 @@ $i: 0;
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    gap: var(--spacer-sm) var(--spacer-md);
+    gap: var(--spacer-xs) var(--spacer);
+
+    @media (min-width: 768px) {
+        gap: var(--spacer-sm) var(--spacer-md);
+    }
 
     .col {
-        min-width: $min-col-width;
         flex-grow: 1;
-        flex-basis: 100px;
+        
+        @media (min-width: 320px) {
+            min-width: $min-col-width;
+            flex-basis: 100px;
+          }
     }
 }
 
