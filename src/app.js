@@ -75,6 +75,31 @@ export function updateUtilization() {
 export function setupSliderInteractionUtilization() {
     const display = document.getElementById('utilizationDsp');
     const slider = document.getElementById('utilization');
+    const input = document.getElementById('utilizationInp');
+
+    input.addEventListener('mouseover', function (event) {
+        input.value = parseInt(slider.value.toString());
+    });
+
+    input.addEventListener('blur', function () {
+        const newValue = parseInt(input.value.toString());
+        if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
+            slider.value = newValue;
+            display.innerText = `${newValue}%`;
+            updateAll();
+        }
+    });
+
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
+            display.innerText = formatFunction(parseInt(event.target.value));
+            setTimeout(() => {
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 0);
+            input.blur();
+            updateAll();
+        }
+    });
 
     slider.addEventListener('input', function (event) {
         const currentValue = parseInt(event.target.value);
