@@ -39,6 +39,12 @@ export function getQueryParams() {
     if (params.get('utilization')) cfg.utilization = parseInt(params.get('utilization'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
 
+    cfg.multiplier = cfg.utilization > 70 ? 1 + ((cfg.utilization - 70) / 100) : 1;
+    cfg.baselineReadsTotal = cfg.baselineReads * cfg.multiplier;
+    cfg.baselineWritesTotal = cfg.baselineWrites * cfg.multiplier;
+    cfg.peakReadsTotal = cfg.peakReads * cfg.multiplier;
+    cfg.peakWritesTotal = cfg.peakWrites * cfg.multiplier;
+
     if (params.get('standalone') === 'false') {
         document.body.classList.remove('standalone');
     }

@@ -49,16 +49,16 @@ export function calculateProvisionedCosts() {
     cfg.perItemWRU = Math.ceil(cfg.itemSizeKB);
     cfg.perItemRRU = Math.ceil(cfg.itemSizeKB / 4.0);
 
-    cfg.baselineWCUNonTransactional = cfg.baselineWrites * cfg.writeNonTransactional * cfg.perItemWRU;
-    cfg.baselineWCUTransactional = cfg.baselineWrites * cfg.writeTransactional * 2 * cfg.perItemWRU;
+    cfg.baselineWCUNonTransactional = cfg.baselineWritesTotal * cfg.writeNonTransactional * cfg.perItemWRU;
+    cfg.baselineWCUTransactional = cfg.baselineWritesTotal * cfg.writeTransactional * 2 * cfg.perItemWRU;
     cfg.baselineWCUTotal = cfg.baselineWCUNonTransactional + cfg.baselineWCUTransactional;
     cfg.reservedWCU = cfg.baselineWCUTotal * (cfg.reserved / 100.0);
     cfg.reservedWCU = Math.ceil(cfg.reservedWCU / 100.0) * 100;
     cfg.baselineWCU = cfg.baselineWCUTotal - cfg.reservedWCU;
     cfg.baselineWCU = Math.ceil(Math.max(cfg.baselineWCU, 0));
     cfg.baselineWCUHours = Math.ceil(cfg.baselineWCU * cfg.baselineHoursWrites);
-    cfg.peakWCUNonTransactional = cfg.peakWrites * cfg.writeNonTransactional * cfg.perItemWRU;
-    cfg.peakWCUTransactional = cfg.peakWrites * cfg.writeTransactional * 2 * cfg.perItemWRU;
+    cfg.peakWCUNonTransactional = cfg.peakWritesTotal * cfg.writeNonTransactional * cfg.perItemWRU;
+    cfg.peakWCUTransactional = cfg.peakWritesTotal * cfg.writeTransactional * 2 * cfg.perItemWRU;
     cfg.peakWCUTotal = cfg.peakWCUNonTransactional + cfg.peakWCUTransactional;
     cfg.peakWCU = cfg.peakWCUTotal - cfg.reservedWCU;
     cfg.peakWCU = Math.ceil(Math.max(cfg.peakWCU, 0));
@@ -71,18 +71,18 @@ export function calculateProvisionedCosts() {
     cfg.costMonthlyWCU = cfg.costProvisionedWCU + cfg.costReservedWCU;
     cfg.costUpfrontWCU = cfg.reservedWCU * 1.50;
 
-    cfg.baselineRCUNonTransactional = cfg.baselineReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU;
-    cfg.baselineRCUStronglyConsistent = cfg.baselineReads * cfg.readStronglyConsistent * cfg.perItemRRU;
-    cfg.baselineRCUTransactional = cfg.baselineReads * cfg.readTransactional * 2 * cfg.perItemRRU;
+    cfg.baselineRCUNonTransactional = cfg.baselineReadsTotal * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU;
+    cfg.baselineRCUStronglyConsistent = cfg.baselineReadsTotal * cfg.readStronglyConsistent * cfg.perItemRRU;
+    cfg.baselineRCUTransactional = cfg.baselineReadsTotal * cfg.readTransactional * 2 * cfg.perItemRRU;
     cfg.baselineRCUTotal = cfg.baselineRCUNonTransactional + cfg.baselineRCUStronglyConsistent + cfg.baselineRCUTransactional;
     cfg.reservedRCU = cfg.baselineRCUTotal * (cfg.reserved / 100.0);
     cfg.reservedRCU = Math.ceil(cfg.reservedRCU / 100.0) * 100;
     cfg.baselineRCU = cfg.baselineRCUTotal - cfg.reservedRCU;
     cfg.baselineRCU = Math.ceil(Math.max(cfg.baselineRCU, 0));
     cfg.baselineRCUHours = Math.ceil(cfg.baselineRCU * cfg.baselineHoursReads);
-    cfg.peakRCUNonTransactional = cfg.peakReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU;
-    cfg.peakRCUStronglyConsistent = cfg.peakReads * cfg.readStronglyConsistent * cfg.perItemRRU;
-    cfg.peakRCUTransactional = cfg.peakReads * cfg.readTransactional * 2 * cfg.perItemRRU;
+    cfg.peakRCUNonTransactional = cfg.peakReadsTotal * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU;
+    cfg.peakRCUStronglyConsistent = cfg.peakReadsTotal * cfg.readStronglyConsistent * cfg.perItemRRU;
+    cfg.peakRCUTransactional = cfg.peakReadsTotal * cfg.readTransactional * 2 * cfg.perItemRRU;
     cfg.peakRCUTotal = cfg.peakRCUNonTransactional + cfg.peakRCUStronglyConsistent + cfg.peakRCUTransactional;
     cfg.peakRCU = cfg.peakRCUTotal - cfg.reservedRCU;
     cfg.peakRCU = Math.ceil(Math.max(cfg.peakRCU, 0));

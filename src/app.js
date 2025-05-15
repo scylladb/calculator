@@ -36,86 +36,40 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-export function updateUtilization(init = false) {
+export function updateUtilization() {
     // get current pricing
     const pricing = document.querySelector('input[name="pricing"]:checked').value;
 
     // Get the input elements
-    const baselineRead = document.getElementById('baselineReads');
-    const baselineWrite = document.getElementById('baselineWrites');
-    const peakRead = document.getElementById(   'peakReads');
-    const peakWrite = document.getElementById('peakWrites');
-    const slider = document.getElementById('utilization')
+    const utilization = document.getElementById('utilization')
 
-    // Get the current value of the slider
-    const currentValue = parseInt(slider.value);
+    // Get the current value of the utilization
+    const targetUtilization = parseInt(utilization.value);
 
     // If utilization is 70% or less, multiplier is 1
     // If utilization is greater than 70%, apply the increase formula
-    const multiplier = currentValue > 70 ? 1 + ((currentValue - 70) / 100) : 1;
-
-    // If the original values are not set, store them
-    if (!cfg.originalBaselineReads) {
-        cfg.originalBaselineReads = parseInt(cfg.baselineReads);
-        cfg.originalBaselineWrites = parseInt(cfg.baselineWrites);
-        cfg.originalPeakReads = parseInt(cfg.peakReads);
-        cfg.originalPeakWrites = parseInt(cfg.peakWrites);
-    }
-
-    // If this is the first time the function is called, we need to adjust the original values
-    if (init) {
-        cfg.originalBaselineReads = Math.floor(cfg.originalBaselineReads / multiplier);
-        cfg.originalBaselineWrites = Math.floor(cfg.originalBaselineWrites / multiplier);
-        cfg.originalPeakReads = Math.floor(cfg.originalPeakReads / multiplier);
-        cfg.originalPeakWrites = Math.floor(cfg.originalPeakWrites / multiplier);
-    }
+    cfg.multiplier = targetUtilization > 70 ? 1 + ((targetUtilization - 70) / 100) : 1;
 
     // Always adjust relative to the original values
-    const newBaselineRead = Math.floor(cfg.originalBaselineReads * multiplier);
-    const newBaselineWrite = Math.floor(cfg.originalBaselineWrites * multiplier);
-    const newPeakRead = Math.floor(cfg.originalPeakReads * multiplier);
-    const newPeakWrite = Math.floor(cfg.originalPeakWrites * multiplier);
-
-    // Update the fields
-    baselineRead.value = newBaselineRead;
-    baselineWrite.value = newBaselineWrite;
-    peakRead.value = newPeakRead;
-    peakWrite.value = newPeakWrite;
-
-    // Calculate differences
-    let baselineReadsDspUtilizationOps = newBaselineRead - cfg.originalBaselineReads;
-    let baselineWritesDspUtilizationOps = newBaselineWrite - cfg.originalBaselineWrites;
-    let peakReadsDspUtilizationOps = newPeakRead - cfg.originalPeakReads;
-    let peakWritesDspUtilizationOps = newPeakWrite - cfg.originalPeakWrites;
+    cfg.baselineReadsTotal = Math.floor(cfg.baselineReads * cfg.multiplier);
+    cfg.baselineWritesTotal = Math.floor(cfg.baselineWrites * cfg.multiplier);
+    cfg.peakReadsTotal = Math.floor(cfg.peakReads * cfg.multiplier);
+    cfg.peakWritesTotal = Math.floor(cfg.peakWrites * cfg.multiplier);
 
     // Update the display elements
-    if (multiplier > 1 && pricing === 'provisioned') {
-        document.getElementById('baselineReadsDspUtilization').innerText = '+' + formatNumber(baselineReadsDspUtilizationOps);
-        document.getElementById('baselineWritesDspUtilization').innerText = '+' + formatNumber(baselineWritesDspUtilizationOps);
-        document.getElementById('peakReadsDspUtilization').innerText = '+' + formatNumber(peakReadsDspUtilizationOps);
-        document.getElementById('peakWritesDspUtilization').innerText = '+' + formatNumber(peakWritesDspUtilizationOps);
-        document.getElementById('baselineReadsDsp').innerText = formatNumber(newBaselineRead);
-        document.getElementById('baselineWritesDsp').innerText = formatNumber(newBaselineWrite);
-        document.getElementById('peakReadsDsp').innerText = formatNumber(newPeakRead);
-        document.getElementById('peakWritesDsp').innerText = formatNumber(newPeakWrite);
+    if (cfg.multiplier > 1 && pricing === 'provisioned') {
+        document.getElementById('baselineReadsDspUtilization').innerText = '+' + formatNumber(cfg.baselineReadsTotal - cfg.baselineReads);
+        document.getElementById('baselineWritesDspUtilization').innerText = '+' + formatNumber(cfg.baselineWritesTotal - cfg.baselineWrites);
+        document.getElementById('peakReadsDspUtilization').innerText = '+' + formatNumber(cfg.peakReadsTotal - cfg.peakReads);
+        document.getElementById('peakWritesDspUtilization').innerText = '+' + formatNumber(cfg.peakWritesTotal - cfg.peakWrites);
         document.getElementById('targetUtilization').classList.add('utilization');
     } else {
         document.getElementById('baselineReadsDspUtilization').innerText = '';
         document.getElementById('baselineWritesDspUtilization').innerText = '';
         document.getElementById('peakReadsDspUtilization').innerText = '';
         document.getElementById('peakWritesDspUtilization').innerText = '';
-        document.getElementById('baselineReadsDsp').innerText = formatNumber(cfg.originalBaselineReads);
-        document.getElementById('baselineWritesDsp').innerText = formatNumber(cfg.originalBaselineWrites);
-        document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.originalPeakReads);
-        document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.originalPeakWrites);
         document.getElementById('targetUtilization').classList.remove('utilization');
     }
-
-    // Update cfg values as well
-    cfg.baselineReads = newBaselineRead;
-    cfg.baselineWrites = newBaselineWrite;
-    cfg.peakReads = newPeakRead;
-    cfg.peakWrites = newPeakWrite;
 }
 
 export function setupSliderInteractionUtilization() {
@@ -125,7 +79,6 @@ export function setupSliderInteractionUtilization() {
     slider.addEventListener('input', function (event) {
         const currentValue = parseInt(event.target.value);
         display.innerText = `${currentValue}%`;
-        updateUtilization();
 
         updateAll();
     });
@@ -148,8 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById(tabContentId).classList.add('active');
         });
     });
-
-    updateUtilization(true);
 });
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
@@ -212,6 +163,7 @@ document.getElementById('peakReads').addEventListener('input', (event) => {
     }
     cfg.peakReads = newPeak;
     document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.peakReads);
+
     updateAll();
 });
 
@@ -224,6 +176,7 @@ document.getElementById('peakWrites').addEventListener('input', (event) => {
     }
     cfg.peakWrites = newPeak;
     document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.peakWrites);
+
     updateAll();
 });
 
