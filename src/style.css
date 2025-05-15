@@ -147,10 +147,10 @@ a:hover {
   font-weight: 600;
 }
 .utilization.medium {
-  color: #F79000;
+  color: var(--warning);
 }
 .utilization.high {
-  color: #CE291F;
+  color: var(--error);
 }
 
 input {
