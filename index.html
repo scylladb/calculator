@@ -228,8 +228,6 @@
                   </div>
                 </div>
 
-                <hr>
-
                 <div id="provisionedParams" style="display: none;">
                   <div class="row-sm">
                     <div class="col vstack gap-3">
@@ -275,26 +273,6 @@
                       <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
                     </div>
                   </div>
-
-                  <div class="col vstack gap-3">
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="storageGB">Storage:</label>
-                        <div class="inline-input">
-                          <div class="value wide">
-                            <input type="text" id="storageInp">
-                            <span id="storageDsp">512 GB</span>
-                          </div>
-                          <div class="units"></div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter your total data storage size.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="storageGB" min="128" max="1048576" step="128" value="512">
-                    </div>
-                  </div>
                 </div>
 
                 <div id="consistencyParams" class="vstack gap-3">
@@ -322,6 +300,27 @@
             </div>
             <div class="tab-content" id="tablesTabContent">
               <div id="tableParams" class="vstack gap-3">
+
+                <h4>Table Storage</h4>
+
+                <div class="range-group">
+                  <div class="range-group-top">
+                    <label for="storageGB">Storage Size:</label>
+                    <div class="inline-input">
+                      <div class="value wide">
+                        <input type="text" id="storageInp">
+                        <span id="storageDsp">512 GB</span>
+                      </div>
+                      <div class="units"></div>
+                    </div>
+                    <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter your total data storage size.</span>
+                        </span>
+                  </div>
+                  <input type="range" id="storageGB" min="128" max="1048576" step="128" value="512">
+                </div>
+
                 <h4>Table Class</h4>
 
                 <div class="hstack gap-3 align-items-center">
