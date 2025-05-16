@@ -42,95 +42,6 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-export function updateUtilization() {
-    // get current pricing
-    const pricing = document.querySelector('input[name="pricing"]:checked').value;
-
-    // Get the input elements
-    const utilization = document.getElementById('utilization')
-
-    // Get the current value of the utilization
-    const targetUtilization = parseInt(utilization.value);
-
-    // If utilization is 70% or less, multiplier is 1
-    // If utilization is greater than 70%, apply the increase formula
-    cfg.multiplier = targetUtilization > 70 ? 1 + ((targetUtilization - 70) / 100) : 1;
-
-    if (pricing === 'demand') {
-        cfg.multiplier = 1;
-    }
-
-    // Always adjust relative to the original values
-    cfg.baselineReadsTotal = Math.floor(cfg.baselineReads * cfg.multiplier);
-    cfg.baselineWritesTotal = Math.floor(cfg.baselineWrites * cfg.multiplier);
-    cfg.peakReadsTotal = Math.floor(cfg.peakReads * cfg.multiplier);
-    cfg.peakWritesTotal = Math.floor(cfg.peakWrites * cfg.multiplier);
-
-
-    // Update the display elements
-    if (cfg.multiplier > 1) {
-        document.getElementById('baselineReadsDspUtilization').innerText = '+' + formatNumber(cfg.baselineReadsTotal - cfg.baselineReads);
-        document.getElementById('baselineWritesDspUtilization').innerText = '+' + formatNumber(cfg.baselineWritesTotal - cfg.baselineWrites);
-        document.getElementById('peakReadsDspUtilization').innerText = '+' + formatNumber(cfg.peakReadsTotal - cfg.peakReads);
-        document.getElementById('peakWritesDspUtilization').innerText = '+' + formatNumber(cfg.peakWritesTotal - cfg.peakWrites);
-
-        document.querySelectorAll('.utilization').forEach(element => {
-            element.classList.remove('medium', 'high');
-
-            if (cfg.multiplier > 1 && cfg.multiplier <= 1.24) {
-                element.classList.add('medium');
-            } else if (cfg.multiplier > 1.24) {
-                element.classList.add('high');
-            }
-        });
-    } else {
-        document.getElementById('baselineReadsDspUtilization').innerText = '';
-        document.getElementById('baselineWritesDspUtilization').innerText = '';
-        document.getElementById('peakReadsDspUtilization').innerText = '';
-        document.getElementById('peakWritesDspUtilization').innerText = '';
-        document.querySelectorAll('.utilization').forEach(element => {
-            element.classList.remove('medium', 'high');
-        });
-    }
-}
-
-export function setupSliderInteractionUtilization() {
-    const display = document.getElementById('utilizationDsp');
-    const slider = document.getElementById('utilization');
-    const input = document.getElementById('utilizationInp');
-
-    input.addEventListener('mouseover', function (event) {
-        input.value = parseInt(slider.value.toString());
-    });
-
-    input.addEventListener('blur', function () {
-        const newValue = parseInt(input.value.toString());
-        if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
-            slider.value = newValue;
-            display.innerText = `${newValue}%`;
-            updateAll();
-        }
-    });
-
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            display.innerText = formatFunction(parseInt(event.target.value));
-            setTimeout(() => {
-                slider.dispatchEvent(new Event('input', { bubbles: true }));
-            }, 0);
-            input.blur();
-            updateAll();
-        }
-    });
-
-    slider.addEventListener('input', function (event) {
-        const currentValue = parseInt(event.target.value);
-        display.innerText = `${currentValue}%`;
-
-        updateAll();
-    });
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     const tabLabels = document.querySelectorAll('.tab-label');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -162,9 +73,6 @@ document.querySelector('input[name="pricing"][value="provisioned"]').addEventLis
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
         provisionedParams.style.display = 'block';
-        document.querySelectorAll('.utilization').forEach(element => {
-            element.style.display = 'block';
-        });
         updateAll();
     }
 });
@@ -236,12 +144,6 @@ document.getElementById('peakDurationReads').addEventListener('input', (event) =
 document.getElementById('peakDurationWrites').addEventListener('input', (event) => {
     cfg.peakDurationWrites = Math.max(0, parseFloat(event.target.value));
     document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationReads.toString();
-    updateAll();
-});
-
-document.getElementById('utilization').addEventListener('input', (event) => {
-    cfg.utilization = parseInt(event.target.value);
-    document.getElementById('utilizationDsp').innerText = `${formatNumber(cfg.utilization)}%`;
     updateAll();
 });
 
@@ -337,8 +239,6 @@ setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatB
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
-setupSliderInteractionUtilization();
-
 getQueryParams();
 
 if (cfg.pricing === 'demand') {
@@ -360,7 +260,6 @@ document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
-document.getElementById('utilization').value = cfg.utilization;
 document.getElementById('reserved').value = cfg.reserved;
 document.getElementById('readConst').value = cfg.readConst;
 document.getElementById('daxNodes').value = cfg.daxNodes;
@@ -378,7 +277,6 @@ document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
-document.getElementById('utilizationDsp').innerText = `${cfg.utilization}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 

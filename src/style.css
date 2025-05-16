@@ -143,16 +143,6 @@ a:hover {
   color: var(--writes);
 }
 
-.utilization {
-  font-weight: 600;
-}
-.utilization.medium {
-  color: var(--warning);
-}
-.utilization.high {
-  color: var(--error);
-}
-
 input {
   font-family: var(--font-family-primary);
 }

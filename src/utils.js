@@ -1,7 +1,6 @@
 import {cfg} from './config.js';
 import {updateCosts} from "./calculator.js";
 import {updateChart} from "./chart.js";
-import {updateUtilization} from "./app.js";
 
 export function formatNumber(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(0) + 'B';
@@ -36,7 +35,6 @@ export function getQueryParams() {
     if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
-    if (params.get('utilization')) cfg.utilization = parseInt(params.get('utilization'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
 
     if(params.get('daxNodes')) {
@@ -44,12 +42,6 @@ export function getQueryParams() {
         cfg.daxInstanceClass = params.get('daxInstanceClass');
         cfg.override = true;
     }
-
-    cfg.multiplier = cfg.utilization > 70 ? 1 + ((cfg.utilization - 70) / 100) : 1;
-    cfg.baselineReadsTotal = cfg.baselineReads * cfg.multiplier;
-    cfg.baselineWritesTotal = cfg.baselineWrites * cfg.multiplier;
-    cfg.peakReadsTotal = cfg.peakReads * cfg.multiplier;
-    cfg.peakWritesTotal = cfg.peakWrites * cfg.multiplier;
 
     if (params.get('standalone') === 'false') {
         document.body.classList.remove('standalone');
@@ -86,7 +78,6 @@ export function updateQueryParams() {
         params.set('peakDurationReads', cfg.peakDurationReads.toString());
         params.set('peakDurationWrites', cfg.peakDurationWrites.toString());
         params.set('reserved', cfg.reserved.toString());
-        params.set('utilization', cfg.utilization.toString());
         params.set('readConst', cfg.readConst.toString());
 
         if (cfg.cacheSizeGB === 0) {
@@ -117,7 +108,6 @@ export function updateQueryParams() {
 
 export function updateAll() {
     updateQueryParams();
-    updateUtilization();
     updateChart();
     updateCosts();
 }

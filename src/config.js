@@ -4,10 +4,6 @@ export const cfg = {
     baselineWrites: 200000,
     peakReads: 250000,
     peakWrites: 500000,
-    baselineReadsTotal: 0,
-    baselineWritesTotal: 0,
-    peakReadsTotal: 0,
-    peakWritesTotal: 0,
     peakDurationReads: 2,
     peakDurationWrites: 4,
     hoursPerMonth: 730,
@@ -15,10 +11,6 @@ export const cfg = {
     storageGB: 512,
     tableClass: 'standard',
     readConst: 100,
-
-    // Utilization
-    utilization: 70,
-    multiplier: 1,
 
     // Demand
     pricePerRRU: 0.000000125,

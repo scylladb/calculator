@@ -20,9 +20,9 @@ function generateData(baseline, peak, peakDuration) {
 }
 
 export function updateChart() {
-    let maxPeak = Math.max(cfg.peakReadsTotal, cfg.peakWritesTotal);
-    chart.data.datasets[0].data = generateData(cfg.baselineReadsTotal, cfg.peakReadsTotal, cfg.peakDurationReads);
-    chart.data.datasets[1].data = generateData(cfg.baselineWritesTotal, cfg.peakWritesTotal, cfg.peakDurationWrites);
+    let maxPeak = Math.max(cfg.peakReads, cfg.peakWrites);
+    chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
+    chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
     // Check if peak is close to the current y-axis max value
     if (maxPeak >= chart.options.scales.y.max * 0.98) {
         chart.options.scales.y.max = maxPeak * 1.2;

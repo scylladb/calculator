@@ -96,7 +96,6 @@
                             <input type="text" id="baselineReadsInp">
                             <span id="baselineReadsDsp">50K</span>
                           </div>
-                          <span id="baselineReadsDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -120,7 +119,6 @@
                             <input type="text" id="peakReadsInp">
                             <span id="peakReadsDsp">500K</span>
                           </div>
-                          <span id="peakReadsDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -170,7 +168,6 @@
                             <input type="text" id="baselineWritesInp">
                             <span id="baselineWritesDsp">50K</span>
                           </div>
-                          <span id="baselineWritesDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -194,7 +191,6 @@
                             <input type="text" id="peakWritesInp">
                             <span id="peakWritesDsp">500K</span>
                           </div>
-                          <span id="peakWritesDspUtilization" class="utilization"></span>
                           <div class="units">
                             ops/sec
                           </div>
@@ -236,27 +232,6 @@
 
                 <div id="provisionedParams" style="display: none;">
                   <div class="row-sm">
-                    <div class="col vstack gap-3">
-                      <div class="range-group">
-                        <div class="range-group-top">
-                          <label for="utilization">Target Utilization:</label>
-                          <div class="inline-input">
-                            <div class="value">
-                              <input type="text" id="utilizationInp">
-                              <span id="utilizationDsp" class="utilization">0</span>
-                            </div>
-                            <div class="units">
-                            </div>
-                          </div>
-                          <span class="info-icon">
-                            <i class="icon-info-outline"></i>
-                            <span class="tooltip-text">Target utilization to avoid Throttled Requests. Increasing this will automatically provision more ops/sec.</span>
-                          </span>
-                        </div>
-                        <input type="range" id="utilization" min="0" max="200" step="1" value="70">
-                      </div>
-                    </div>
-
                     <div class="col vstack gap-3">
                       <div class="range-group">
                         <div class="range-group-top">
