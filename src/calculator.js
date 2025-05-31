@@ -249,7 +249,7 @@ function logCosts() {
         logs.push(`Total annual cost: ${Math.floor(cfg.costTotalMonthly * 12).toLocaleString()}`);
     }
 
-    //console.log(cfg);
+    console.log(cfg);
 
     updateDisplayedCosts(logs);
 }
