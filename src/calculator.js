@@ -38,8 +38,8 @@ function getReservedValues() {
 }
 
 function getHoursValues() {
-    cfg.peakHoursReads = (cfg.peakDurationReads * 365 / 12).toFixed(1);
-    cfg.peakHoursWrites = (cfg.peakDurationWrites * 365 / 12).toFixed(1);
+    cfg.peakHoursReads = Number((cfg.peakDurationReads * 365 / 12).toFixed(1));
+    cfg.peakHoursWrites = Number((cfg.peakDurationWrites * 365 / 12).toFixed(1));
     cfg.baselineHoursReads = cfg.hoursPerMonth - cfg.peakHoursReads;
     cfg.baselineHoursWrites = cfg.hoursPerMonth - cfg.peakHoursWrites;
     cfg.reserved = parseInt(document.getElementById('reserved').value);
@@ -68,8 +68,8 @@ export function calculateProvisionedCosts() {
     cfg.costReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
     cfg.replicatedWCUHours =  Math.ceil(cfg.baselineWCUTotal * cfg.baselineHoursWrites) + Math.ceil(cfg.peakWCUTotal * cfg.peakHoursWrites);
     cfg.costMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.replicatedWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    cfg.costMonthlyWCU = cfg.costProvisionedWCU + cfg.costReservedWCU;
-    cfg.costUpfrontWCU = cfg.reservedWCU * 1.50;
+    cfg.costMonthlyWCU = Number(Math.trunc((cfg.costProvisionedWCU + cfg.costReservedWCU) * 100) / 100);
+    cfg.costUpfrontWCU = Number(Math.trunc((cfg.reservedWCU * 1.50) * 100) / 100);
 
     cfg.baselineRCUNonTransactional = cfg.baselineReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU;
     cfg.baselineRCUStronglyConsistent = cfg.baselineReads * cfg.readStronglyConsistent * cfg.perItemRRU;
@@ -90,8 +90,8 @@ export function calculateProvisionedCosts() {
     cfg.totalRCUHours = Math.ceil(cfg.baselineRCUHours + cfg.peakRCUHours);
     cfg.costProvisionedRCU = cfg.totalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
     cfg.costReservedRCU = cfg.reservedRCU * cfg.pricePerRRCU * cfg.hoursPerMonth;
-    cfg.costMonthlyRCU = cfg.costProvisionedRCU + cfg.costReservedRCU;
-    cfg.costUpfrontRCU = cfg.reservedRCU * 0.3;
+    cfg.costMonthlyRCU = Number(Math.trunc((cfg.costProvisionedRCU + cfg.costReservedRCU) * 100) / 100);
+    cfg.costUpfrontRCU = Number(Math.trunc((cfg.reservedRCU * 0.3) * 100) / 100);
 
     cfg.costProvisionedMonthly = cfg.costMonthlyWCU + cfg.costMonthlyRCU + cfg.costMonthlyReplicatedWCU;
     cfg.costReservedUpfront = cfg.costUpfrontWCU + cfg.costUpfrontRCU;
