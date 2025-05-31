@@ -38,8 +38,8 @@ function getReservedValues() {
 }
 
 function getHoursValues() {
-    cfg.peakHoursReads = cfg.peakDurationReads * 365 / 12;
-    cfg.peakHoursWrites = cfg.peakDurationWrites * 365 / 12;
+    cfg.peakHoursReads = (cfg.peakDurationReads * 365 / 12).toFixed(1);
+    cfg.peakHoursWrites = (cfg.peakDurationWrites * 365 / 12).toFixed(1);
     cfg.baselineHoursReads = cfg.hoursPerMonth - cfg.peakHoursReads;
     cfg.baselineHoursWrites = cfg.hoursPerMonth - cfg.peakHoursWrites;
     cfg.reserved = parseInt(document.getElementById('reserved').value);
