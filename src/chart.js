@@ -144,7 +144,7 @@ export const chart = new Chart(ctx, {
     }
 });
 
-let chartConfiguration = {
+export const chartReal = new Chart(ctxReal,  {
     type: "line",
     options: {
         animation: true,
@@ -235,24 +235,7 @@ let chartConfiguration = {
         labels: [...Array(24).keys()].map(h => `${h}:00`),
         datasets: [
             {
-                label: "Actual ops/sec",
-                data: [...Array(24).keys()].map((x, i) => ({
-                    x, y: [150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
-                        450000, 550000, 400000, 350000, 330000, 310000, 300000,
-                        320000, 350000, 370000, 330000, 250000, 200000, 170000,
-                        150000, 130000][i]
-                })),
-                backgroundColor: orangePattern,
-                borderColor: '#FF5500',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.2,
-                cubicInterpolationMode: 'monotone',
-                pointHitRadius: 25,
-                // stepped: true,
-            },
-            {
-                label: "Planned ops/sec",
+                label: "Reads",
                 data: [...Array(24).keys()].map((x, i) => ({
                     x, y: [150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
                         450000, 550000, 400000, 350000, 330000, 310000, 300000,
@@ -267,48 +250,27 @@ let chartConfiguration = {
                 cubicInterpolationMode: 'monotone',
                 pointHitRadius: 25,
                 // stepped: true,
+            },
+            {
+                label: "Writes",
+                data: [...Array(24).keys()].map((x, i) => ({
+                    x, y: [150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
+                        450000, 550000, 400000, 350000, 330000, 310000, 300000,
+                        320000, 350000, 370000, 330000, 250000, 200000, 170000,
+                        150000, 130000][i]
+                })),
+                backgroundColor: orangePattern,
+                borderColor: '#FF5500',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.2,
+                cubicInterpolationMode: 'monotone',
+                pointHitRadius: 25,
+                // stepped: true,
             }
         ],
     },
-};
-
-export const chartReal = new Chart(ctxReal, chartConfiguration);
-
-function updateSummaryTable() {
-    const actual = window.testedChart.data.datasets[0].data.map(d => d.y);
-    const planned = window.testedChart.data.datasets[1].data.map(d => d.y);
-
-    const totalActual = _.sum(actual);
-    const totalPlanned = _.sum(planned);
-    const delta = totalPlanned - totalActual;
-
-    const formatOps = v => (v >= 1_000_000 ? (v / 1_000_000).toFixed(2) + "M" : (v / 1000).toFixed(0) + "K");
-
-    let warnings = [];
-    for (let i = 0; i < 24; i++) {
-        if (actual[i] > planned[i]) warnings.push(`Time ${i.toString().padStart(2, "0")}00: underprovisioned (actual ${formatOps(actual[i])} > planned ${formatOps(planned[i])})`);
-        if (planned[i] > actual[i] * 1.5) warnings.push(`Time ${i.toString().padStart(2, "0")}00: overprovisioned (planned ${formatOps(planned[i])} >> actual ${formatOps(actual[i])})`);
-    }
-
-    document.getElementById("summaryTable").innerHTML = `
-  <div class="mui-container">
-    <table class="mui-table mui-table--bordered">
-      <thead>
-        <tr><th></th><th>Workload total ops/sec</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Actual</td><td style="text-align: right;">${formatOps(totalActual)}</td></tr>
-        <tr><td>Planned</td><td style="text-align: right;">${formatOps(totalPlanned)}</td></tr>
-        <tr><td>Delta</td><td style="text-align: right;">${formatOps(delta)}</td></tr>
-      </tbody>
-    </table>
-    <div style="margin-top: 1em; color: ${warnings.length ? "red" : "green"};">
-      ${warnings.length ? `<strong>Warnings:</strong><ul>${warnings.map(w => `<li>${w}</li>`).join("")}</ul>` : "<strong>No issues detected.</strong>"}
-    </div>
-  </div>
-`;
-}
-
+});
 
 function applyWorkload(workload) {
     const base = 100000;
@@ -376,11 +338,9 @@ function applyWorkload(workload) {
     chartReal.data.datasets[0].data = data;
     chartReal.data.datasets[1].data = data.map(d => ({x: d.x, y: d.y * 1.25}));
     chartReal.update();
-    updateSummaryTable();
 }
 
 document.getElementById("workloadSelect").addEventListener("change", function () {
-    console.log("Workload changed to:", this.value);
     const url = new URL(window.location);
     url.searchParams.set("workload", this.value);
     window.history.replaceState({}, '', url);
@@ -413,7 +373,7 @@ document.getElementById("saveCsvBtn").addEventListener("click", function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    const chartCanvas = document.getElementById('chartJSContainer');
+    const chartCanvas = document.getElementById('chartReal');
     const chartRect = chartCanvas.getBoundingClientRect();
 
     // Create overlay for y-axis drag
@@ -504,5 +464,3 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 100);
     }
 });
-
-console.log("Rendering chartReal with config:", chartConfiguration);
