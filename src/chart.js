@@ -224,7 +224,7 @@ export const chartReal = new Chart(ctxReal,  {
                 },
                 title: {
                     display: true,
-                    text: "← ops/sec →"
+                    text: "ops/sec"
                 }
             }
         },
