@@ -14,9 +14,9 @@ function generateData(baseline, peak, peakDuration) {
 
     for (let hour = 0; hour < 24; hour++) {
         if (peakDuration > 0 && hour >= peakStart && hour < peakEnd) {
-            data.push({x: hour, y: peak});
+            data.push(peak);
         } else {
-            data.push({x: hour, y: baseline});
+            data.push(baseline);
         }
     }
 
@@ -36,7 +36,7 @@ export function updateChart() {
 }
 
 export const chart = new Chart(ctx, {
-    type: 'scatter',
+    type: 'line',
     data: {
         datasets: [{
             label: 'Reads',
@@ -47,7 +47,6 @@ export const chart = new Chart(ctx, {
             fill: true,
             tension: 0.5,
             cubicInterpolationMode: 'monotone',
-            showLine: true,
             pointRadius: 0,
             hidden: false
         },{
@@ -55,12 +54,10 @@ export const chart = new Chart(ctx, {
             data: generateData(),
             borderColor: '#FF5500',
             borderWidth: 2,
-
             backgroundColor: orangePattern,
             fill: true,
             tension: 0.5,
             cubicInterpolationMode: 'monotone',
-            showLine: true,
             pointRadius: 0,
             hidden: false
         }]
@@ -77,16 +74,15 @@ export const chart = new Chart(ctx, {
                 display: true,
                 callbacks: {
                     label: function (context) {
-                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
+                        return context.dataset.label +  ': ' + formatNumber(context.raw) + ' ops/sec';
                     }
                 },
             }
         },
         scales: {
             x: {
-                stacked: false,
-                min: 0,
-                max: 23,
+                type: 'category',
+                labels: [...Array(24).keys()].map(h => h.toString().padStart(2, '0') + ':00'),
                 title: {
                     display: false,
                 },
@@ -99,10 +95,6 @@ export const chart = new Chart(ctx, {
                 },
                 ticks: {
                     stepSize: 1,
-                    callback: function (value) {
-                        if (value === 23) return '00:00';
-                        return value.toString().padStart(2, '0') + ':00';
-                    },
                     display: false
                 }
             },
@@ -112,7 +104,7 @@ export const chart = new Chart(ctx, {
                 title: {
                     display: true,
                     text: 'ops/sec',
-                    color: '#616D87', 
+                    color: '#616D87',
                     font: {
                         size: 15,
                         weight: 'normal'
