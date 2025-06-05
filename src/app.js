@@ -1,6 +1,6 @@
 import {cfg} from './config.js';
 import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
-import {chartReal} from "./chart.js";
+import {chart} from "./chart.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
     const display = document.getElementById(displayId);
@@ -45,7 +45,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
 
 export function applyWorkload(workload) {
     const base = 100000;
-    chartReal.options.scales.y.max = 1_000_000;
+    chart.options.scales.y.max = 1_000_000;
     const data = [];
 
     for (let i = 0; i < 24; i++) {
@@ -106,9 +106,9 @@ export function applyWorkload(workload) {
         data.push({x: i, y: actual});
     }
 
-    chartReal.data.datasets[0].data = data;
-    chartReal.data.datasets[1].data = data.map(d => ({x: d.x, y: d.y * 1.25}));
-    chartReal.update();
+    chart.data.datasets[0].data = data;
+    chart.data.datasets[1].data = data.map(d => ({x: d.x, y: d.y * 1.25}));
+    chart.update();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -360,7 +360,6 @@ document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Event
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
 document.getElementById("saveCsvBtn").addEventListener("click", function () {
-    const chart = chartReal;
     const labels = chart.data.labels;
     const datasets = chart.data.datasets;
     const workload = document.getElementById("workloadSelect").value || "workload";
