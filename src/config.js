@@ -1,5 +1,5 @@
 export const cfg = {
-    workload: 'default',
+    workload: 'baselinePeak',
     seriesReads: [],
     seriesWrites: [],
     pricing: 'demand',

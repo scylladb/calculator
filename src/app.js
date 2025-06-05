@@ -117,18 +117,27 @@ export function applyWorkload(workload) {
     cfg.totalWrites = 0;
     // sum up all series data for both reads and writes
     for (const point of cfg.seriesReads) {
-        cfg.totalReads += point.y;
+        cfg.totalReads += (point.y * 3600);
     }
     for (const point of cfg.seriesWrites) {
-        cfg.totalWrites += point.y;
+        cfg.totalWrites += (point.y * 3600);
     }
 
     const opsParams = document.getElementById('opsParams');
     const totalOpsParams = document.getElementById('totalOpsParams');
     const totalReadsDsp = document.getElementById('totalReadsDsp');
     const totalWritesDsp = document.getElementById('totalWritesDsp');
+    const totalReadsInp = document.getElementById('totalReadsInp');
+    const totalWritesInp = document.getElementById('totalWritesInp');
+    const totalReads = document.getElementById('totalReads');
+    const totalWrites = document.getElementById('totalWrites');
+
     totalReadsDsp.innerText = formatNumber(cfg.totalReads);
     totalWritesDsp.innerText = formatNumber(cfg.totalWrites);
+    totalReadsInp.value = cfg.totalReads;
+    totalWritesInp.value = cfg.totalWrites;
+    totalReads.innerText = formatNumber(cfg.totalReads);
+    totalWrites.innerText = formatNumber(cfg.totalWrites);
 
     if (workload === "baselinePeak") {
         opsParams.style.display = 'block';
@@ -259,19 +268,19 @@ document.getElementById('peakDurationWrites').addEventListener('input', (event) 
 document.getElementById('totalReads').addEventListener('input', (event) => {
     const newTotal = parseInt(event.target.value);
     if (!isNaN(newTotal) && cfg.seriesReads.length > 0) {
-        const oldTotal = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
-        const delta = newTotal - oldTotal;
-        const adjustment = delta / cfg.seriesReads.length;
+        const currentTotal = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
+        if (currentTotal === 0) return;
 
+        const scaleFactor = newTotal / currentTotal;
         cfg.seriesReads.forEach((point, index) => {
-            point.y += adjustment;
-            if (point.y < 0) point.y = 0;
+            point.y *= scaleFactor;
+            point.y /= 3600;
+            point.y = Math.max(0, point.y);
             chart.data.datasets[0].data[index] = point;
         });
 
-        cfg.totalReads = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
+        cfg.totalReads = newTotal;
         document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
-
         updateAll();
     }
 });
@@ -279,19 +288,19 @@ document.getElementById('totalReads').addEventListener('input', (event) => {
 document.getElementById('totalWrites').addEventListener('input', (event) => {
     const newTotal = parseInt(event.target.value);
     if (!isNaN(newTotal) && cfg.seriesWrites.length > 0) {
-        const oldTotal = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
-        const delta = newTotal - oldTotal;
-        const adjustment = delta / cfg.seriesWrites.length;
+        const currentTotal = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
+        if (currentTotal === 0) return;
 
+        const scaleFactor = newTotal / currentTotal;
         cfg.seriesWrites.forEach((point, index) => {
-            point.y += adjustment;
-            if (point.y < 0) point.y = 0;
+            point.y *= scaleFactor;
+            point.y /= 3600;
+            point.y = Math.max(0, point.y);
             chart.data.datasets[1].data[index] = point;
         });
 
-        cfg.totalWrites = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
+        cfg.totalWrites = newTotal;
         document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
-
         updateAll();
     }
 });
@@ -406,6 +415,8 @@ document.getElementById('peakReads').value = cfg.peakReads;
 document.getElementById('peakWrites').value = cfg.peakWrites;
 document.getElementById('peakDurationReads').value = cfg.peakDurationReads;
 document.getElementById('peakDurationWrites').value = cfg.peakDurationWrites;
+document.getElementById('totalReads').value = cfg.totalReads;
+document.getElementById('totalWrites').value = cfg.totalWrites;
 document.getElementById('itemSizeB').value = cfg.itemSizeB;
 document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('regions').value = cfg.regions;
@@ -422,6 +433,8 @@ document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.peakReads);
 document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.peakWrites);
 document.getElementById('peakDurationReadsDsp').innerText = cfg.peakDurationReads.toString();
 document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationWrites.toString();
+document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
+document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();

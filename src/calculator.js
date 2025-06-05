@@ -101,15 +101,23 @@ export function calculateProvisionedCosts() {
 export function calculateDemandCosts() {
     cfg.perItemRRU = Math.ceil(cfg.itemSizeKB / 4.0);
     cfg.perItemWRU = Math.ceil(cfg.itemSizeKB);
-    cfg.totalReads = (cfg.baselineReads * 3600 * cfg.baselineHoursReads) + (cfg.peakReads * 3600 * cfg.peakHoursReads);
-    cfg.totalRRU = (cfg.totalReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU) +
-        (cfg.totalReads * cfg.readStronglyConsistent * cfg.perItemRRU) +
-        (cfg.totalReads * cfg.readTransactional * 2 * cfg.perItemRRU);
+    if (cfg.workload === 'baselinePeak') {
+        cfg.totalReadsMonth = (cfg.baselineReads * 3600 * cfg.baselineHoursReads) + (cfg.peakReads * 3600 * cfg.peakHoursReads);
+    } else {
+        cfg.totalReadsMonth = cfg.totalReads * 365 / 12;
+    }
+    cfg.totalRRU = (cfg.totalReadsMonth * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU) +
+        (cfg.totalReadsMonth * cfg.readStronglyConsistent * cfg.perItemRRU) +
+        (cfg.totalReadsMonth * cfg.readTransactional * 2 * cfg.perItemRRU);
     cfg.costDemandMonthlyReads = cfg.totalRRU * (cfg.tableClass === 'standard' ? cfg.pricePerRRU : cfg.pricePerRRU_IA);
 
-    cfg.totalWrites = (cfg.baselineWrites * 3600 * cfg.baselineHoursWrites) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
-    cfg.totalWRU = (cfg.totalWrites * cfg.writeNonTransactional * cfg.perItemWRU) +
-        (cfg.totalWrites * cfg.writeTransactional * 2 * cfg.perItemWRU);
+    if (cfg.workload === 'baselinePeak') {
+        cfg.totalWritesMonth = (cfg.baselineWrites * 3600 * cfg.baselineHoursWrites) + (cfg.peakWrites * 3600 * cfg.peakHoursWrites);
+    } else {
+        cfg.totalWritesMonth = cfg.totalWrites * 365 / 12;
+    }
+    cfg.totalWRU = (cfg.totalWritesMonth * cfg.writeNonTransactional * cfg.perItemWRU) +
+        (cfg.totalWritesMonth * cfg.writeTransactional * 2 * cfg.perItemWRU);
     cfg.costDemandMonthlyWrites = cfg.totalWRU * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
 
     cfg.costDemandMonthlyReplicatedWRU = (cfg.regions - 1) * cfg.totalWRU * (cfg.tableClass === 'standard' ? cfg.pricePerWRU : cfg.pricePerWRU_IA);
