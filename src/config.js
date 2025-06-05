@@ -1,4 +1,5 @@
 export const cfg = {
+    workload: 'default',
     pricing: 'demand',
     baselineReads: 100000,
     baselineWrites: 200000,

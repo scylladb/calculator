@@ -36,6 +36,7 @@ export function getQueryParams() {
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
+    if (params.get('pattern')) cfg.pattern = parseInt(params.get('patttern'));
 
     if(params.get('daxNodes')) {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
@@ -79,6 +80,7 @@ export function updateQueryParams() {
         params.set('peakDurationWrites', cfg.peakDurationWrites.toString());
         params.set('reserved', cfg.reserved.toString());
         params.set('readConst', cfg.readConst.toString());
+        params.set('workload', cfg.workload);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
