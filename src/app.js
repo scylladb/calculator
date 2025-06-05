@@ -1,5 +1,6 @@
 import {cfg} from './config.js';
 import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
+import {chartReal} from "./chart.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
     const display = document.getElementById(displayId);
@@ -42,6 +43,74 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
+export function applyWorkload(workload) {
+    const base = 100000;
+    chartReal.options.scales.y.max = 1_000_000;
+    const data = [];
+
+    for (let i = 0; i < 24; i++) {
+        let actual = base;
+
+        switch (workload) {
+            case "dailyPeak":
+                actual = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                break;
+            case "twiceDaily":
+                actual = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                break;
+            case "batch":
+                actual = (i >= 0 && i <= 3) ? base * 6 : base;
+                break;
+            case "sawtooth":
+                actual = base + (i % 6) * base * 0.5;
+                break;
+            case "bursty":
+                actual = (Math.random() < 0.3) ? base * (5 + Math.random() * 5) : base;
+                break;
+            case "rampUp":
+                actual = base + (i * (base * 9 / 23));
+                break;
+            case "rampDown":
+                actual = base * (1 - i / 24);
+                break;
+            case "flatline":
+                actual = base;
+                break;
+            case "sinusoidal":
+                actual = base + base * Math.sin((i / 12) * 2 * Math.PI);
+                break;
+            case "diurnal":
+                actual = 400000 + Math.cos((i - 12) * Math.PI / 12) * 400000 * 0.9;
+                break;
+            case "nocturnal":
+                actual = 400000 + Math.cos((i) * Math.PI / 12) * 400000 * 0.9;
+                break;
+            case "mountain":
+                actual = base + Math.max(0, (12 - Math.abs(i - 12)) * (base / 2));
+                break;
+            case "valley":
+                actual = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
+                break;
+            case "chaos":
+                actual = base * (0.5 + Math.random() * 5);
+                break;
+            default:
+                actual = [
+                    150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
+                    450000, 550000, 400000, 350000, 330000, 310000, 300000,
+                    320000, 350000, 370000, 330000, 250000, 200000, 170000,
+                    150000, 130000
+                ][i];
+        }
+
+        data.push({x: i, y: actual});
+    }
+
+    chartReal.data.datasets[0].data = data;
+    chartReal.data.datasets[1].data = data.map(d => ({x: d.x, y: d.y * 1.25}));
+    chartReal.update();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const tabLabels = document.querySelectorAll('.tab-label');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -59,6 +128,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById(tabContentId).classList.add('active');
         });
     });
+
+    const select = document.getElementById("workloadSelect");
+    select.value = cfg.workload;
+    select.dispatchEvent(new Event("change"));
+});
+
+document.getElementById("workloadSelect").addEventListener('change', function () {
+    cfg.workload = this.value;
+    applyWorkload(this.value);
+    updateAll();
 });
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
@@ -279,5 +358,30 @@ document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - 
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
+
+document.getElementById("saveCsvBtn").addEventListener("click", function () {
+    const chart = chartReal;
+    const labels = chart.data.labels;
+    const datasets = chart.data.datasets;
+    const workload = document.getElementById("workloadSelect").value || "workload";
+
+    let csv = "Hour,Actual ops/sec,Planned ops/sec\n";
+    for (let i = 0; i < labels.length; i++) {
+        const hour = labels[i];
+        const actual = (datasets[0].data[i]?.y).toFixed(0);
+        const planned = (datasets[1].data[i]?.y).toFixed(0);
+        csv += `${hour},${actual},${planned}\n`;
+    }
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${workload}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
 
 updateAll();
