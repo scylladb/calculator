@@ -46,7 +46,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
 export function applyWorkload(workload) {
     const base = 100000;
     chart.options.scales.y.max = 1_000_000;
-    const data = [];
+    const series = [];
 
     for (let i = 0; i < 24; i++) {
         let actual = base;
@@ -103,11 +103,23 @@ export function applyWorkload(workload) {
                 ][i];
         }
 
-        data.push({x: i, y: actual});
+        series.push({x: i, y: actual});
     }
 
-    chart.data.datasets[0].data = data;
-    chart.data.datasets[1].data = data.map(d => ({x: d.x, y: d.y * 1.25}));
+    cfg.series = series;
+    cfg.workload = workload;
+
+    const opsParams = document.getElementById('opsParams');
+    const totalOpsParams = document.getElementById('totalOpsParams');
+
+    if (workload === "baselinePeak") {
+        opsParams.style.display = 'block';
+        totalOpsParams.style.display = 'none';
+    } else {
+        opsParams.style.display = 'none';
+        totalOpsParams.style.display = 'block';
+    }
+
     chart.update();
 }
 

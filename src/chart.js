@@ -24,8 +24,18 @@ function generateData(baseline, peak, peakDuration) {
 
 export function updateChart() {
     let maxPeak = Math.max(cfg.peakReads, cfg.peakWrites);
-    chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
-    chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
+
+    if (cfg.workload === "baselinePeak") {
+        chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
+        chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
+    } else {
+        console.log(`Applying workload: ${cfg.workload}`);
+        chart.data.datasets[0].pointHitRadius = 25;
+        chart.data.datasets[0].data = cfg.series;
+        chart.data.datasets[1].pointHitRadius = 25;
+        chart.data.datasets[1].data = cfg.series.map(d => ({x: d.x, y: d.y * 1.25}));
+    }
+
 
     // Check if peak is close to the current y-axis max value
     if (maxPeak >= chart.options.scales.y.max * 0.98) {
@@ -46,6 +56,7 @@ export const chart = new Chart(ctx, {
             fill: true,
             tension: 0.5,
             cubicInterpolationMode: 'monotone',
+            pointHitRadius: 0,
             pointRadius: 0,
             hidden: false
         }, {
@@ -57,40 +68,9 @@ export const chart = new Chart(ctx, {
             fill: true,
             tension: 0.5,
             cubicInterpolationMode: 'monotone',
+            pointHitRadius: 0,
             pointRadius: 0,
             hidden: false
-        }, {
-            label: "Reads",
-            data: [...Array(24).keys()].map((x, i) => ({
-                x, y: [150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
-                    450000, 550000, 400000, 350000, 330000, 310000, 300000,
-                    320000, 350000, 370000, 330000, 250000, 200000, 170000,
-                    150000, 130000][i] * 1.25
-            })),
-            backgroundColor: bluePattern,
-            borderColor: '#326DE6',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.2,
-            cubicInterpolationMode: 'monotone',
-            pointHitRadius: 25,
-            // stepped: true,
-        }, {
-            label: "Writes",
-            data: [...Array(24).keys()].map((x, i) => ({
-                x, y: [150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
-                    450000, 550000, 400000, 350000, 330000, 310000, 300000,
-                    320000, 350000, 370000, 330000, 250000, 200000, 170000,
-                    150000, 130000][i]
-            })),
-            backgroundColor: orangePattern,
-            borderColor: '#FF5500',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.2,
-            cubicInterpolationMode: 'monotone',
-            pointHitRadius: 25,
-            // stepped: true,
         }]
     }, options: {
         plugins: {

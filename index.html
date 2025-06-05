@@ -37,38 +37,25 @@
           <button id="copyLinkBtn" class="btn btn-light">
             <i class="icon-copy me-3"></i> Copy
           </button>
+          <button id="saveCsvBtn" class="btn btn-light">
+            <i class="icon-save me-3"></i> Save
+          </button>
           <p class="result"></p>
-<!--          <button class="btn btn-light">-->
-<!--            Save Settings Preset-->
-<!--          </button>-->
-<!--          <button class="btn btn-light menu-button">-->
-<!--            <i class="icon-menu"></i>-->
-<!--          </button>-->
         </div>
       </header>
       <div class="row">
         <div class="col vstack gap-6">
           <canvas id="chart" width="800" height="400"></canvas>
-
-          <div style="padding: 1em; font-family: sans-serif;">
-            <label for="workloadSelect">Select Workload Pattern:</label>
-            <select id="workloadSelect">
-              <option value="baselinePeak">Baseline + Peak</option>
-              <option value="businessHours">Business Hours</option>
-              <option value="dailyPeak">Unimodal (Daily Peak)</option>
-              <option value="twiceDaily">Bimodal (Twice Daily Peak)</option>
-              <option value="batch">Batch</option>
-              <option value="flatline">Flatline</option>
-              <option value="diurnal">Diurnal</option>
-              <option value="chaos">Chaos (Random)</option>
-            </select>
-            <button id="saveCsvBtn" style="margin-left:1em;">
-              <i class="fas fa-file-csv"></i>
-            </button>
-
-          </div>
-          <div id="summaryTable" style="padding: 1em; font-family: sans-serif;"></div>
-
+          <select id="workloadSelect">
+            <option value="baselinePeak">Baseline + Peak</option>
+            <option value="businessHours">Business Hours</option>
+            <option value="dailyPeak">Unimodal (Daily Peak)</option>
+            <option value="twiceDaily">Bimodal (Twice Daily Peak)</option>
+            <option value="batch">Batch</option>
+            <option value="flatline">Flatline</option>
+            <option value="diurnal">Diurnal</option>
+            <option value="chaos">Chaos (Random)</option>
+          </select>
           <div id="costParams">
             <div class="radio-container">
               <label>
@@ -76,9 +63,6 @@
               </label>
               <label>
                 <input type="radio" name="pricing" value="provisioned"> Provisioned
-              </label>
-              <label>
-                <input type="radio" name="pricing" value="autoscaled"> Autoscaled
               </label>
             </div>
             <div id="costs" class="costs"></div>
@@ -101,14 +85,8 @@
 
             <div class="tab-content active" id="loadTabContent">
 
-
               <div id="opsParams" class="vstack gap-3">
-                <!-- <div class="lead">
-                  Operations
-                </div> -->
-
                 <div class="row-sm">
-
                   <div class="col vstack gap-3">
                     <h4 class="reads">Reads</h4>
 
@@ -178,9 +156,7 @@
                       </div>
                       <input type="range" id="peakDurationReads" min="0" max="24" value="1">
                     </div>
-
                   </div>
-
                   <div class="col vstack gap-3">
                     <h4 class="writes">Writes</h4>
 
@@ -251,32 +227,90 @@
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div id="provisionedParams" style="display: none;">
+              <div id="totalOpsParams" class="vstack gap-3"  style="display: none;">
                   <div class="row-sm">
                     <div class="col vstack gap-3">
+                      <h4 class="reads">Total Reads</h4>
                       <div class="range-group">
                         <div class="range-group-top">
-                          <label for="reserved">Reserved Capacity:</label>
+                          <label for="totalReads">Total:</label>
                           <div class="inline-input">
                             <div class="value">
-                              <input type="text" id="reservedInp">
-                              <span id="reservedDsp">0</span>
+                              <input type="text" id="totalReadsInp">
+                              <span id="totalReadsDsp">500K</span>
                             </div>
                             <div class="units">
+                              ops/sec
                             </div>
                           </div>
                           <span class="info-icon">
-                            <i class="icon-info-outline"></i>
-                            <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
-                          </span>
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the total sum of read operations per second that your
+                            workload
+                            needs
+                            during a 24h period.</span>
+                        </span>
                         </div>
-                        <input type="range" id="reserved" min="0" max="100" step="1" value="0">
+                        <input type="range" id="totalReads" min="1000" max="2000000" step="1000" value="500000">
+                      </div>
+                    </div>
+                    <div class="col vstack gap-3">
+                      <h4 class="writes">Total Writes</h4>
+
+                      <div class="range-group">
+                        <div class="range-group-top">
+                          <label for="totalWrittes">Total:</label>
+                          <div class="inline-input">
+                            <div class="value">
+                              <input type="text" id="totalWrittesInp">
+                              <span id="totalWrittesDsp">500K</span>
+                            </div>
+                            <div class="units">
+                              ops/sec
+                            </div>
+                          </div>
+                          <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the total sum of writte operations per second that your
+                            workload
+                            needs
+                            during a 24h period.</span>
+                        </span>
+                        </div>
+                        <input type="range" id="totalWrittes" min="1000" max="2000000" step="1000" value="500000">
                       </div>
                     </div>
                   </div>
-                </div>
+              </div>
 
+              <div id="provisionedParams" style="display: none;">
+                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="reserved">Reserved Capacity:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="reservedInp">
+                            <span id="reservedDsp">0</span>
+                          </div>
+                          <div class="units">
+                          </div>
+                        </div>
+                        <span class="info-icon">
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+                    </span>
+                      </div>
+                      <input type="range" id="reserved" min="0" max="100" step="1" value="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="itemParams">
                 <div class="row-sm">
                   <div class="col vstack gap-3">
                     <div class="range-group">
@@ -290,38 +324,38 @@
                           <div class="units"></div>
                         </div>
                         <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter your average operation size (all attributes).</span>
-                        </span>
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter your average operation size (all attributes).</span>
+                    </span>
                       </div>
                       <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
                     </div>
                   </div>
                 </div>
-
-                <div id="consistencyParams" class="vstack gap-3">
-                  <div class="range-group">
-                    <div class="range-group-top">
-                      <label>Reads: </label>
-                      <div class="inline-input">
-                        <div class="value fill">
-                          <span id="readConstDsp">Strongly Consistent</span>
-                        </div>
-                        <div class="units">
-                        </div>
-                      </div>
-                      <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
-                        as a percentage.</span>
-                    </span>
-                    </div>
-                    <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
-                  </div>
-                </div>
               </div>
 
+              <div id="consistencyParams">
+                <div class="range-group">
+                  <div class="range-group-top">
+                    <label>Reads: </label>
+                    <div class="inline-input">
+                      <div class="value fill">
+                        <span id="readConstDsp">Strongly Consistent</span>
+                      </div>
+                      <div class="units">
+                      </div>
+                    </div>
+                    <span class="info-icon">
+                <i class="icon-info-outline"></i>
+                <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
+                  as a percentage.</span>
+              </span>
+                  </div>
+                  <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
+                </div>
+              </div>
             </div>
+
             <div class="tab-content" id="tablesTabContent">
               <div id="tableParams" class="vstack gap-3">
 
@@ -384,6 +418,7 @@
               </div>
 
             </div>
+
             <div class="tab-content" id="daxTabContent">
 
               <div id="daxParams" class="vstack gap-3">
