@@ -406,7 +406,7 @@ window.setupChart = function setupChart(options) {
 
         window.updateSummaryTable = updateSummaryTable;
 
-        function applyPattern(pattern) {
+        function applyWorkload(pattern) {
             const base = 100000;
             window.testedChart.options.scales.y.max = 1_000_000;
             const data = [];
@@ -475,10 +475,10 @@ window.setupChart = function setupChart(options) {
             updateSummaryTable();
         }
 
-        window.applyPattern = applyPattern;
+        window.applyWorkload = applyWorkload;
 
         document.getElementById("workloadSelect").addEventListener("change", function () {
-            applyPattern(this.value);
+            applyWorkload(this.value);
         });
 
         window.testedChart.options.plugins.dragData.onDragEnd = function (e) {
@@ -597,35 +597,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const pattern = urlSearchParams.get("pattern");
-
-    if (pattern) {
-        const select = document.getElementById("workloadSelect");
-        if ([...select.options].some(opt => opt.value === pattern)) {
-            select.value = pattern;
-        }
-    }
-
-    if (pattern.draw && pattern.draw('disc', '#000', '#fff', 6) instanceof CanvasPattern) {
-        setupChart({
-            disablePlugin: false,
-            draggableAxis: "both",
-            roundingPrecision: 2,
-        });
-    } else {
-        console.error("pattern.draw did not return a CanvasPattern");
-    }
-
-    if (pattern) {
-        setTimeout(() => {
-            const select = document.getElementById("workloadSelect");
-            select.dispatchEvent(new Event("change"));
-        }, 500);
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById("chartReal");
     const ctx = canvas.getContext("2d");
 
@@ -701,6 +672,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    if (workload) {
+        setTimeout(() => {
+            const select = document.getElementById("workloadSelect");
+            select.dispatchEvent(new Event("change"));
+        }, 500);
+    }
 });
 
 
