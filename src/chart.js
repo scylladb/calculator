@@ -245,7 +245,6 @@ let chartConfiguration = {
     },
 };
 
-window.isPluginLoaded = false;
 
 window.setupChart = function setupChart(options) {
     const {
@@ -257,256 +256,247 @@ window.setupChart = function setupChart(options) {
 
     let onDrag = undefined;
 
-    function onPluginScriptLoaded() {
-        if (!window.isPluginLoaded) console.log("Plugin script loaded");
-        window.isPluginLoaded = true;
+    // --- Begin contents of onPluginScriptLoaded ---
+    const bothAxesDraggable = draggableAxis === "both",
+        xAxisDraggable =
+            !draggableAxis || bothAxesDraggable || draggableAxis === "x",
+        yAxisDraggable = bothAxesDraggable || draggableAxis === "y";
 
-        const bothAxesDraggable = draggableAxis === "both",
-            xAxisDraggable =
-                !draggableAxis || bothAxesDraggable || draggableAxis === "x",
-            yAxisDraggable = bothAxesDraggable || draggableAxis === "y";
+    function drawDragMarker(e) {
+        // demo environment stub
+    }
 
-        function drawDragMarker(e) {
-            // demo environment stub
-        }
-
-        const configuration = _.merge(
-            {
-                options: {
-                    animation: true,
-                    plugins: {
-                        dragData: disablePlugin
-                            ? false
-                            : {
-                                dragX: false,
-                                dragY: true,
-                                round: roundingPrecision,
-                                showTooltip: true,
-                                onDragStart: function (e) {
-                                    if (renderOnHoverCirclesTrail) drawDragMarker(e);
-                                },
-                                onDrag: function (...args) {
-                                    const [e] = args;
-                                    if (e.target?.style)
-                                        e.target.style.cursor = "grabbing";
-
-                                    onDrag?.(...args);
-                                    if (renderOnHoverCirclesTrail) drawDragMarker(e);
-                                },
-                                onDragEnd: function (e) {
-                                    if (e.target?.style)
-                                        e.target.style.cursor = "default";
-
-                                    if (renderOnHoverCirclesTrail) drawDragMarker(e);
-                                },
+    const configuration = _.merge(
+        {
+            options: {
+                animation: true,
+                plugins: {
+                    dragData: disablePlugin
+                        ? false
+                        : {
+                            dragX: false,
+                            dragY: true,
+                            round: roundingPrecision,
+                            showTooltip: true,
+                            onDragStart: function (e) {
+                                if (renderOnHoverCirclesTrail) drawDragMarker(e);
                             },
-                    },
-                    onHover: function (e) {
-                        const point = e.chart.getElementsAtEventForMode(
-                            e,
-                            e.chart.options.interaction.mode,
-                            {intersect: true},
-                            false,
-                        );
-                        if (point.length) e.native.target.style.cursor = "grab";
-                        else e.native.target.style.cursor = "default";
-                    },
-                },
-            },
-            {
-                ...chartConfiguration,
-                options: {
-                    ...chartConfiguration.options,
-                    plugins: {
-                        ...(chartConfiguration.options.plugins ?? {}),
-                        datalabels: {
-                            ...(chartConfiguration.options.plugins?.datalabels ?? {}),
-                            ...(chartConfiguration.options.plugins?.datalabels?.display
-                                ? {
-                                    formatter: function (value, context) {
-                                        return (
-                                            dateFns.differenceInDays(value[1], value[0]) + "d"
-                                        );
-                                    },
-                                }
-                                : {}),
+                            onDrag: function (...args) {
+                                const [e] = args;
+                                if (e.target?.style)
+                                    e.target.style.cursor = "grabbing";
+
+                                onDrag?.(...args);
+                                if (renderOnHoverCirclesTrail) drawDragMarker(e);
+                            },
+                            onDragEnd: function (e) {
+                                if (e.target?.style)
+                                    e.target.style.cursor = "default";
+
+                                if (renderOnHoverCirclesTrail) drawDragMarker(e);
+                            },
                         },
-                    },
                 },
-                data: {
-                    ...chartConfiguration.data,
-                    ...(chartConfiguration.scales?.x?.type === "time"
-                        ? {
-                            datasets: chartConfiguration.data.datasets.map((d) => ({
-                                ...d,
-                                data: d.data.map((darr) =>
-                                    darr.map((date) => new Date(date)),
-                                ),
-                            })),
-                        }
-                        : {}),
+                onHover: function (e) {
+                    const point = e.chart.getElementsAtEventForMode(
+                        e,
+                        e.chart.options.interaction.mode,
+                        {intersect: true},
+                        false,
+                    );
+                    if (point.length) e.native.target.style.cursor = "grab";
+                    else e.native.target.style.cursor = "default";
                 },
             },
+        },
+        {
+            ...chartConfiguration,
+            options: {
+                ...chartConfiguration.options,
+                plugins: {
+                    ...(chartConfiguration.options.plugins ?? {}),
+                    datalabels: {
+                        ...(chartConfiguration.options.plugins?.datalabels ?? {}),
+                        ...(chartConfiguration.options.plugins?.datalabels?.display
+                            ? {
+                                formatter: function (value, context) {
+                                    return (
+                                        dateFns.differenceInDays(value[1], value[0]) + "d"
+                                    );
+                                },
+                            }
+                            : {}),
+                    },
+                },
+            },
+            data: {
+                ...chartConfiguration.data,
+                ...(chartConfiguration.scales?.x?.type === "time"
+                    ? {
+                        datasets: chartConfiguration.data.datasets.map((d) => ({
+                            ...d,
+                            data: d.data.map((darr) =>
+                                darr.map((date) => new Date(date)),
+                            ),
+                        })),
+                    }
+                    : {}),
+            },
+        },
+    );
+
+    var ctx = document
+        .getElementById("chartReal")
+        .getContext("2d");
+    Chart.register(ChartDataLabels);
+
+    window.testedChart = new Chart(ctx, configuration);
+
+    let originalTestedChartData = _.cloneDeep(window.testedChart.data);
+    window.resetData = function resetData() {
+        console.log(
+            "[resetData] Resetting data to original data passed to setupChart()",
+            originalTestedChartData,
         );
 
-        var ctx = document
-            .getElementById("chartReal")
-            .getContext("2d");
-        Chart.register(ChartDataLabels);
+        window.testedChart.data = _.cloneDeep(originalTestedChartData);
+        window.testedChart.update("none");
+    };
 
-        window.testedChart = new Chart(ctx, configuration);
+    function updateSummaryTable() {
+        const actual = window.testedChart.data.datasets[0].data.map(d => d.y);
+        const planned = window.testedChart.data.datasets[1].data.map(d => d.y);
 
-        let originalTestedChartData = _.cloneDeep(window.testedChart.data);
-        window.resetData = function resetData() {
-            console.log(
-                "[resetData] Resetting data to original data passed to setupChart()",
-                originalTestedChartData,
-            );
+        const totalActual = _.sum(actual);
+        const totalPlanned = _.sum(planned);
+        const delta = totalPlanned - totalActual;
 
-            window.testedChart.data = _.cloneDeep(originalTestedChartData);
-            window.testedChart.update("none");
-        };
+        const formatOps = v => (v >= 1_000_000 ? (v / 1_000_000).toFixed(2) + "M" : (v / 1000).toFixed(0) + "K");
 
-        function updateSummaryTable() {
-            const actual = window.testedChart.data.datasets[0].data.map(d => d.y);
-            const planned = window.testedChart.data.datasets[1].data.map(d => d.y);
-
-            const totalActual = _.sum(actual);
-            const totalPlanned = _.sum(planned);
-            const delta = totalPlanned - totalActual;
-
-            const formatOps = v => (v >= 1_000_000 ? (v / 1_000_000).toFixed(2) + "M" : (v / 1000).toFixed(0) + "K");
-
-            let warnings = [];
-            for (let i = 0; i < 24; i++) {
-                if (actual[i] > planned[i]) warnings.push(`Time ${i.toString().padStart(2, "0")}00: underprovisioned (actual ${formatOps(actual[i])} > planned ${formatOps(planned[i])})`);
-                if (planned[i] > actual[i] * 1.5) warnings.push(`Time ${i.toString().padStart(2, "0")}00: overprovisioned (planned ${formatOps(planned[i])} >> actual ${formatOps(actual[i])})`);
-            }
-
-            document.getElementById("summaryTable").innerHTML = `
-          <div class="mui-container">
-            <table class="mui-table mui-table--bordered">
-              <thead>
-                <tr><th></th><th>Workload total ops/sec</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Actual</td><td style="text-align: right;">${formatOps(totalActual)}</td></tr>
-                <tr><td>Planned</td><td style="text-align: right;">${formatOps(totalPlanned)}</td></tr>
-                <tr><td>Delta</td><td style="text-align: right;">${formatOps(delta)}</td></tr>
-              </tbody>
-            </table>
-            <div style="margin-top: 1em; color: ${warnings.length ? "red" : "green"};">
-              ${warnings.length ? `<strong>Warnings:</strong><ul>${warnings.map(w => `<li>${w}</li>`).join("")}</ul>` : "<strong>No issues detected.</strong>"}
-            </div>
-          </div>
-        `;
+        let warnings = [];
+        for (let i = 0; i < 24; i++) {
+            if (actual[i] > planned[i]) warnings.push(`Time ${i.toString().padStart(2, "0")}00: underprovisioned (actual ${formatOps(actual[i])} > planned ${formatOps(planned[i])})`);
+            if (planned[i] > actual[i] * 1.5) warnings.push(`Time ${i.toString().padStart(2, "0")}00: overprovisioned (planned ${formatOps(planned[i])} >> actual ${formatOps(actual[i])})`);
         }
 
+        document.getElementById("summaryTable").innerHTML = `
+      <div class="mui-container">
+        <table class="mui-table mui-table--bordered">
+          <thead>
+            <tr><th></th><th>Workload total ops/sec</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Actual</td><td style="text-align: right;">${formatOps(totalActual)}</td></tr>
+            <tr><td>Planned</td><td style="text-align: right;">${formatOps(totalPlanned)}</td></tr>
+            <tr><td>Delta</td><td style="text-align: right;">${formatOps(delta)}</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top: 1em; color: ${warnings.length ? "red" : "green"};">
+          ${warnings.length ? `<strong>Warnings:</strong><ul>${warnings.map(w => `<li>${w}</li>`).join("")}</ul>` : "<strong>No issues detected.</strong>"}
+        </div>
+      </div>
+    `;
+    }
+
+    updateSummaryTable();
+
+    window.updateSummaryTable = updateSummaryTable;
+
+    function applyWorkload(workload) {
+        const base = 100000;
+        window.testedChart.options.scales.y.max = 1_000_000;
+        const data = [];
+
+        for (let i = 0; i < 24; i++) {
+            let actual = base;
+
+            switch (workload) {
+                case "dailyPeak":
+                    actual = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                    break;
+                case "twiceDaily":
+                    actual = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                    break;
+                case "batch":
+                    actual = (i >= 0 && i <= 3) ? base * 6 : base;
+                    break;
+                case "sawtooth":
+                    actual = base + (i % 6) * base * 0.5;
+                    break;
+                case "bursty":
+                    actual = (Math.random() < 0.3) ? base * (5 + Math.random() * 5) : base;
+                    break;
+                case "rampUp":
+                    actual = base + (i * (base * 9 / 23));
+                    break;
+                case "rampDown":
+                    actual = base * (1 - i / 24);
+                    break;
+                case "flatline":
+                    actual = base;
+                    break;
+                case "sinusoidal":
+                    actual = base + base * Math.sin((i / 12) * 2 * Math.PI);
+                    break;
+                case "diurnal":
+                    actual = 400000 + Math.cos((i - 12) * Math.PI / 12) * 400000 * 0.9;
+                    break;
+                case "nocturnal":
+                    actual = 400000 + Math.cos((i) * Math.PI / 12) * 400000 * 0.9;
+                    break;
+                case "mountain":
+                    actual = base + Math.max(0, (12 - Math.abs(i - 12)) * (base / 2));
+                    break;
+                case "valley":
+                    actual = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
+                    break;
+                case "chaos":
+                    actual = base * (0.5 + Math.random() * 5);
+                    break;
+                default:
+                    actual = [
+                        150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
+                        450000, 550000, 400000, 350000, 330000, 310000, 300000,
+                        320000, 350000, 370000, 330000, 250000, 200000, 170000,
+                        150000, 130000
+                    ][i];
+            }
+
+            data.push({x: i, y: actual});
+        }
+
+        console.log("Applying workload:", workload, "Data:", data);
+
+        window.testedChart.data.datasets[0].data = data;
+        window.testedChart.data.datasets[1].data = data.map(d => ({x: d.x, y: d.y * 1.25}));
+        window.testedChart.update();
         updateSummaryTable();
-
-        window.updateSummaryTable = updateSummaryTable;
-
-        function applyWorkload(pattern) {
-            const base = 100000;
-            window.testedChart.options.scales.y.max = 1_000_000;
-            const data = [];
-
-            for (let i = 0; i < 24; i++) {
-                let actual = base;
-
-                switch (pattern) {
-                    case "dailyPeak":
-                        actual = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
-                        break;
-                    case "twiceDaily":
-                        actual = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
-                        break;
-                    case "batch":
-                        actual = (i >= 0 && i <= 3) ? base * 6 : base;
-                        break;
-                    case "sawtooth":
-                        actual = base + (i % 6) * base * 0.5;
-                        break;
-                    case "bursty":
-                        actual = (Math.random() < 0.3) ? base * (5 + Math.random() * 5) : base;
-                        break;
-                    case "rampUp":
-                        actual = base + (i * (base * 9 / 23));
-                        break;
-                    case "rampDown":
-                        actual = base * (1 - i / 24);
-                        break;
-                    case "flatline":
-                        actual = base;
-                        break;
-                    case "sinusoidal":
-                        actual = base + base * Math.sin((i / 12) * 2 * Math.PI);
-                        break;
-                    case "diurnal":
-                        actual = 400000 + Math.cos((i - 12) * Math.PI / 12) * 400000 * 0.9;
-                        break;
-                    case "nocturnal":
-                        actual = 400000 + Math.cos((i) * Math.PI / 12) * 400000 * 0.9;
-                        break;
-                    case "mountain":
-                        actual = base + Math.max(0, (12 - Math.abs(i - 12)) * (base / 2));
-                        break;
-                    case "valley":
-                        actual = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
-                        break;
-                    case "chaos":
-                        actual = base * (0.5 + Math.random() * 5);
-                        break;
-                    default:
-                        actual = [
-                            150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
-                            450000, 550000, 400000, 350000, 330000, 310000, 300000,
-                            320000, 350000, 370000, 330000, 250000, 200000, 170000,
-                            150000, 130000
-                        ][i];
-                }
-
-                data.push({x: i, y: actual});
-            }
-
-            window.testedChart.data.datasets[0].data = data;
-            window.testedChart.data.datasets[1].data = data.map(d => ({x: d.x, y: d.y * 1.25}));
-            window.testedChart.update();
-            updateSummaryTable();
-        }
-
-        window.applyWorkload = applyWorkload;
-
-        document.getElementById("workloadSelect").addEventListener("change", function () {
-            applyWorkload(this.value);
-        });
-
-        window.testedChart.options.plugins.dragData.onDragEnd = function (e) {
-            if (e.target?.style) e.target.style.cursor = "default";
-            if (renderOnHoverCirclesTrail) drawDragMarker(e);
-            updateSummaryTable();
-        };
     }
 
-    if (window.isPluginLoaded) {
-        onPluginScriptLoaded();
-    } else {
+    window.applyWorkload = applyWorkload;
 
-    }
+    document.getElementById("workloadSelect").addEventListener("change", function () {
+        console.log("Workload changed to:", this.value);
+        const url = new URL(window.location);
+        url.searchParams.set("workload", this.value);
+        window.history.replaceState({}, '', url);
+        window.applyWorkload(this.value);
+    });
+
+
+    window.testedChart.options.plugins.dragData.onDragEnd = function (e) {
+        if (e.target?.style) e.target.style.cursor = "default";
+        if (renderOnHoverCirclesTrail) drawDragMarker(e);
+        updateSummaryTable();
+    };
 };
 
-document.getElementById("workloadSelect").addEventListener("change", function () {
-    // Update the pattern param in the URL without reloading
-    const url = new URL(window.location);
-    url.searchParams.set("pattern", this.value);
-    window.history.replaceState({}, '', url);
-});
 
 document.getElementById("saveCsvBtn").addEventListener("click", function () {
     const chart = window.testedChart;
     const labels = chart.data.labels;
     const datasets = chart.data.datasets;
-    const pattern = document.getElementById("workloadSelect").value || "workload";
+    const workload = document.getElementById("workloadSelect").value || "workload";
 
     let csv = "Hour,Actual ops/sec,Planned ops/sec\n";
     for (let i = 0; i < labels.length; i++) {
@@ -520,7 +510,7 @@ document.getElementById("saveCsvBtn").addEventListener("click", function () {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${pattern}.csv`;
+    a.download = `${workload}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -616,13 +606,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-    const actualData = [
+    const baselineReads = [
         150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
         450000, 550000, 400000, 350000, 330000, 310000, 300000,
         320000, 350000, 370000, 330000, 250000, 200000, 170000,
         150000, 130000
     ];
-    const plannedData = actualData.map(v => v * 1.25);
+    const baselineWrites = baselineReads.map(v => v * 1.25);
 
     new Chart(ctx, {
         type: 'line',
@@ -630,21 +620,22 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: hours,
             datasets: [
                 {
-                    label: "Actual ops/sec",
-                    data: actualData,
+                    label: "Reads",
+                    data: baselineReads,
+                    fill: true,
+                    backgroundColor: bluePattern,
+                    borderColor: "rgba(50, 109, 230, 1)",
+                    tension: 0.4
+                },
+                {
+                    label: "Writes",
+                    data: baselineWrites,
                     fill: true,
                     backgroundColor: orangePattern,
                     borderColor: "rgba(255, 85, 0, 1)",
                     tension: 0.4
                 },
-                {
-                    label: "Planned ops/sec",
-                    data: plannedData,
-                    fill: true,
-                    backgroundColor: bluePattern,
-                    borderColor: "rgba(50, 109, 230, 1)",
-                    tension: 0.4
-                }
+
             ]
         },
         options: {
@@ -673,11 +664,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // After setupChart is called and chart is initialized
     if (workload) {
+        const select = document.getElementById("workloadSelect");
         setTimeout(() => {
-            const select = document.getElementById("workloadSelect");
             select.dispatchEvent(new Event("change"));
-        }, 500);
+        }, 100);
     }
 });
 

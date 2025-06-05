@@ -36,7 +36,7 @@ export function getQueryParams() {
     if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
-    if (params.get('pattern')) cfg.pattern = parseInt(params.get('patttern'));
+    if (params.get('workload')) cfg.workload = parseInt(params.get('workload'));
 
     if(params.get('daxNodes')) {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
