@@ -1,6 +1,7 @@
 export const cfg = {
     workload: 'default',
-    series: [],
+    seriesReads: [],
+    seriesWrites: [],
     pricing: 'demand',
     baselineReads: 100000,
     baselineWrites: 200000,
@@ -8,6 +9,8 @@ export const cfg = {
     peakWrites: 500000,
     peakDurationReads: 2,
     peakDurationWrites: 4,
+    totalReads: 0,
+    totalWrites: 0,
     hoursPerMonth: 730,
     itemSizeB: 1024,
     storageGB: 512,

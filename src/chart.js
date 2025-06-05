@@ -23,24 +23,30 @@ function generateData(baseline, peak, peakDuration) {
 }
 
 export function updateChart() {
-    let maxPeak = Math.max(cfg.peakReads, cfg.peakWrites);
+    let yMax = 0;
 
     if (cfg.workload === "baselinePeak") {
         chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
         chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
+        yMax = Math.max(
+            cfg.baselineReads + cfg.peakReads,
+            cfg.baselineWrites + cfg.peakWrites
+        );
     } else {
-        console.log(`Applying workload: ${cfg.workload}`);
         chart.data.datasets[0].pointHitRadius = 25;
-        chart.data.datasets[0].data = cfg.series;
+        chart.data.datasets[0].data = cfg.seriesReads;
         chart.data.datasets[1].pointHitRadius = 25;
-        chart.data.datasets[1].data = cfg.series.map(d => ({x: d.x, y: d.y * 1.25}));
+        chart.data.datasets[1].data = cfg.seriesWrites.map(d => ({x: d.x, y: d.y * 1.25}));
+        yMax = Math.max(
+            ...cfg.seriesReads.map(p => p.y),
+            ...cfg.seriesWrites.map(p => p.y)
+        );
     }
 
-
-    // Check if peak is close to the current y-axis max value
-    if (maxPeak >= chart.options.scales.y.max * 0.98) {
-        chart.options.scales.y.max = maxPeak * 1.2;
+    if (yMax >= chart.options.scales.y.max * 0.98) {
+        chart.options.scales.y.max = yMax * 1.2;
     }
+
     chart.update();
 }
 
@@ -161,4 +167,3 @@ export const chart = new Chart(ctx, {
         }
     }
 });
-

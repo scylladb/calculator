@@ -84,7 +84,6 @@
             </nav>
 
             <div class="tab-content active" id="loadTabContent">
-
               <div id="opsParams" class="vstack gap-3">
                 <div class="row-sm">
                   <div class="col vstack gap-3">
@@ -253,7 +252,7 @@
                             during a 24h period.</span>
                         </span>
                         </div>
-                        <input type="range" id="totalReads" min="1000" max="2000000" step="1000" value="500000">
+                        <input type="range" id="totalReads" min="1000" max="100000000" step="1000" value="500000">
                       </div>
                     </div>
                     <div class="col vstack gap-3">
@@ -261,11 +260,11 @@
 
                       <div class="range-group">
                         <div class="range-group-top">
-                          <label for="totalWrittes">Total:</label>
+                          <label for="totalWrites">Total:</label>
                           <div class="inline-input">
                             <div class="value">
-                              <input type="text" id="totalWrittesInp">
-                              <span id="totalWrittesDsp">500K</span>
+                              <input type="text" id="totalWritesInp">
+                              <span id="totalWritesDsp">500K</span>
                             </div>
                             <div class="units">
                               ops/sec
@@ -273,13 +272,13 @@
                           </div>
                           <span class="info-icon">
                           <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the total sum of writte operations per second that your
+                          <span class="tooltip-text">Enter the total sum of write operations per second that your
                             workload
                             needs
                             during a 24h period.</span>
                         </span>
                         </div>
-                        <input type="range" id="totalWrittes" min="1000" max="2000000" step="1000" value="500000">
+                        <input type="range" id="totalWrites" min="1000" max="100000000" step="1000" value="500000">
                       </div>
                     </div>
                   </div>

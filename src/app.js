@@ -46,7 +46,8 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
 export function applyWorkload(workload) {
     const base = 100000;
     chart.options.scales.y.max = 1_000_000;
-    const series = [];
+    const seriesReads = [];
+    const seriesWrites = [];
 
     for (let i = 0; i < 24; i++) {
         let actual = base;
@@ -103,14 +104,31 @@ export function applyWorkload(workload) {
                 ][i];
         }
 
-        series.push({x: i, y: actual});
+        seriesReads.push({x: i, y: actual});
+        seriesWrites.push({x: i, y: actual * 1.2});
     }
 
-    cfg.series = series;
+    cfg.seriesReads = seriesReads;
+    cfg.seriesWrites = seriesWrites;
     cfg.workload = workload;
+
+    // calculate total ops
+    cfg.totalReads = 0;
+    cfg.totalWrites = 0;
+    // sum up all series data for both reads and writes
+    for (const point of cfg.seriesReads) {
+        cfg.totalReads += point.y;
+    }
+    for (const point of cfg.seriesWrites) {
+        cfg.totalWrites += point.y;
+    }
 
     const opsParams = document.getElementById('opsParams');
     const totalOpsParams = document.getElementById('totalOpsParams');
+    const totalReadsDsp = document.getElementById('totalReadsDsp');
+    const totalWritesDsp = document.getElementById('totalWritesDsp');
+    totalReadsDsp.innerText = formatNumber(cfg.totalReads);
+    totalWritesDsp.innerText = formatNumber(cfg.totalWrites);
 
     if (workload === "baselinePeak") {
         opsParams.style.display = 'block';
@@ -238,6 +256,46 @@ document.getElementById('peakDurationWrites').addEventListener('input', (event) 
     updateAll();
 });
 
+document.getElementById('totalReads').addEventListener('input', (event) => {
+    const newTotal = parseInt(event.target.value);
+    if (!isNaN(newTotal) && cfg.seriesReads.length > 0) {
+        const oldTotal = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
+        const delta = newTotal - oldTotal;
+        const adjustment = delta / cfg.seriesReads.length;
+
+        cfg.seriesReads.forEach((point, index) => {
+            point.y += adjustment;
+            if (point.y < 0) point.y = 0;
+            chart.data.datasets[0].data[index] = point;
+        });
+
+        cfg.totalReads = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
+        document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
+
+        updateAll();
+    }
+});
+
+document.getElementById('totalWrites').addEventListener('input', (event) => {
+    const newTotal = parseInt(event.target.value);
+    if (!isNaN(newTotal) && cfg.seriesWrites.length > 0) {
+        const oldTotal = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
+        const delta = newTotal - oldTotal;
+        const adjustment = delta / cfg.seriesWrites.length;
+
+        cfg.seriesWrites.forEach((point, index) => {
+            point.y += adjustment;
+            if (point.y < 0) point.y = 0;
+            chart.data.datasets[1].data[index] = point;
+        });
+
+        cfg.totalWrites = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
+        document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
+
+        updateAll();
+    }
+});
+
 document.getElementById('reserved').addEventListener('input', (event) => {
     cfg.reserved = parseInt(event.target.value);
     document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
@@ -324,6 +382,8 @@ setupSliderInteraction('peakReadsDsp', 'peakReadsInp', 'peakReads', formatNumber
 setupSliderInteraction('peakWritesDsp', 'peakWritesInp', 'peakWrites', formatNumber);
 setupSliderInteraction('peakDurationReadsDsp', 'peakDurationReadsInp', 'peakDurationReads', value => value);
 setupSliderInteraction('peakDurationWritesDsp', 'peakDurationWritesInp', 'peakDurationWrites', value => value);
+setupSliderInteraction('totalReadsDsp', 'totalReadsInp', 'totalReads', formatNumber);
+setupSliderInteraction('totalWritesDsp', 'totalWritesInp', 'totalWrites', formatNumber);
 setupSliderInteraction('reservedDsp', 'reservedInp', 'reserved', value => `${value}%`);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
