@@ -42,59 +42,100 @@ function getHoursValues() {
     cfg.peakHoursWrites = Number((cfg.peakDurationWrites * 365 / 12).toFixed(1));
     cfg.baselineHoursReads = cfg.hoursPerMonth - cfg.peakHoursReads;
     cfg.baselineHoursWrites = cfg.hoursPerMonth - cfg.peakHoursWrites;
-    cfg.reserved = parseInt(document.getElementById('reserved').value);
+    cfg.reservedPercentage = parseInt(document.getElementById('reserved').value);
 }
 
+export function calculateProvisionedWrites() {
+    const itemWCU = Math.ceil(cfg.itemSizeKB);
+    const costPerWCU = (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+
+    const totalBaseWCU = cfg.baselineWrites * itemWCU;
+
+    const totalPeakWCU = cfg.peakWrites * itemWCU;
+
+    const totalReservedWCU = Math.ceil((totalBaseWCU * (cfg.reservedPercentage / 100.0)) / 100.0) * 100;
+
+    const unreservedBaseWCU = Math.ceil(Math.max(totalBaseWCU - totalReservedWCU, 0));
+    const unreservedBaseWCUHours = unreservedBaseWCU * cfg.baselineHoursWrites;
+    const unreservedPeakWCU = Math.ceil(Math.max(totalPeakWCU - totalReservedWCU, 0));
+    const unreservedPeakWCUHours = unreservedPeakWCU * cfg.peakHoursWrites;
+
+    const totalUnreservedWCUHours = Math.ceil(unreservedBaseWCUHours + unreservedPeakWCUHours);
+    const costWCUProvisioned = totalUnreservedWCUHours * costPerWCU;
+
+    const reservedWCUCost = totalReservedWCU * cfg.pricePerReservedWCU * cfg.hoursPerMonth;
+    const upfrontReservedWCUCost = totalReservedWCU * 1.5;
+
+    cfg._provisionedWriteCost = {
+        totalBaseWCU,
+        totalReservedWCU,
+        unreservedBaseWCU,
+        unreservedPeakWCU,
+        totalUnreservedWCUHours,
+        monthlyCost: Number(Math.trunc((costWCUProvisioned) * 100) / 100),
+        reservedMonthlyCost: Number(Math.trunc((reservedWCUCost) * 100) / 100),
+        reservedUpfrontCost: Number(Math.trunc((upfrontReservedWCUCost) * 100) / 100),
+        totalMonthly: Number(Math.trunc(((costWCUProvisioned + reservedWCUCost)) * 100) / 100)
+    };
+}
+
+export function calculateProvisionedReads() {
+    const itemRCU = Math.ceil(cfg.itemSizeKB / 4.0);
+    const costPerRCU = (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
+
+    const totalBaseRCU = (cfg.baselineReads * cfg.readEventuallyConsistent * 0.5 * itemRCU) + (cfg.baselineReads * cfg.readStronglyConsistent * itemRCU);
+
+    const totalPeakRCU = (cfg.peakReads * cfg.readEventuallyConsistent * 0.5 * itemRCU) + (cfg.peakReads * cfg.readStronglyConsistent * itemRCU);
+
+    const totalReservedRCU = Math.ceil((totalBaseRCU * (cfg.reservedPercentage / 100.0)) / 100.0) * 100;
+
+    const unreservedBaseRCU = Math.ceil(Math.max(totalBaseRCU - totalReservedRCU, 0));
+    const unreservedBaseRCUHours = unreservedBaseRCU * cfg.baselineHoursReads;
+    const unreservedPeakRCU = Math.ceil(Math.max(totalPeakRCU - totalReservedRCU, 0));
+    const unreservedPeakRCUHours = unreservedPeakRCU * cfg.peakHoursReads;
+
+    const totalUnreservedRCUHours = Math.ceil(unreservedBaseRCUHours + unreservedPeakRCUHours);
+    const costRCUProvisioned = totalUnreservedRCUHours * costPerRCU;
+
+    const reservedRCUCost = totalReservedRCU * cfg.pricePerReservedRCU * cfg.hoursPerMonth;
+    const upfrontReservedRCUCost = totalReservedRCU * 1.5;
+
+    cfg._provisionedReadCost = {
+        totalBaseRCU,
+        totalReservedRCU,
+        unreservedBaseRCU,
+        unreservedPeakRCU,
+        totalUnreservedRCUHours,
+        monthlyCost: Number(Math.trunc((costRCUProvisioned) * 100) / 100),
+        reservedMonthlyCost: Number(Math.trunc((reservedRCUCost) * 100) / 100),
+        reservedUpfrontCost: Number(Math.trunc((upfrontReservedRCUCost) * 100) / 100),
+        totalMonthly: Number(Math.trunc(((costRCUProvisioned + reservedRCUCost)) * 100) / 100)
+    };
+}
+
+export function calculateReplicatedProvisionedWrites() {
+    const itemWCU = Math.ceil(cfg.itemSizeKB);
+    const costPerWCU = (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
+
+    const totalBaseWCU = cfg.baselineWrites * itemWCU;
+    const totalPeakWCU = cfg.peakWrites * itemWCU;
+
+    const totalReplicatedWCU = (cfg.regions - 1) * (totalBaseWCU + totalPeakWCU);
+
+    cfg._replicatedProvisionedWriteCost = {
+        totalReplicatedWCU,
+        monthlyCost: Number(Math.trunc((totalReplicatedWCU * costPerWCU) * 100) / 100)
+    };
+}
+
+
 export function calculateProvisionedCosts() {
-    cfg.perItemWRU = Math.ceil(cfg.itemSizeKB);
-    cfg.perItemRRU = Math.ceil(cfg.itemSizeKB / 4.0);
+    calculateProvisionedReads();
+    calculateProvisionedWrites();
+    calculateReplicatedProvisionedWrites();
 
-    cfg.baselineWCUNonTransactional = cfg.baselineWrites * cfg.writeNonTransactional * cfg.perItemWRU;
-    cfg.baselineWCUTransactional = cfg.baselineWrites* cfg.writeTransactional * 2 * cfg.perItemWRU;
-    cfg.baselineWCUTotal = cfg.baselineWCUNonTransactional + cfg.baselineWCUTransactional;
-    cfg.reservedWCU = cfg.baselineWCUTotal * (cfg.reserved / 100.0);
-    cfg.reservedWCU = Math.ceil(cfg.reservedWCU / 100.0) * 100;
-    cfg.baselineWCU = cfg.baselineWCUTotal - cfg.reservedWCU;
-    cfg.baselineWCU = Math.ceil(Math.max(cfg.baselineWCU, 0));
-    cfg.baselineWCUHours = Math.ceil(cfg.baselineWCU * cfg.baselineHoursWrites);
-    cfg.peakWCUNonTransactional = cfg.peakWrites * cfg.writeNonTransactional * cfg.perItemWRU;
-    cfg.peakWCUTransactional = cfg.peakWrites * cfg.writeTransactional * 2 * cfg.perItemWRU;
-    cfg.peakWCUTotal = cfg.peakWCUNonTransactional + cfg.peakWCUTransactional;
-    cfg.peakWCU = cfg.peakWCUTotal - cfg.reservedWCU;
-    cfg.peakWCU = Math.ceil(Math.max(cfg.peakWCU, 0));
-    cfg.peakWCUHours = Math.ceil(cfg.peakWCU * cfg.peakHoursWrites);
-    cfg.totalWCUHours = Math.ceil(cfg.baselineWCUHours + cfg.peakWCUHours);
-    cfg.costProvisionedWCU = cfg.totalWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    cfg.costReservedWCU = cfg.reservedWCU * cfg.pricePerRWCU * cfg.hoursPerMonth;
-    cfg.replicatedWCUHours =  Math.ceil(cfg.baselineWCUTotal * cfg.baselineHoursWrites) + Math.ceil(cfg.peakWCUTotal * cfg.peakHoursWrites);
-    cfg.costMonthlyReplicatedWCU = (cfg.regions - 1) * cfg.replicatedWCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    cfg.costMonthlyWCU = Number(Math.trunc((cfg.costProvisionedWCU + cfg.costReservedWCU) * 100) / 100);
-    cfg.costUpfrontWCU = Number(Math.trunc((cfg.reservedWCU * 1.50) * 100) / 100);
-
-    cfg.baselineRCUNonTransactional = cfg.baselineReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU;
-    cfg.baselineRCUStronglyConsistent = cfg.baselineReads * cfg.readStronglyConsistent * cfg.perItemRRU;
-    cfg.baselineRCUTransactional = cfg.baselineReads * cfg.readTransactional * 2 * cfg.perItemRRU;
-    cfg.baselineRCUTotal = cfg.baselineRCUNonTransactional + cfg.baselineRCUStronglyConsistent + cfg.baselineRCUTransactional;
-    cfg.reservedRCU = cfg.baselineRCUTotal * (cfg.reserved / 100.0);
-    cfg.reservedRCU = Math.ceil(cfg.reservedRCU / 100.0) * 100;
-    cfg.baselineRCU = cfg.baselineRCUTotal - cfg.reservedRCU;
-    cfg.baselineRCU = Math.ceil(Math.max(cfg.baselineRCU, 0));
-    cfg.baselineRCUHours = Math.ceil(cfg.baselineRCU * cfg.baselineHoursReads);
-    cfg.peakRCUNonTransactional = cfg.peakReads * cfg.readEventuallyConsistent * 0.5 * cfg.perItemRRU;
-    cfg.peakRCUStronglyConsistent = cfg.peakReads * cfg.readStronglyConsistent * cfg.perItemRRU;
-    cfg.peakRCUTransactional = cfg.peakReads * cfg.readTransactional * 2 * cfg.perItemRRU;
-    cfg.peakRCUTotal = cfg.peakRCUNonTransactional + cfg.peakRCUStronglyConsistent + cfg.peakRCUTransactional;
-    cfg.peakRCU = cfg.peakRCUTotal - cfg.reservedRCU;
-    cfg.peakRCU = Math.ceil(Math.max(cfg.peakRCU, 0));
-    cfg.peakRCUHours = Math.ceil(cfg.peakRCU * cfg.peakHoursReads);
-    cfg.totalRCUHours = Math.ceil(cfg.baselineRCUHours + cfg.peakRCUHours);
-    cfg.costProvisionedRCU = cfg.totalRCUHours * (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
-    cfg.costReservedRCU = cfg.reservedRCU * cfg.pricePerRRCU * cfg.hoursPerMonth;
-    cfg.costMonthlyRCU = Number(Math.trunc((cfg.costProvisionedRCU + cfg.costReservedRCU) * 100) / 100);
-    cfg.costUpfrontRCU = Number(Math.trunc((cfg.reservedRCU * 0.3) * 100) / 100);
-
-    cfg.costProvisionedMonthly = cfg.costMonthlyWCU + cfg.costMonthlyRCU + cfg.costMonthlyReplicatedWCU;
-    cfg.costReservedUpfront = cfg.costUpfrontWCU + cfg.costUpfrontRCU;
+    cfg.costProvisionedMonthly = cfg._provisionedReadCost.monthlyCost + cfg._provisionedWriteCost.monthlyCost + cfg._replicatedProvisionedWriteCost.monthlyCost;
+    cfg.costReservedUpfront = cfg._provisionedReadCost.reservedUpfrontCost + cfg._provisionedWriteCost.reservedUpfrontCost;
     cfg.costProvisioned = cfg.costProvisionedMonthly + cfg.costReservedUpfront / 12;
 }
 
@@ -221,20 +262,20 @@ function logCosts() {
 
         logs.push(`Monthly read cost: ${Math.floor(cfg.costDemandMonthlyReads).toLocaleString()}`);
     } else {
-        logs.push(`Monthly write cost: ${Math.floor(cfg.costMonthlyWCU).toLocaleString()}`);
+        logs.push(`Monthly write cost: ${Math.floor(cfg._provisionedWriteCost.monthlyCost).toLocaleString()}`);
 
-        if (cfg.costMonthlyReplicatedWCU !== 0) {
-            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg.costMonthlyReplicatedWCU).toLocaleString()}`);
+        if (cfg._replicatedProvisionedWriteCost.monthlyCost !== 0) {
+            logs.push(`Monthly write cost (replicated): ${Math.floor(cfg._replicatedProvisionedWriteCost.monthlyCost).toLocaleString()}`);
         }
 
-        if (cfg.costUpfrontWCU !== 0) {
-            logs.push(`Upfront write cost: ${Math.floor(cfg.costUpfrontWCU).toLocaleString()}`);
+        if (cfg._provisionedWriteCost.totalReservedWCU !== 0) {
+            logs.push(`Upfront write cost: ${Math.floor(cfg._provisionedWriteCost.reservedUpfrontCost).toLocaleString()}`);
         }
 
-        logs.push(`Monthly read cost: ${Math.floor(cfg.costMonthlyRCU).toLocaleString()}`);
+        logs.push(`Monthly read cost: ${Math.floor(cfg._provisionedReadCost.monthlyCost).toLocaleString()}`);
 
-        if (cfg.costUpfrontRCU !== 0) {
-            logs.push(`Upfront read cost: ${Math.floor(cfg.costUpfrontRCU).toLocaleString()}`);
+        if (cfg._provisionedReadCost.totalReservedRCU !== 0) {
+            logs.push(`Upfront read cost: ${Math.floor(cfg._provisionedReadCost.reservedUpfrontCost).toLocaleString()}`);
         }
     }
 
