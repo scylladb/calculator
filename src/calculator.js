@@ -42,11 +42,14 @@ function getReservedValues() {
 }
 
 function getHoursValues() {
-    cfg.totalPeakHoursPerMonthReads = Number((cfg.peakDurationReads * 365 / 12).toFixed(1));
-    cfg.totalPeakHoursPerMonthWrites = Number((cfg.peakDurationWrites * 365 / 12).toFixed(1));
+    cfg.daysPerMonth = 365 / 12;
+    cfg.secondsPerDay = 24 * 60 * 60;
+    cfg.totalPeakHoursPerMonthReads = Number((cfg.peakDurationReads * cfg.daysPerMonth).toFixed(1));
+    cfg.totalPeakHoursPerMonthWrites = Number((cfg.peakDurationWrites * cfg.daysPerMonth).toFixed(1));
     cfg.totalBaseHoursPerMonthReads = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthReads;
     cfg.totalBaseHoursPerMonthWrites = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
-    cfg.reservedPercentage = parseInt(document.getElementById('reserved').value);
+    cfg.reservedPercentage = parseInt(document.getElementById('reserved').value) / 100.0;
+    cfg.unreservedPercentage = 1 - cfg.reservedPercentage;
 }
 
 export function calculateProvisionedReads() {
@@ -56,24 +59,29 @@ export function calculateProvisionedReads() {
 
     const totalPeakRCU = (cfg.peakReads * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) + (cfg.peakReads * cfg.readStronglyConsistent * cfg.itemRCU);
 
-    const totalReservedRCU = Math.ceil((totalBaseRCU * (cfg.reservedPercentage / 100.0)) / 100.0) * 100;
+    const totalReservedRCU = (cfg.workload === 'baselinePeak') ?
+        Math.ceil((totalBaseRCU * cfg.reservedPercentage) / 100.0) * 100 :
+        Math.ceil((cfg.totalReads / cfg.secondsPerDay * cfg.reservedPercentage) / 100.0) * 100;
+
+    const costReservedRCU = totalReservedRCU * cfg.pricePerReservedRCU * cfg.hoursPerMonth;
+    const costReservedUpfrontRCU = totalReservedRCU * 1.5;
 
     const unreservedBaseRCU = Math.ceil(Math.max(totalBaseRCU - totalReservedRCU, 0));
     const unreservedBaseHoursPerMonthRCU = unreservedBaseRCU * cfg.totalBaseHoursPerMonthReads;
     const unreservedPeakRCU = Math.ceil(Math.max(totalPeakRCU - totalReservedRCU, 0));
     const unreservedPeakHoursPerMonthRCU = unreservedPeakRCU * cfg.totalPeakHoursPerMonthReads;
 
-    const totalUnreservedPerMonthRCU = Math.ceil(unreservedBaseHoursPerMonthRCU + unreservedPeakHoursPerMonthRCU);
-    const costRCUProvisioned = totalUnreservedPerMonthRCU * costPerRCU;
+    const totalUnreservedPerMonthRCU = (cfg.workload === 'baselinePeak') ?
+        Math.ceil(unreservedBaseHoursPerMonthRCU + unreservedPeakHoursPerMonthRCU) :
+        Math.ceil(cfg.totalReads / cfg.secondsPerDay * cfg.unreservedPercentage * cfg.hoursPerMonth);
 
-    const reservedRCUCost = totalReservedRCU * cfg.pricePerReservedRCU * cfg.hoursPerMonth;
-    const upfrontReservedRCUCost = totalReservedRCU * 1.5;
+    const costUnreservedRCU = totalUnreservedPerMonthRCU * costPerRCU;
 
     cfg._provisionedReadCost = {
-        monthlyCost: Number(Math.trunc((costRCUProvisioned) * 100) / 100),
-        reservedMonthlyCost: Number(Math.trunc((reservedRCUCost) * 100) / 100),
-        reservedUpfrontCost: Number(Math.trunc((upfrontReservedRCUCost) * 100) / 100),
-        totalMonthly: Number(Math.trunc(((costRCUProvisioned + reservedRCUCost)) * 100) / 100)
+        monthlyCost: Number(Math.trunc((costUnreservedRCU) * 100) / 100),
+        reservedMonthlyCost: Number(Math.trunc((costReservedRCU) * 100) / 100),
+        reservedUpfrontCost: Number(Math.trunc((costReservedUpfrontRCU) * 100) / 100),
+        totalMonthly: Number(Math.trunc(((costUnreservedRCU + costReservedRCU)) * 100) / 100)
     };
 }
 
@@ -84,24 +92,29 @@ export function calculateProvisionedWrites() {
 
     const totalPeakWCU = cfg.peakWrites * cfg.itemWCU;
 
-    const totalReservedWCU = Math.ceil((totalBaseWCU * (cfg.reservedPercentage / 100.0)) / 100.0) * 100;
+    const totalReservedWCU = (cfg.workload === 'baselinePeak') ?
+        Math.ceil((totalBaseWCU * cfg.reservedPercentage) / 100.0) * 100 :
+        Math.ceil((cfg.totalWrites  / cfg.secondsPerDay * cfg.reservedPercentage) / 100.0) * 100;
+
+    const costReservedWCU = totalReservedWCU * cfg.pricePerReservedWCU * cfg.hoursPerMonth;
+    const costReservedUpfrontWCU = totalReservedWCU * 1.5;
 
     const unreservedBaseWCU = Math.ceil(Math.max(totalBaseWCU - totalReservedWCU, 0));
     const unreservedBaseHoursPerMonthWCU = unreservedBaseWCU * cfg.totalBaseHoursPerMonthWrites;
     const unreservedPeakWCU = Math.ceil(Math.max(totalPeakWCU - totalReservedWCU, 0));
     const unreservedPeakHoursPerMonthWCU = unreservedPeakWCU * cfg.totalPeakHoursPerMonthWrites;
 
-    const totalUnreservedHoursPerMonthWCU = Math.ceil(unreservedBaseHoursPerMonthWCU + unreservedPeakHoursPerMonthWCU);
-    const costWCUProvisioned = totalUnreservedHoursPerMonthWCU * costPerWCU;
+    const totalUnreservedHoursPerMonthWCU = (cfg.workload === 'baselinePeak') ?
+        Math.ceil(unreservedBaseHoursPerMonthWCU + unreservedPeakHoursPerMonthWCU) :
+        Math.ceil(cfg.totalWrites / cfg.secondsPerDay * cfg.unreservedPercentage * cfg.hoursPerMonth);
 
-    const reservedWCUCost = totalReservedWCU * cfg.pricePerReservedWCU * cfg.hoursPerMonth;
-    const upfrontReservedWCUCost = totalReservedWCU * 1.5;
+    const costUnreservedWCU = totalUnreservedHoursPerMonthWCU * costPerWCU;
 
     cfg._provisionedWriteCost = {
-        monthlyCost: Number(Math.trunc((costWCUProvisioned) * 100) / 100),
-        reservedMonthlyCost: Number(Math.trunc((reservedWCUCost) * 100) / 100),
-        reservedUpfrontCost: Number(Math.trunc((upfrontReservedWCUCost) * 100) / 100),
-        totalMonthly: Number(Math.trunc(((costWCUProvisioned + reservedWCUCost)) * 100) / 100)
+        monthlyCost: Number(Math.trunc((costUnreservedWCU) * 100) / 100),
+        reservedMonthlyCost: Number(Math.trunc((costReservedWCU) * 100) / 100),
+        reservedUpfrontCost: Number(Math.trunc((costReservedUpfrontWCU) * 100) / 100),
+        totalMonthly: Number(Math.trunc(((costUnreservedWCU + costReservedWCU)) * 100) / 100)
     };
 }
 
@@ -111,7 +124,9 @@ export function calculateReplicatedProvisionedWrites() {
     const totalBaseWCU = cfg.baselineWrites * cfg.itemWCU;
     const totalPeakWCU = cfg.peakWrites * cfg.itemWCU;
 
-    const totalReplicatedWCU = (cfg.regions - 1) * (totalBaseWCU + totalPeakWCU);
+    const totalReplicatedWCU = (cfg.workload === 'baselinePeak') ?
+        (cfg.regions - 1) * (totalBaseWCU + totalPeakWCU) :
+        (cfg.regions - 1) * (cfg.totalWrites / cfg.secondsPerDay);
 
     cfg._replicatedProvisionedWriteCost = {
         monthlyCost: Number(Math.trunc((totalReplicatedWCU * costPerWCU) * 100) / 100)
@@ -138,7 +153,8 @@ export function calculateDemandReads() {
     const totalPeakPerMonthRRU = totalPeakRRU * 3600 * cfg.totalPeakHoursPerMonthReads;
     const totalPerMonthRRU = (cfg.workload === 'baselinePeak') ?
         Math.ceil(totalBasePerMonthRRU + totalPeakPerMonthRRU) :
-        Math.ceil(cfg.totalReads);
+        Math.ceil(cfg.totalReads * cfg.daysPerMonth);
+
     const costRRU = totalPerMonthRRU * costPerRRU;
 
     cfg._demandReadCost = {
@@ -156,7 +172,8 @@ export function calculateDemandWrites() {
     const totalPeakPerMonthWRU = totalPeakWRU * 3600 * cfg.totalPeakHoursPerMonthWrites;
     const totalPerMonthWRU = (cfg.workload === 'baselinePeak') ?
         Math.ceil(totalBasePerMonthWRU + totalPeakPerMonthWRU) :
-        Math.ceil(cfg.totalWrites);
+        Math.ceil(cfg.totalWrites * cfg.daysPerMonth);
+
     const costWRU = totalPerMonthWRU * costPerWRU;
 
     cfg._demandWriteCost = {
@@ -175,7 +192,7 @@ export function calculateDemandReplicatedWrites() {
 
     const totalReplicatedPerMonthWRU = (cfg.workload === 'baselinePeak') ?
         (cfg.regions - 1) * (totalBaseReplicatedHoursPerMonthWRU + totalPeakReplicatedHoursPerMonthWRU) :
-        (cfg.regions - 1) * cfg.totalWrites;
+        (cfg.regions - 1) * cfg.totalWrites * cfg.daysPerMonth;
 
     const costReplicatedWRU = totalReplicatedPerMonthWRU * costPerWRU;
 
