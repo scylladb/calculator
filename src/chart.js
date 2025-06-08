@@ -1,5 +1,7 @@
 import {cfg} from './config.js';
-import {formatNumber} from "./utils.js";
+import {formatNumber, updateAll} from "./utils.js";
+import {updateCosts} from "./calculator.js";
+import {calculateTotalOps} from "./app.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
@@ -36,7 +38,7 @@ export function updateChart() {
         chart.data.datasets[0].pointHitRadius = 25;
         chart.data.datasets[0].data = cfg.seriesReads;
         chart.data.datasets[1].pointHitRadius = 25;
-        chart.data.datasets[1].data = cfg.seriesWrites.map(d => ({x: d.x, y: d.y * 1.25}));
+        chart.data.datasets[1].data = cfg.seriesWrites;
         yMax = Math.max(
             ...cfg.seriesReads.map(p => p.y),
             ...cfg.seriesWrites.map(p => p.y)
@@ -108,6 +110,8 @@ export const chart = new Chart(ctx, {
                         e.target.style.cursor = "grabbing";
                 },
                 onDragEnd: function (e) {
+                    calculateTotalOps();
+                    updateCosts();
                     if (e.target?.style)
                         e.target.style.cursor = "default";
                 },
@@ -147,10 +151,10 @@ export const chart = new Chart(ctx, {
                 min: 1000,
                 max: (cfg.peakReads + cfg.peakWrites) * 2,
                 ticks: {
-                    color: '#616D87', // Tick text color
+                    color: '#616D87',
                     font: {
                         size: 13,
-                        weight: 'normal' // Font weight (normal, bold, etc.)
+                        weight: 'normal'
                     },
                     padding: 5,
                     callback: function (value, index, values) {

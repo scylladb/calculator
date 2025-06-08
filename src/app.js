@@ -43,6 +43,19 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
+export function calculateTotalOps() {
+    // calculate total ops
+    cfg.totalReads = 0;
+    cfg.totalWrites = 0;
+    // sum up all series data for both reads and writes
+    for (const point of cfg.seriesReads) {
+        cfg.totalReads += (point.y * 3600);
+    }
+    for (const point of cfg.seriesWrites) {
+        cfg.totalWrites += (point.y * 3600);
+    }
+}
+
 export function applyWorkload(workload) {
     const base = 100000;
     chart.options.scales.y.max = 1_000_000;
@@ -105,23 +118,14 @@ export function applyWorkload(workload) {
         }
 
         seriesReads.push({x: i, y: actual});
-        seriesWrites.push({x: i, y: actual * 1.2});
+        seriesWrites.push({x: i, y: actual * 0.7});
     }
 
     cfg.seriesReads = seriesReads;
     cfg.seriesWrites = seriesWrites;
     cfg.workload = workload;
 
-    // calculate total ops
-    cfg.totalReads = 0;
-    cfg.totalWrites = 0;
-    // sum up all series data for both reads and writes
-    for (const point of cfg.seriesReads) {
-        cfg.totalReads += (point.y * 3600);
-    }
-    for (const point of cfg.seriesWrites) {
-        cfg.totalWrites += (point.y * 3600);
-    }
+    calculateTotalOps();
 
     const opsParams = document.getElementById('opsParams');
     const totalOpsParams = document.getElementById('totalOpsParams');
