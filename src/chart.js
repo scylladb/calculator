@@ -91,7 +91,7 @@ export const chart = new Chart(ctx, {
                 display: true,
                 callbacks: {
                     label: function (context) {
-                        return context.dataset.label +  ': ' + formatNumber(context.raw) + ' ops/sec';
+                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
                     }
                 },
             },
