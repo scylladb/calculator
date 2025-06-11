@@ -74,6 +74,29 @@ export function encodeSeriesData() {
     cfg.seriesWritesEncoded = cfg.seriesWrites.map(p => Math.round(p.y / 1000)).join(".");
 }
 
+// Helper to update display and input fields
+function updateOpsDisplays(reads, writes) {
+    document.getElementById('totalReadsDsp').innerText = formatNumber(reads);
+    document.getElementById('totalWritesDsp').innerText = formatNumber(writes);
+    document.getElementById('totalReadsInp').value = reads;
+    document.getElementById('totalWritesInp').value = writes;
+    document.getElementById('totalReads').innerText = formatNumber(reads);
+    document.getElementById('totalWrites').innerText = formatNumber(writes);
+}
+
+// Helper to show/hide ops params
+function toggleOpsParams(workload) {
+    const opsParams = document.getElementById('opsParams');
+    const totalOpsParams = document.getElementById('totalOpsParams');
+    if (workload === "baselinePeak") {
+        opsParams.style.display = 'block';
+        totalOpsParams.style.display = 'none';
+    } else {
+        opsParams.style.display = 'none';
+        totalOpsParams.style.display = 'block';
+    }
+}
+
 export function updateWorkload(workload) {
     const base = 100000;
     const seriesReads = [];
@@ -81,7 +104,6 @@ export function updateWorkload(workload) {
 
     for (let i = 0; i < 24; i++) {
         let value = base;
-
         switch (workload) {
             case "dailyPeak":
                 value = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
@@ -135,7 +157,6 @@ export function updateWorkload(workload) {
                     150000, 130000
                 ][i];
         }
-
         seriesReads.push({x: i, y: value});
         seriesWrites.push({x: i, y: value * 0.7});
     }
@@ -147,38 +168,12 @@ export function updateWorkload(workload) {
         cfg.seriesWrites = seriesWrites;
         encodeSeriesData();
     }
-
     cfg.workload = workload;
-
     updateTotalOps();
-
-    const opsParams = document.getElementById('opsParams');
-    const totalOpsParams = document.getElementById('totalOpsParams');
-    const totalReadsDsp = document.getElementById('totalReadsDsp');
-    const totalWritesDsp = document.getElementById('totalWritesDsp');
-    const totalReadsInp = document.getElementById('totalReadsInp');
-    const totalWritesInp = document.getElementById('totalWritesInp');
-    const totalReads = document.getElementById('totalReads');
-    const totalWrites = document.getElementById('totalWrites');
-
-    totalReadsDsp.innerText = formatNumber(cfg.totalReads);
-    totalWritesDsp.innerText = formatNumber(cfg.totalWrites);
-    totalReadsInp.value = cfg.totalReads;
-    totalWritesInp.value = cfg.totalWrites;
-    totalReads.innerText = formatNumber(cfg.totalReads);
-    totalWrites.innerText = formatNumber(cfg.totalWrites);
-
-    if (workload === "baselinePeak") {
-        opsParams.style.display = 'block';
-        totalOpsParams.style.display = 'none';
-    } else {
-        opsParams.style.display = 'none';
-        totalOpsParams.style.display = 'block';
-    }
-
+    updateOpsDisplays(cfg.totalReads, cfg.totalWrites);
+    toggleOpsParams(workload);
     chart.data.datasets[0].data = [...cfg.seriesReads];
     chart.data.datasets[1].data = [...cfg.seriesWrites];
-
     chart.update();
 }
 
