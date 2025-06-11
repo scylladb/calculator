@@ -228,60 +228,49 @@
                 </div>
               </div>
 
-              <div id="totalOpsParams" class="vstack gap-3"  style="display: none;">
-                  <div class="row-sm">
-                    <div class="col vstack gap-3">
-                      <h4 class="reads">Total Reads</h4>
-                      <div class="range-group">
-                        <div class="range-group-top">
-                          <label for="totalReads">Total:</label>
-                          <div class="inline-input">
-                            <div class="value">
-                              <input type="text" id="totalReadsInp">
-                              <span id="totalReadsDsp">500K</span>
-                            </div>
-                            <div class="units">
-                              ops/day
-                            </div>
+              <div id="totalOpsParams" class="vstack gap-3" style="display: none;">
+                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <h4 class="reads">Total Reads</h4>
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="totalReads">Total:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="totalReadsInp">
+                            <span id="totalReadsDsp">500K</span>
                           </div>
-                          <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the total sum of read operations per day that your
-                            workload
-                            needs
-                            during a 24h period.</span>
-                        </span>
+                          <div class="units">ops/day</div>
                         </div>
-                        <input type="range" id="totalReads" min="1000" max="100000000000" step="1000" value="10000000000">
-                      </div>
-                    </div>
-                    <div class="col vstack gap-3">
-                      <h4 class="writes">Total Writes</h4>
-
-                      <div class="range-group">
-                        <div class="range-group-top">
-                          <label for="totalWrites">Total:</label>
-                          <div class="inline-input">
-                            <div class="value">
-                              <input type="text" id="totalWritesInp">
-                              <span id="totalWritesDsp">500K</span>
-                            </div>
-                            <div class="units">
-                              ops/day
-                            </div>
-                          </div>
-                          <span class="info-icon">
+                        <span class="info-icon">
                           <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the total sum of write operations per day that your
-                            workload
-                            needs
-                            during a 24h period.</span>
+                          <span class="tooltip-text">Enter the total sum of read operations per day that your workload needs during a 24h period.</span>
                         </span>
-                        </div>
-                        <input type="range" id="totalWrites" min="1000" max="100000000000" step="1000" value="10000000000">
                       </div>
+                      <input type="range" id="totalReads" min="1000" max="100000000000" step="1000" value="10000000000">
                     </div>
                   </div>
+                  <div class="col vstack gap-3">
+                    <h4 class="writes">Total Writes</h4>
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="totalWrites">Total:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="totalWritesInp">
+                            <span id="totalWritesDsp">500K</span>
+                          </div>
+                          <div class="units">ops/day</div>
+                        </div>
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the total sum of write operations per day that your workload needs during a 24h period.</span>
+                        </span>
+                      </div>
+                      <input type="range" id="totalWrites" min="1000" max="100000000000" step="1000" value="10000000000">
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div id="provisionedParams" style="display: none;">
