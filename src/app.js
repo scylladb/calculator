@@ -151,9 +151,6 @@ export function applyWorkload(workload) {
 
     cfg.workload = workload;
 
-    const maxY = Math.max(...seriesReads.map(p => p.y), ...seriesWrites.map(p => p.y));
-    chart.options.scales.y.max = Math.ceil(maxY * 1.1 / 10000) * 10000;
-
     updateTotalOps();
 
     const opsParams = document.getElementById('opsParams');
@@ -183,6 +180,11 @@ export function applyWorkload(workload) {
     chart.update();
 }
 
+export function updateChartScale() {
+    const maxY = Math.max(...cfg.seriesReads.map(p => p.y), ...cfg.seriesWrites.map(p => p.y));
+    chart.options.scales.y.max = Math.ceil(maxY * 1.25 / 10000) * 10000;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const tabLabels = document.querySelectorAll('.tab-label');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -209,7 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
 document.getElementById("workloadSelect").addEventListener('change', function () {
     cfg.workload = this.value;
     applyWorkload(this.value);
-    updateAll();
 });
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
