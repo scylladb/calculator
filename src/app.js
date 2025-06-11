@@ -12,7 +12,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         cfg.override = true;
     });
 
-    input.addEventListener('mouseover', function (event) {
+    input.addEventListener('mouseover', function () {
         input.value = parseInt(slider.value.toString());
     });
 
