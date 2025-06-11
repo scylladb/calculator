@@ -80,55 +80,55 @@ export function updateWorkload(workload) {
     const seriesWrites = [];
 
     for (let i = 0; i < 24; i++) {
-        let actual = base;
+        let value = base;
 
         switch (workload) {
             case "dailyPeak":
-                actual = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                value = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
                 break;
             case "twiceDaily":
-                actual = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                value = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
                 break;
             case "batch":
-                actual = (i >= 0 && i <= 3) ? base * 6 : base;
+                value = (i >= 0 && i <= 3) ? base * 6 : base;
                 break;
             case "sawtooth":
-                actual = base + (i % 6) * base * 0.5;
+                value = base + (i % 6) * base * 0.5;
                 break;
             case "bursty":
-                actual = (Math.random() < 0.3) ? base * (5 + Math.random() * 5) : base;
+                value = (Math.random() < 0.3) ? base * (5 + Math.random() * 5) : base;
                 break;
             case "rampUp":
-                actual = base + (i * (base * 9 / 23));
+                value = base + (i * (base * 9 / 23));
                 break;
             case "rampDown":
-                actual = base * (1 - i / 24);
+                value = base * (1 - i / 24);
                 break;
             case "flatline":
-                actual = base;
+                value = base;
                 break;
             case "sinusoidal":
-                actual = base + base * Math.sin((i / 12) * 2 * Math.PI);
+                value = base + base * Math.sin((i / 12) * 2 * Math.PI);
                 break;
             case "diurnal":
-                actual = 400000 + Math.cos((i - 12) * Math.PI / 12) * 400000 * 0.9;
+                value = 400000 + Math.cos((i - 12) * Math.PI / 12) * 400000 * 0.9;
                 break;
             case "nocturnal":
-                actual = 400000 + Math.cos((i) * Math.PI / 12) * 400000 * 0.9;
+                value = 400000 + Math.cos((i) * Math.PI / 12) * 400000 * 0.9;
                 break;
             case "mountain":
-                actual = base + Math.max(0, (12 - Math.abs(i - 12)) * (base / 2));
+                value = base + Math.max(0, (12 - Math.abs(i - 12)) * (base / 2));
                 break;
             case "valley":
-                actual = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
+                value = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
                 break;
             case "chaos":
-                actual = base * (0.5 + Math.random() * 5);
+                value = base * (0.5 + Math.random() * 5);
                 break;
             case "custom":
                 break;
             default:
-                actual = [
+                value = [
                     150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
                     450000, 550000, 400000, 350000, 330000, 310000, 300000,
                     320000, 350000, 370000, 330000, 250000, 200000, 170000,
@@ -136,12 +136,11 @@ export function updateWorkload(workload) {
                 ][i];
         }
 
-        seriesReads.push({x: i, y: actual});
-        seriesWrites.push({x: i, y: actual * 0.7});
+        seriesReads.push({x: i, y: value});
+        seriesWrites.push({x: i, y: value * 0.7});
     }
 
     if (workload === "custom") {
-        // Do not overwrite series, just decode existing encoded values
         updateSeriesData();
     } else {
         cfg.seriesReads = seriesReads;
