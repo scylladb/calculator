@@ -56,19 +56,26 @@ export function updateTotalOps() {
     }
 }
 
-// TODO: not working yet
 export function updateSeriesData() {
-    console.log("Updating series data...");
-    console.log("Series Reads:", cfg.seriesReadsEncoded);
-    // cfg.seriesReads = cfg.seriesReadsEncoded.split('.').map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
-    // cfg.seriesReadsEncoded = chart.data.datasets[0].data.map(p => Math.round(p.y / 1000)).join(".");
-    // cfg.seriesReadsEncoded = cfg.seriesReads.data.map(p => Math.round(p.y / 1000)).join(".");
-    // cfg.seriesWritesEncoded = chart.data.datasets[1].data.map(p => Math.round(p.y / 1000)).join(".");
+    // Only proceed if both encoded strings exist and are non-empty
+    if (!cfg.seriesReadsEncoded?.length || !cfg.seriesWritesEncoded?.length) return;
+
+    cfg.seriesReads = cfg.seriesReadsEncoded
+        .split('.')
+        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+
+    cfg.seriesWrites = cfg.seriesWritesEncoded
+        .split('.')
+        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+}
+
+export function encodeSeriesData() {
+    cfg.seriesReadsEncoded = cfg.seriesReads.map(p => Math.round(p.y / 1000)).join(".");
+    cfg.seriesWritesEncoded = cfg.seriesWrites.map(p => Math.round(p.y / 1000)).join(".");
 }
 
 export function applyWorkload(workload) {
     const base = 100000;
-    chart.options.scales.y.max = 1_000_000;
     const seriesReads = [];
     const seriesWrites = [];
 
@@ -134,17 +141,18 @@ export function applyWorkload(workload) {
     }
 
     if (workload === "custom") {
-        console.log("Custom workload detected, using encoded series data.");
-        cfg.seriesReads = cfg.seriesReadsEncoded.split('.').map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
-        cfg.seriesWrites = cfg.seriesWritesEncoded.split('.').map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        // Do not overwrite series, just decode existing encoded values
+        updateSeriesData();
     } else {
         cfg.seriesReads = seriesReads;
-        cfg.seriesReadsEncoded = seriesReads.map(p => Math.round(p.y / 1000)).join(".");
         cfg.seriesWrites = seriesWrites;
-        cfg.seriesWritesEncoded = seriesWrites.map(p => Math.round(p.y / 1000)).join(".");
+        encodeSeriesData();
     }
 
     cfg.workload = workload;
+
+    const maxY = Math.max(...seriesReads.map(p => p.y), ...seriesWrites.map(p => p.y));
+    chart.options.scales.y.max = Math.ceil(maxY * 1.1 / 10000) * 10000;
 
     updateTotalOps();
 
@@ -305,6 +313,7 @@ document.getElementById('totalReads').addEventListener('input', (event) => {
         });
 
         cfg.totalReads = newTotal;
+        encodeSeriesData();
         document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
         updateAll();
     }
@@ -325,6 +334,7 @@ document.getElementById('totalWrites').addEventListener('input', (event) => {
         });
 
         cfg.totalWrites = newTotal;
+        encodeSeriesData();
         document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
         updateAll();
     }
@@ -425,6 +435,16 @@ setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
 getQueryParams();
+
+const select = document.getElementById("workloadSelect");
+if ([...select.options].some(opt => opt.value === cfg.workload)) {
+    select.value = cfg.workload;
+    select.dispatchEvent(new Event("change"));
+} else {
+    // fallback if cfg.workload isn't valid
+    select.value = "baselinePeak";
+    select.dispatchEvent(new Event("change"));
+}
 
 if (cfg.pricing === 'demand') {
     document.querySelector('input[name="pricing"][value="demand"]').checked = true;
