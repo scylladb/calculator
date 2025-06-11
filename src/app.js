@@ -439,12 +439,14 @@ getQueryParams();
 const select = document.getElementById("workloadSelect");
 if ([...select.options].some(opt => opt.value === cfg.workload)) {
     select.value = cfg.workload;
-    select.dispatchEvent(new Event("change"));
+    applyWorkload(cfg.workload);
 } else {
     // fallback if cfg.workload isn't valid
     select.value = "baselinePeak";
-    select.dispatchEvent(new Event("change"));
+    applyWorkload("baselinePeak");
 }
+
+updateAll();
 
 if (cfg.pricing === 'demand') {
     document.querySelector('input[name="pricing"][value="demand"]').checked = true;
@@ -512,5 +514,3 @@ document.getElementById("saveCsvBtn").addEventListener("click", function () {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 });
-
-updateAll();
