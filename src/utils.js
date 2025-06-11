@@ -3,6 +3,7 @@ import {updateCosts} from "./calculator.js";
 import {updateChart} from "./chart.js";
 import {updateSeriesData, updateTotalOps, encodeSeriesData, updateChartScale} from "./app.js";
 
+// Format a number with suffixes (K, M, B)
 export function formatNumber(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(0) + 'B';
     if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
@@ -12,6 +13,7 @@ export function formatNumber(num) {
     return num.toString();
 }
 
+// Format bytes with appropriate units
 export function formatBytes(bytes) {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
     if (bytes === 0) return '0 B';
@@ -19,27 +21,35 @@ export function formatBytes(bytes) {
     return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
 }
 
+// Helper to parse and assign a param if present
+function assignParam(param, parser = v => v) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get(param) !== null) {
+        cfg[param] = parser(params.get(param));
+    }
+}
+
+// Parse query params and update cfg accordingly
 export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
 
-    if (params.get('workload')) cfg.workload = params.get('workload');
-    if (params.get('baselineReads')) cfg.baselineReads = parseInt(params.get('baselineReads'));
-    if (params.get('baselineWrites')) cfg.baselineWrites = parseInt(params.get('baselineWrites'));
-    if (params.get('peakReads')) cfg.peakReads = parseInt(params.get('peakReads'));
-    if (params.get('peakWrites')) cfg.peakWrites = parseInt(params.get('peakWrites'));
-    if (params.get('peakDurationReads')) cfg.peakDurationReads = parseFloat(params.get('peakDurationReads'));
-    if (params.get('peakDurationWrites')) cfg.peakDurationWrites = parseFloat(params.get('peakDurationWrites'));
-    if (params.get('totalReads')) cfg.totalReads = parseInt(params.get('totalReads'));
-    if (params.get('totalWrites')) cfg.totalWrites = parseInt(params.get('totalWrites'));
-    if (params.get('storageGB')) cfg.storageGB = parseInt(params.get('storageGB'));
-    if (params.get('itemSizeB')) cfg.itemSizeB = parseInt(params.get('itemSizeB'));
-    if (params.get('pricing')) cfg.pricing = params.get('pricing');
-    if (params.get('regions')) cfg.regions = parseInt(params.get('regions'));
-    if (params.get('cacheSizeGB')) cfg.cacheSizeGB = parseInt(params.get('cacheSizeGB'));
-    if (params.get('cacheRatio')) cfg.cacheRatio = parseInt(params.get('cacheRatio'));
-    if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
-    if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
-    if (params.get('workload')) cfg.workload = params.get('workload');
+    assignParam('workload');
+    assignParam('baselineReads', parseInt);
+    assignParam('baselineWrites', parseInt);
+    assignParam('peakReads', parseInt);
+    assignParam('peakWrites', parseInt);
+    assignParam('peakDurationReads', parseFloat);
+    assignParam('peakDurationWrites', parseFloat);
+    assignParam('totalReads', parseInt);
+    assignParam('totalWrites', parseInt);
+    assignParam('storageGB', parseInt);
+    assignParam('itemSizeB', parseInt);
+    assignParam('pricing');
+    assignParam('regions', parseInt);
+    assignParam('cacheSizeGB', parseInt);
+    assignParam('cacheRatio', parseInt);
+    assignParam('reserved', parseInt);
+    assignParam('readConst', parseInt);
 
     if (cfg.workload === 'custom') {
         cfg.seriesReadsEncoded = params.get('seriesReads') || '';
@@ -71,55 +81,65 @@ export function getQueryParams() {
 
 let debounceTimeout;
 
+// Update the URL query params to reflect current cfg
 export function updateQueryParams() {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
         const params = new URLSearchParams(window.location.search);
 
-        params.set('pricing', cfg.pricing);
-        params.set('storageGB', cfg.storageGB.toString());
-        params.set('itemSizeB', cfg.itemSizeB.toString());
-        params.set('tableClass', cfg.tableClass);
-        params.set('baselineReads', cfg.baselineReads.toString());
-        params.set('baselineWrites', cfg.baselineWrites.toString());
-        params.set('peakReads', cfg.peakReads.toString());
-        params.set('peakWrites', cfg.peakWrites.toString());
-        params.set('peakDurationReads', cfg.peakDurationReads.toString());
-        params.set('peakDurationWrites', cfg.peakDurationWrites.toString());
-        params.set('totalReads', cfg.totalReads.toString());
-        params.set('totalWrites', cfg.totalWrites.toString());
-        params.set('reserved', cfg.reserved.toString());
-        params.set('readConst', cfg.readConst.toString());
-        params.set('seriesReads', cfg.seriesReadsEncoded.toString());
-        params.set('seriesWrites', cfg.seriesWritesEncoded.toString());
-        params.set('workload', cfg.workload.toString());
+        const setOrDelete = (key, value, defaultValue = undefined) => {
+            if (defaultValue !== undefined && value === defaultValue) {
+                params.delete(key);
+            } else {
+                params.set(key, value.toString());
+            }
+        };
+
+        setOrDelete('pricing', cfg.pricing);
+        setOrDelete('storageGB', cfg.storageGB);
+        setOrDelete('itemSizeB', cfg.itemSizeB);
+        setOrDelete('tableClass', cfg.tableClass);
+        setOrDelete('baselineReads', cfg.baselineReads);
+        setOrDelete('baselineWrites', cfg.baselineWrites);
+        setOrDelete('peakReads', cfg.peakReads);
+        setOrDelete('peakWrites', cfg.peakWrites);
+        setOrDelete('peakDurationReads', cfg.peakDurationReads);
+        setOrDelete('peakDurationWrites', cfg.peakDurationWrites);
+        setOrDelete('totalReads', cfg.totalReads);
+        setOrDelete('totalWrites', cfg.totalWrites);
+        setOrDelete('reserved', cfg.reserved);
+        setOrDelete('readConst', cfg.readConst);
+        setOrDelete('seriesReads', cfg.seriesReadsEncoded);
+        setOrDelete('seriesWrites', cfg.seriesWritesEncoded);
+        setOrDelete('workload', cfg.workload);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
             params.delete('cacheRatio');
         } else {
-            params.set('cacheSizeGB', cfg.cacheSizeGB.toString());
-            params.set('cacheRatio', cfg.cacheRatio.toString());
+            setOrDelete('cacheSizeGB', cfg.cacheSizeGB);
+            setOrDelete('cacheRatio', cfg.cacheRatio);
         }
 
         if (cfg.daxNodes === 0) {
             params.delete('daxNodes');
             params.delete('daxInstanceClass');
         } else {
-            params.set('daxNodes', cfg.daxNodes.toString());
-            params.set('daxInstanceClass', cfg.daxInstanceClass);
+            setOrDelete('daxNodes', cfg.daxNodes);
+            setOrDelete('daxInstanceClass', cfg.daxInstanceClass);
         }
 
         if (cfg.regions === 1) {
             params.delete('regions');
         } else {
-            params.set('regions', cfg.regions.toString());
+            setOrDelete('regions', cfg.regions);
         }
 
         window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
     }, 1000);
 }
 
+// Update all UI and calculations
 export function updateAll() {
     if (cfg.workload === "custom") {
         encodeSeriesData();
@@ -133,6 +153,7 @@ export function updateAll() {
     updateCosts();
 }
 
+// Update the displayed costs in the DOM
 export function updateDisplayedCosts(logs) {
     const costs = document.getElementById('costs');
     costs.innerHTML = logs.map(log => {
@@ -152,12 +173,12 @@ export function updateDisplayedCosts(logs) {
     }).join('');
 }
 
-// Share button selector
+// --- Share and Copy Link Logic ---
+
 const shareButton = document.getElementById('shareBtn');
 const copyLinkButton = document.getElementById('copyLinkBtn');
 const resultPara = document.querySelector('.result');
 
-// Function to build the shareable URL with query parameters
 function buildShareableURL() {
     const currentURL = new URL(window.location.href);
     const params = new URLSearchParams(window.location.search);
@@ -165,43 +186,33 @@ function buildShareableURL() {
     return currentURL.toString();
 }
 
-// Data to share
 const shareData = {
     title: 'ScyllaDB | DynamoDB Workload Calculator',
     text: 'Check out this DynamoDB workload calculator powered by ScyllaDB!',
     url: buildShareableURL(),
 };
 
-// Share button event listener
 shareButton.addEventListener('click', async () => {
+    if (!navigator.share) {
+        resultPara.textContent = 'Web Share API is not supported in your browser.';
+        return;
+    }
     try {
-        if (navigator.share) {
-            // Web Share API is supported
-            await navigator.share(shareData);
-            resultPara.textContent = 'Calculator shared successfully';
-        } else {
-            resultPara.textContent = 'Web Share API is not supported in your browser.';
-        }
+        await navigator.share(shareData);
+        resultPara.textContent = 'Calculator shared successfully';
     } catch (err) {
         console.log('Error sharing: ' + err.message);
     }
 });
 
-// Copy link event listener
 copyLinkButton.addEventListener('click', () => {
     const url = buildShareableURL();
     navigator.clipboard.writeText(url)
         .then(() => {
-            // Get the icon element
             const icon = copyLinkButton.querySelector('i');
-            // Store the original classes
             const originalClasses = [...icon.classList];
-
-            // Temporarily switch icon while keeping existing classes
             icon.classList.remove('icon-copy');
             icon.classList.add('icon-check-circle-outline');
-
-            // Revert icon after 2 seconds
             setTimeout(() => {
                 icon.classList.remove('icon-check-circle-outline');
                 icon.classList.add(...originalClasses);
