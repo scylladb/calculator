@@ -177,6 +177,9 @@ export function applyWorkload(workload) {
         totalOpsParams.style.display = 'block';
     }
 
+    chart.data.datasets[0].data = [...cfg.seriesReads];
+    chart.data.datasets[1].data = [...cfg.seriesWrites];
+
     chart.update();
 }
 
@@ -492,26 +495,31 @@ document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
-document.getElementById("saveCsvBtn").addEventListener("click", function () {
-    const labels = chart.data.labels;
-    const datasets = chart.data.datasets;
-    const workload = document.getElementById("workloadSelect").value || "workload";
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("saveCsvBtn").addEventListener("click", function () {
+        if (!chart?.data?.datasets?.length) {
+            console.warn("Chart or datasets not available");
+            return;
+        }
 
-    let csv = "Hour,Actual ops/sec,Planned ops/sec\n";
-    for (let i = 0; i < labels.length; i++) {
-        const hour = labels[i];
-        const actual = (datasets[0].data[i]?.y).toFixed(0);
-        const planned = (datasets[1].data[i]?.y).toFixed(0);
-        csv += `${hour},${actual},${planned}\n`;
-    }
+        let csv = "Hour,Reads ops/sec,Writes ops/sec\n";
+        const datasets = chart.data.datasets;
 
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${workload}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+        for (let i = 0; i < datasets[0].data.length; i++) {
+            const hour = datasets[0].data[i].x;
+            const reads = datasets[0].data[i].y.toFixed(0);
+            const writes = datasets[1].data[i].y.toFixed(0);
+            csv += `${hour},${reads},${writes}\n`;
+        }
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${cfg.workload || "workload"}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
 });
