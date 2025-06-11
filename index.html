@@ -46,7 +46,7 @@
         <div class="col vstack gap-4">
           <canvas id="chart" width="800" height="400"></canvas>
           <select id="workloadSelect">
-            <option value="baselinePeak">Baseline + Peak</option>
+            <option value="baselinePeak">Baseline + Peak (Default)</option>
             <option value="businessHours">Business Hours</option>
             <option value="dailyPeak">Unimodal (Daily Peak)</option>
             <option value="twiceDaily">Bimodal (Twice Daily Peak)</option>
@@ -59,7 +59,7 @@
           <div id="costParams">
             <div class="radio-container">
               <label>
-                <input type="radio" name="pricing" value="demand" checked> Demand
+                <input type="radio" name="pricing" value="demand" checked> On-Demand
               </label>
               <label>
                 <input type="radio" name="pricing" value="provisioned"> Provisioned
