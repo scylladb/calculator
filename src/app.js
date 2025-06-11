@@ -74,7 +74,7 @@ export function encodeSeriesData() {
     cfg.seriesWritesEncoded = cfg.seriesWrites.map(p => Math.round(p.y / 1000)).join(".");
 }
 
-export function applyWorkload(workload) {
+export function updateWorkload(workload) {
     const base = 100000;
     const seriesReads = [];
     const seriesWrites = [];
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.getElementById("workloadSelect").addEventListener('change', function () {
     cfg.workload = this.value;
-    applyWorkload(this.value);
+    updateWorkload(this.value);
 });
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
@@ -443,11 +443,11 @@ getQueryParams();
 const select = document.getElementById("workloadSelect");
 if ([...select.options].some(opt => opt.value === cfg.workload)) {
     select.value = cfg.workload;
-    applyWorkload(cfg.workload);
+    updateWorkload(cfg.workload);
 } else {
     // fallback if cfg.workload isn't valid
     select.value = "baselinePeak";
-    applyWorkload("baselinePeak");
+    updateWorkload("baselinePeak");
 }
 
 updateAll();
