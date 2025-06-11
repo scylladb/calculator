@@ -214,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.getElementById("workloadSelect").addEventListener('change', function () {
     cfg.workload = this.value;
     updateWorkload(this.value);
+    updateAll();
 });
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
