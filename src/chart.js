@@ -1,7 +1,5 @@
 import {cfg} from './config.js';
-import {formatNumber, updateAll} from "./utils.js";
-import {updateCosts} from "./calculator.js";
-import {calculateTotalOps} from "./app.js";
+import {formatNumber, updateAll, updateQueryParams} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
@@ -110,8 +108,8 @@ export const chart = new Chart(ctx, {
                         e.target.style.cursor = "grabbing";
                 },
                 onDragEnd: function (e) {
-                    calculateTotalOps();
-                    updateCosts();
+                    cfg.workload = "custom";
+                    updateAll();
                     if (e.target?.style)
                         e.target.style.cursor = "default";
                 },

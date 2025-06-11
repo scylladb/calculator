@@ -1,6 +1,7 @@
 import {cfg} from './config.js';
 import {updateCosts} from "./calculator.js";
 import {updateChart} from "./chart.js";
+import {updateSeriesData, updateTotalOps} from "./app.js";
 
 export function formatNumber(num) {
     if (num >= 1e9) return (num / 1e9).toFixed(0) + 'B';
@@ -39,6 +40,11 @@ export function getQueryParams() {
     if (params.get('reserved')) cfg.reserved = parseInt(params.get('reserved'));
     if (params.get('readConst')) cfg.readConst = parseInt(params.get('readConst'));
     if (params.get('workload')) cfg.workload = params.get('workload');
+
+    if (cfg.workload === 'custom') {
+        cfg.seriesReadsEncoded = params.get('seriesReads') || '';
+        cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
+    }
 
     if(params.get('daxNodes')) {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
@@ -84,7 +90,9 @@ export function updateQueryParams() {
         params.set('totalWrites', cfg.totalWrites.toString());
         params.set('reserved', cfg.reserved.toString());
         params.set('readConst', cfg.readConst.toString());
-        params.set('workload', cfg.workload);
+        params.set('seriesReads', cfg.seriesReadsEncoded.toString());
+        params.set('seriesWrites', cfg.seriesWritesEncoded.toString());
+        params.set('workload', cfg.workload.toString());
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
@@ -114,6 +122,8 @@ export function updateQueryParams() {
 
 export function updateAll() {
     updateQueryParams();
+    updateTotalOps();
+    updateSeriesData();
     updateChart();
     updateCosts();
 }

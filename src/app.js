@@ -43,7 +43,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-export function calculateTotalOps() {
+export function updateTotalOps() {
     // calculate total ops
     cfg.totalReads = 0;
     cfg.totalWrites = 0;
@@ -54,6 +54,16 @@ export function calculateTotalOps() {
     for (const point of cfg.seriesWrites) {
         cfg.totalWrites += (point.y * 3600);
     }
+}
+
+// TODO: not working yet
+export function updateSeriesData() {
+    console.log("Updating series data...");
+    console.log("Series Reads:", cfg.seriesReadsEncoded);
+    // cfg.seriesReads = cfg.seriesReadsEncoded.split('.').map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+    // cfg.seriesReadsEncoded = chart.data.datasets[0].data.map(p => Math.round(p.y / 1000)).join(".");
+    // cfg.seriesReadsEncoded = cfg.seriesReads.data.map(p => Math.round(p.y / 1000)).join(".");
+    // cfg.seriesWritesEncoded = chart.data.datasets[1].data.map(p => Math.round(p.y / 1000)).join(".");
 }
 
 export function applyWorkload(workload) {
@@ -108,6 +118,8 @@ export function applyWorkload(workload) {
             case "chaos":
                 actual = base * (0.5 + Math.random() * 5);
                 break;
+            case "custom":
+                break;
             default:
                 actual = [
                     150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
@@ -121,11 +133,20 @@ export function applyWorkload(workload) {
         seriesWrites.push({x: i, y: actual * 0.7});
     }
 
-    cfg.seriesReads = seriesReads;
-    cfg.seriesWrites = seriesWrites;
+    if (workload === "custom") {
+        console.log("Custom workload detected, using encoded series data.");
+        cfg.seriesReads = cfg.seriesReadsEncoded.split('.').map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        cfg.seriesWrites = cfg.seriesWritesEncoded.split('.').map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+    } else {
+        cfg.seriesReads = seriesReads;
+        cfg.seriesReadsEncoded = seriesReads.map(p => Math.round(p.y / 1000)).join(".");
+        cfg.seriesWrites = seriesWrites;
+        cfg.seriesWritesEncoded = seriesWrites.map(p => Math.round(p.y / 1000)).join(".");
+    }
+
     cfg.workload = workload;
 
-    calculateTotalOps();
+    updateTotalOps();
 
     const opsParams = document.getElementById('opsParams');
     const totalOpsParams = document.getElementById('totalOpsParams');
