@@ -345,6 +345,12 @@ document.getElementById('reserved').addEventListener('input', (event) => {
     updateAll();
 });
 
+document.getElementById('overprovisioned').addEventListener('input', (event) => {
+    cfg.overprovisioned = parseInt(event.target.value);
+    document.getElementById('overprovisionedDsp').innerText = `${formatNumber(cfg.overprovisioned)}%`;
+    updateAll();
+});
+
 document.getElementById('storageGB').addEventListener('input', (event) => {
     const storageGB = parseInt(event.target.value);
     document.getElementById('storageDsp').innerText = formatBytes(storageGB * 1024 * 1024 * 1024);
@@ -428,6 +434,7 @@ setupSliderInteraction('peakDurationWritesDsp', 'peakDurationWritesInp', 'peakDu
 setupSliderInteraction('totalReadsDsp', 'totalReadsInp', 'totalReads', formatNumber);
 setupSliderInteraction('totalWritesDsp', 'totalWritesInp', 'totalWrites', formatNumber);
 setupSliderInteraction('reservedDsp', 'reservedInp', 'reserved', value => `${value}%`);
+setupSliderInteraction('overprovisionedDsp', 'overprovisionedInp', 'overprovisioned', value => `${value}%`);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
@@ -469,6 +476,7 @@ document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
 document.getElementById('reserved').value = cfg.reserved;
+document.getElementById('overprovisioned').value = cfg.overprovisioned;
 document.getElementById('readConst').value = cfg.readConst;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 document.getElementById('daxInstanceClass').value = cfg.daxInstanceClass;
@@ -487,6 +495,7 @@ document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
+document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 

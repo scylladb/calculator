@@ -54,6 +54,7 @@ export function getQueryParams() {
     assignParam('cacheSizeGB', parseInt);
     assignParam('cacheRatio', parseInt);
     assignParam('reserved', parseInt);
+    assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
 
     if (cfg.pricing === 'provisioned' || cfg.pricing === 'demand') {
@@ -118,6 +119,7 @@ export function updateQueryParams() {
         setOrDelete('totalReads', cfg.totalReads);
         setOrDelete('totalWrites', cfg.totalWrites);
         setOrDelete('reserved', cfg.reserved);
+        setOrDelete('overprovisioned', cfg.overprovisioned);
         setOrDelete('readConst', cfg.readConst);
         setOrDelete('seriesReads', cfg.seriesReadsEncoded);
         setOrDelete('seriesWrites', cfg.seriesWritesEncoded);

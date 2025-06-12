@@ -43,6 +43,11 @@ function getReservedValues() {
     cfg.reserved = parseInt(document.getElementById('reserved').value);
 }
 
+function getProvisionedValues() {
+    cfg.overprovisioned = parseInt(document.getElementById('overprovisioned').value);
+    cfg.overprovisionedPercentage = 1 + (cfg.overprovisioned / 100.0);
+}
+
 function getHoursValues() {
     cfg.daysPerMonth = 365 / 12;
     cfg.secondsPerDay = 24 * 60 * 60;
@@ -56,12 +61,12 @@ function getHoursValues() {
 
 export function calculateProvisionedReads() {
     const costPerRCU = (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
-    const baseRCU = (cfg.baselineReads * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
-        (cfg.baselineReads * cfg.readStronglyConsistent * cfg.itemRCU);
-    const peakRCU = (cfg.peakReads * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
-        (cfg.peakReads * cfg.readStronglyConsistent * cfg.itemRCU);
-    const totalRCU = (cfg.totalReads / cfg.secondsPerDay * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
-        (cfg.totalReads / cfg.secondsPerDay * cfg.readStronglyConsistent * cfg.itemRCU);
+    const baseRCU = ((cfg.baselineReads * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
+        (cfg.baselineReads * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
+    const peakRCU = ((cfg.peakReads * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
+        (cfg.peakReads * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
+    const totalRCU = ((cfg.totalReads / cfg.secondsPerDay * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
+        (cfg.totalReads / cfg.secondsPerDay * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
     let reservedRCU, totalReservedRCU, unreservedRCU, costReservedRCU, costReservedUpfrontRCU, costUnreservedRCU;
 
     if (cfg.workload === 'baselinePeak') {
@@ -92,9 +97,9 @@ export function calculateProvisionedReads() {
 
 export function calculateProvisionedWrites() {
     const costPerWCU = (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-    const baseWCU = cfg.baselineWrites * cfg.itemWCU;
-    const peakWCU = cfg.peakWrites * cfg.itemWCU;
-    const totalWCU = cfg.totalWrites / cfg.secondsPerDay * cfg.itemWCU;
+    const baseWCU = (cfg.baselineWrites * cfg.itemWCU) * cfg.overprovisionedPercentage;
+    const peakWCU = (cfg.peakWrites * cfg.itemWCU) * cfg.overprovisionedPercentage;
+    const totalWCU = (cfg.totalWrites / cfg.secondsPerDay * cfg.itemWCU) * cfg.overprovisionedPercentage;
     let reservedWCU, totalReservedWCU, unreservedWCU, costReservedWCU, costReservedUpfrontWCU, costUnreservedWCU;
 
     if (cfg.workload === 'baselinePeak') {
@@ -128,15 +133,15 @@ export function calculateReplicatedProvisionedWrites() {
     let replicatedWCU;
     if (cfg.workload === 'baselinePeak') {
         // Use baseline and peak WCUs for all regions except the primary
-        const baseWCU = cfg.baselineWrites * cfg.itemWCU;
-        const peakWCU = cfg.peakWrites * cfg.itemWCU;
+        const baseWCU = (cfg.baselineWrites * cfg.itemWCU) * cfg.overprovisionedPercentage;
+        const peakWCU = (cfg.peakWrites * cfg.itemWCU) * cfg.overprovisionedPercentage;
         const baselineHours = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
         const peakHours = cfg.totalPeakHoursPerMonthWrites;
         // Calculate replicated WCU for all regions except the primary
         replicatedWCU = (cfg.regions - 1) * ((baseWCU * baselineHours) + (peakWCU * peakHours));
     } else {
         // Use totalWCU for all regions except the primary
-        const totalWCU = cfg.totalWrites / cfg.secondsPerDay * cfg.itemWCU;
+        const totalWCU = (cfg.totalWrites / cfg.secondsPerDay * cfg.itemWCU) * cfg.overprovisionedPercentage;
         replicatedWCU = (cfg.regions - 1) * totalWCU * cfg.hoursPerMonth;
     }
     cfg._replicatedProvisionedWriteCost = {
@@ -371,6 +376,7 @@ export function updateCosts() {
     getConsistencyValues();
     getHoursValues();
     getReservedValues();
+    getProvisionedValues()
     getDaxValues();
 
     calculateProvisionedCosts();

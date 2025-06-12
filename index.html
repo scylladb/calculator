@@ -295,6 +295,28 @@
                     </div>
                   </div>
                 </div>
+                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="overprovisioned">Overprovisioned Capacity:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="overprovisionedInp">
+                            <span id="overprovisionedDsp">20</span>
+                          </div>
+                          <div class="units">
+                          </div>
+                        </div>
+                        <span class="info-icon">
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter the percentage of capacity to overprovision to avoid request throttling. Recommend a minimum +20%.</span>
+                    </span>
+                      </div>
+                      <input type="range" id="overprovisioned" min="0" max="100" step="1" value="20">
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div id="itemParams">
