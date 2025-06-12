@@ -26,6 +26,11 @@ function assignParam(param, parser = v => v) {
     const params = new URLSearchParams(window.location.search);
     if (params.get(param) !== null) {
         cfg[param] = parser(params.get(param));
+        // Update the input field if it exists
+        const input = document.getElementById(param);
+        if (input) {
+            input.value = cfg[param];
+        }
     }
 }
 
@@ -54,16 +59,6 @@ export function getQueryParams() {
     if (cfg.pricing === 'provisioned' || cfg.pricing === 'demand') {
         const radio = document.querySelector(`input[name="pricing"][value="${cfg.pricing}"]`);
         if (radio) radio.checked = true;
-    }
-
-    if (typeof cfg.reserved === 'number' && !isNaN(cfg.reserved)) {
-        const reservedInput = document.getElementById('reserved');
-        if (reservedInput) reservedInput.value = cfg.reserved;
-    }
-
-    if (typeof cfg.regions === 'number' && !isNaN(cfg.regions)) {
-        const regionsInput = document.getElementById('regions');
-        if (regionsInput) regionsInput.value = cfg.regions;
     }
 
     if (cfg.workload === 'custom') {
