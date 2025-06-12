@@ -51,6 +51,11 @@ export function getQueryParams() {
     assignParam('reserved', parseInt);
     assignParam('readConst', parseInt);
 
+    if (cfg.pricing === 'provisioned' || cfg.pricing === 'demand') {
+        const radio = document.querySelector(`input[name="pricing"][value="${cfg.pricing}"]`);
+        if (radio) radio.checked = true;
+    }
+
     if (cfg.workload === 'custom') {
         cfg.seriesReadsEncoded = params.get('seriesReads') || '';
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
