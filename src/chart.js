@@ -28,6 +28,8 @@ export function updateChart() {
     if (cfg.workload === "baselinePeak") {
         chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
         chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
+        chart.data.labels = Array.from({length: 24}, (_, i) => (i + 1).toString());
+        chart.options.scales.x.ticks.display = false;
         yMax = Math.max(
             cfg.baselineReads + cfg.peakReads,
             cfg.baselineWrites + cfg.peakWrites
@@ -37,6 +39,8 @@ export function updateChart() {
         chart.data.datasets[0].data = cfg.seriesReads;
         chart.data.datasets[1].pointHitRadius = 25;
         chart.data.datasets[1].data = cfg.seriesWrites;
+        chart.data.labels = Array.from({length: 24}, (_, i) => (i + 1).toString());
+        chart.options.scales.x.ticks.display = true;
         yMax = Math.max(
             ...cfg.seriesReads.map(p => p.y),
             ...cfg.seriesWrites.map(p => p.y)
@@ -174,7 +178,7 @@ export const chart = new Chart(ctx, {
                 },
                 ticks: {
                     stepSize: 1,
-                    display: false
+                    display: true
                 }
             },
             y: {
