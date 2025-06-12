@@ -33,7 +33,7 @@ export const cfg = {
     pricePerRCU_IA: 0.00016,
     pricePerWCU_IA: 0.00081,
     reserved: 0,
-    overprovisioned: 20,
+    overprovisioned: 0,
 
     // Reserved
     pricePerReservedRCUUpfront: 0.30,
