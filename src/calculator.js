@@ -125,17 +125,22 @@ export function calculateProvisionedWrites() {
 
 export function calculateReplicatedProvisionedWrites() {
     const costPerWCU = (cfg.tableClass === 'standard' ? cfg.pricePerWCU : cfg.pricePerWCU_IA);
-
-    const totalBaseWCU = cfg.baselineWrites * cfg.itemWCU;
-    const totalPeakWCU = cfg.peakWrites * cfg.itemWCU;
-    const totalWCU = cfg.totalWrites / cfg.secondsPerDay * cfg.itemWCU;
-
-    const totalReplicatedWCU = (cfg.workload === 'baselinePeak') ?
-        (cfg.regions - 1) * (totalBaseWCU + totalPeakWCU) :
-        (cfg.regions - 1) * (totalWCU);
-
+    let replicatedWCU;
+    if (cfg.workload === 'baselinePeak') {
+        // Use baseline and peak WCUs for all regions except the primary
+        const baseWCU = cfg.baselineWrites * cfg.itemWCU;
+        const peakWCU = cfg.peakWrites * cfg.itemWCU;
+        const baselineHours = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
+        const peakHours = cfg.totalPeakHoursPerMonthWrites;
+        // Calculate replicated WCU for all regions except the primary
+        replicatedWCU = (cfg.regions - 1) * ((baseWCU * baselineHours) + (peakWCU * peakHours));
+    } else {
+        // Use totalWCU for all regions except the primary
+        const totalWCU = cfg.totalWrites / cfg.secondsPerDay * cfg.itemWCU;
+        replicatedWCU = (cfg.regions - 1) * totalWCU * cfg.hoursPerMonth;
+    }
     cfg._replicatedProvisionedWriteCost = {
-        monthlyCost: Number(Math.trunc((totalReplicatedWCU * costPerWCU) * 100) / 100)
+        monthlyCost: Number(Math.trunc((replicatedWCU * costPerWCU) * 100) / 100)
     };
 }
 

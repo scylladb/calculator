@@ -61,6 +61,11 @@ export function getQueryParams() {
         if (reservedInput) reservedInput.value = cfg.reserved;
     }
 
+    if (typeof cfg.regions === 'number' && !isNaN(cfg.regions)) {
+        const regionsInput = document.getElementById('regions');
+        if (regionsInput) regionsInput.value = cfg.regions;
+    }
+
     if (cfg.workload === 'custom') {
         cfg.seriesReadsEncoded = params.get('seriesReads') || '';
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
