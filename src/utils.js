@@ -56,6 +56,11 @@ export function getQueryParams() {
         if (radio) radio.checked = true;
     }
 
+    if (typeof cfg.reserved === 'number' && !isNaN(cfg.reserved)) {
+        const reservedInput = document.getElementById('reserved');
+        if (reservedInput) reservedInput.value = cfg.reserved;
+    }
+
     if (cfg.workload === 'custom') {
         cfg.seriesReadsEncoded = params.get('seriesReads') || '';
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
