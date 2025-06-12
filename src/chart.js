@@ -47,6 +47,15 @@ export function updateChart() {
         chart.options.scales.y.max = yMax * 1.2;
     }
 
+    chart.data.datasets[2].data = chart.data.datasets[0].data.map((v, i) => {
+        const y = typeof v === 'object' ? v.y : v;
+        return typeof v === 'object' ? {x: v.x, y: y * (1 + cfg.overprovisioned / 100)} : y * (1 + cfg.overprovisioned / 100);
+    });
+    chart.data.datasets[3].data = chart.data.datasets[1].data.map((v, i) => {
+        const y = typeof v === 'object' ? v.y : v;
+        return typeof v === 'object' ? {x: v.x, y: y * (1 + cfg.overprovisioned / 100)} : y * (1 + cfg.overprovisioned / 100);
+    });
+
     chart.update();
 }
 
@@ -77,12 +86,46 @@ export const chart = new Chart(ctx, {
             pointHitRadius: 0,
             pointRadius: 0,
             hidden: false
+        }, {
+            label: 'Overprovisioned Reads',
+            data: generateData().map((v, i) => typeof v === 'object' ? {x: v.x, y: v.y * 1.2} : v * 1.2),
+            borderColor: 'rgba(50,109,230,0.40)',
+            borderWidth: 2,
+            borderDash: [6, 6],
+            fill: false,
+            pointRadius: 0,
+            pointHitRadius: 0,
+            tension: 0.5,
+            cubicInterpolationMode: 'monotone',
+            hidden: false,
+            showLine: true,
+            showInLegend: false
+        }, {
+            label: 'Overprovisioned Writes',
+            data: generateData().map((v, i) => typeof v === 'object' ? {x: v.x, y: v.y * 1.2} : v * 1.2),
+            borderColor: 'rgba(255,85,0,0.40)',
+            borderWidth: 2,
+            borderDash: [6, 6],
+            fill: false,
+            pointRadius: 0,
+            pointHitRadius: 0,
+            tension: 0.5,
+            cubicInterpolationMode: 'monotone',
+            hidden: false,
+            showLine: true,
+            showInLegend: false
         }]
     }, options: {
         plugins: {
             legend: {
                 display: true,
-                position: 'bottom'
+                position: 'bottom',
+                labels: {
+                    filter: function(item, chart) {
+                        // Only show legend for series 0 and 1
+                        return item.datasetIndex === 0 || item.datasetIndex === 1;
+                    }
+                }
             },
             title: {
                 display: false

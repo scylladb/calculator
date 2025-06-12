@@ -179,7 +179,8 @@ export function updateWorkload(workload) {
 
 export function updateChartScale() {
     const maxY = Math.max(...cfg.seriesReads.map(p => p.y), ...cfg.seriesWrites.map(p => p.y));
-    chart.options.scales.y.max = Math.ceil(maxY * 1.25 / 10000) * 10000;
+    const overprovisionedPercentage = 0.8 + cfg.overprovisioned / 100;
+    chart.options.scales.y.max = Math.ceil(maxY * 1.25 * overprovisionedPercentage / 10000) * 10000;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
