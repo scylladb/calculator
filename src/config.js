@@ -34,6 +34,10 @@ export const cfg = {
     pricePerWCU_IA: 0.00081,
     reserved: 0,
 
+    // Reserved
+    pricePerReservedRCUUpfront: 0.30,
+    pricePerReservedWCUUpfront: 1.50,
+
     // Replicated
     regions: 1,
 

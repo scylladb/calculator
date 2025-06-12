@@ -79,7 +79,7 @@ export function calculateProvisionedReads() {
     }
 
     costReservedRCU = totalReservedRCU * cfg.pricePerReservedRCU * cfg.hoursPerMonth;
-    costReservedUpfrontRCU = totalReservedRCU * 1.5;
+    costReservedUpfrontRCU = totalReservedRCU * cfg.pricePerReservedRCUUpfront;
     costUnreservedRCU = unreservedRCU * cfg.cacheMissPercentage * costPerRCU;
 
     cfg._provisionedReadCost = {
@@ -112,7 +112,7 @@ export function calculateProvisionedWrites() {
     }
 
     costReservedWCU = totalReservedWCU * cfg.pricePerReservedWCU * cfg.hoursPerMonth;
-    costReservedUpfrontWCU = totalReservedWCU * 1.5;
+    costReservedUpfrontWCU = totalReservedWCU * cfg.pricePerReservedWCUUpfront;
     costUnreservedWCU = unreservedWCU * costPerWCU;
 
     cfg._provisionedWriteCost = {
