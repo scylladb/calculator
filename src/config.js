@@ -2,6 +2,8 @@ export const cfg = {
     workload: 'baselinePeak',
     seriesReads: [],
     seriesWrites: [],
+    seriesReservedRCU: [],
+    seriesReservedWCU: [],
     seriesReadsEncoded: '',
     seriesWritesEncoded: '',
     pricing: 'demand',

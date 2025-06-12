@@ -60,6 +60,9 @@ export function updateChart() {
         return typeof v === 'object' ? {x: v.x, y: y * (1 + cfg.overprovisioned / 100)} : y * (1 + cfg.overprovisioned / 100);
     });
 
+    chart.data.datasets[4].data = cfg.seriesReservedRCU || Array(24).fill(null);
+    chart.data.datasets[5].data = cfg.seriesReservedWCU || Array(24).fill(null);
+
     chart.update();
 }
 
@@ -118,6 +121,34 @@ export const chart = new Chart(ctx, {
             hidden: false,
             showLine: true,
             showInLegend: false
+        }, {
+            label: 'Reserved RCU',
+            data: Array(24).fill(null),
+            borderColor: 'rgba(50,109,230,0.80)',
+            borderWidth: 2,
+            borderDash: [2, 2],
+            fill: false,
+            pointRadius: 0,
+            pointHitRadius: 0,
+            tension: 0,
+            cubicInterpolationMode: 'monotone',
+            hidden: false,
+            showLine: true,
+            showInLegend: true
+        }, {
+            label: 'Reserved WCU',
+            data: Array(24).fill(null),
+            borderColor: 'rgba(255,85,0,0.80)',
+            borderWidth: 2,
+            borderDash: [2, 2],
+            fill: false,
+            pointRadius: 0,
+            pointHitRadius: 0,
+            tension: 0,
+            cubicInterpolationMode: 'monotone',
+            hidden: false,
+            showLine: true,
+            showInLegend: true
         }]
     }, options: {
         plugins: {
