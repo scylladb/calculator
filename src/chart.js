@@ -25,6 +25,13 @@ function generateData(baseline, peak, peakDuration) {
 export function updateChart() {
     let yMax;
 
+    const showProvisioned = cfg.pricing === 'provisioned';
+    [2, 3, 4, 5].forEach(i => {
+        if (chart.data.datasets[i]) {
+            chart.data.datasets[i].hidden = !showProvisioned;
+        }
+    });
+
     if (cfg.workload === "baselinePeak") {
         chart.data.datasets[0].data = generateData(cfg.baselineReads, cfg.peakReads, cfg.peakDurationReads);
         chart.data.datasets[1].data = generateData(cfg.baselineWrites, cfg.peakWrites, cfg.peakDurationWrites);
@@ -63,7 +70,15 @@ export function updateChart() {
     chart.data.datasets[4].data = cfg.seriesReservedRCU || Array(24).fill(null);
     chart.data.datasets[5].data = cfg.seriesReservedWCU || Array(24).fill(null);
 
-    chart.update();
+    chart.update('none'); // Force full redraw to ensure hidden state is respected
+    // Defensive: also update legend hidden state if present
+    if (chart.legend && chart.legend.legendItems) {
+        chart.legend.legendItems.forEach((item, idx) => {
+            if ([2, 3, 4, 5].includes(item.datasetIndex)) {
+                item.hidden = !showProvisioned;
+            }
+        });
+    }
 }
 
 export const chart = new Chart(ctx, {
@@ -96,7 +111,7 @@ export const chart = new Chart(ctx, {
         }, {
             label: 'Overprovisioned Reads',
             data: generateData().map((v, i) => typeof v === 'object' ? {x: v.x, y: v.y * 1.2} : v * 1.2),
-            borderColor: 'rgba(50,109,230,0.40)',
+            borderColor: 'rgba(50,109,230,0.80)',
             borderWidth: 2,
             borderDash: [6, 6],
             fill: false,
@@ -110,7 +125,7 @@ export const chart = new Chart(ctx, {
         }, {
             label: 'Overprovisioned Writes',
             data: generateData().map((v, i) => typeof v === 'object' ? {x: v.x, y: v.y * 1.2} : v * 1.2),
-            borderColor: 'rgba(255,85,0,0.40)',
+            borderColor: 'rgba(255,85,0,0.80)',
             borderWidth: 2,
             borderDash: [6, 6],
             fill: false,
@@ -126,7 +141,7 @@ export const chart = new Chart(ctx, {
             data: Array(24).fill(null),
             borderColor: 'rgba(50,109,230,0.80)',
             borderWidth: 2,
-            borderDash: [2, 2],
+            borderDash: [3, 3],
             fill: false,
             pointRadius: 0,
             pointHitRadius: 0,
@@ -140,7 +155,7 @@ export const chart = new Chart(ctx, {
             data: Array(24).fill(null),
             borderColor: 'rgba(255,85,0,0.80)',
             borderWidth: 2,
-            borderDash: [2, 2],
+            borderDash: [3, 3],
             fill: false,
             pointRadius: 0,
             pointHitRadius: 0,

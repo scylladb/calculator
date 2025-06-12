@@ -215,6 +215,7 @@ document.getElementById("workloadSelect").addEventListener('change', function ()
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
+        cfg.pricing = 'demand';
         provisionedParams.style.display = 'none';
         updateAll();
     }
@@ -223,6 +224,7 @@ document.querySelector('input[name="pricing"][value="demand"]').addEventListener
 document.querySelector('input[name="pricing"][value="provisioned"]').addEventListener('change', (event) => {
     const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
+        cfg.pricing = 'provisioned';
         provisionedParams.style.display = 'block';
         updateAll();
     }
