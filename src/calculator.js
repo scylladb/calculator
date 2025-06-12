@@ -15,6 +15,8 @@ function getReplicatedRegions() {
 
 function getDaxValues() {
     cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
+    cfg.cacheHitPercentage =  cfg.cacheRatio / 100;
+    cfg.cacheMissPercentage =  1 - cfg.cacheRatio / 100;
 }
 
 function getStorageValues() {
@@ -80,7 +82,7 @@ export function calculateProvisionedReads() {
         Math.ceil(unreservedBaseHoursPerMonthRCU + unreservedPeakHoursPerMonthRCU) :
         Math.ceil(totalRCU * cfg.unreservedPercentage * cfg.hoursPerMonth);
 
-    const costUnreservedRCU = totalUnreservedPerMonthRCU * costPerRCU;
+    const costUnreservedRCU = totalUnreservedPerMonthRCU * cfg.cacheMissPercentage * costPerRCU;
 
     cfg._provisionedReadCost = {
         monthlyCost: Number(Math.trunc((costUnreservedRCU) * 100) / 100),
@@ -167,7 +169,7 @@ export function calculateDemandReads() {
         Math.ceil(totalBasePerMonthRRU + totalPeakPerMonthRRU) :
         Math.ceil(totalRRU);
 
-    const costRRU = totalPerMonthRRU * costPerRRU;
+    const costRRU = totalPerMonthRRU * cfg.cacheMissPercentage * costPerRRU;
 
     cfg._demandReadCost = {
         monthlyCost: Number(Math.trunc(costRRU * 100) / 100),
@@ -270,8 +272,8 @@ function calculateDaxCosts() {
         return;
     }
 
-    let readRPS_CacheHit = cfg.baselineReads * cfg.cacheRatio / 100;
-    let readRPS_CacheMiss = cfg.baselineReads * (1 - cfg.cacheRatio / 100);
+    let readRPS_CacheHit = cfg.baselineReads * cfg.cacheHitPercentage;
+    let readRPS_CacheMiss = cfg.baselineReads * cfg.cacheMissPercentage;
     let readMissFactor = 1;
     let size = cfg.itemSizeKB;
     let writeRPS = cfg.totalWriteOpsSec;
