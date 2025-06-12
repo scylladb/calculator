@@ -1,12 +1,17 @@
 export const cfg = {
-    workload: 'baselinePeak',
+    // Charting
     seriesReads: [],
     seriesWrites: [],
     seriesReservedRCU: [],
     seriesReservedWCU: [],
     seriesReadsEncoded: '',
     seriesWritesEncoded: '',
+    maxReads: 0,
+    maxWrites: 0,
     pricing: 'demand',
+
+    // Model
+    workload: 'baselinePeak',
     baselineReads: 100000,
     baselineWrites: 200000,
     peakReads: 250000,

@@ -52,6 +52,9 @@ export function updateChart() {
             ...cfg.seriesReads.map(p => p.y),
             ...cfg.seriesWrites.map(p => p.y)
         );
+
+        cfg.maxReads = Math.max(...cfg.seriesReads.map(p => p.y));
+        cfg.maxWrites = Math.max(...cfg.seriesWrites.map(p => p.y));
     }
 
     if (yMax >= chart.options.scales.y.max * 0.98) {

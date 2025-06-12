@@ -67,6 +67,7 @@ export function calculateProvisionedReads() {
         (cfg.peakReads * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
     const totalRCU = ((cfg.totalReads / cfg.secondsPerDay * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
         (cfg.totalReads / cfg.secondsPerDay * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
+    const maxRCU = cfg.maxReads * cfg.itemRCU * cfg.overprovisionedPercentage;
     let reservedRCU, totalReservedRCU, unreservedRCU, costReservedRCU, costReservedUpfrontRCU, costUnreservedRCU;
 
     if (cfg.workload === 'baselinePeak') {
@@ -78,7 +79,7 @@ export function calculateProvisionedReads() {
         const peakHours = cfg.totalPeakHoursPerMonthReads;
         unreservedRCU = (unreservedBaseRCU * baselineHours) + (unreservedPeakRCU * peakHours);
     } else {
-        reservedRCU = totalRCU * cfg.reservedPercentage;
+        reservedRCU = maxRCU * cfg.reservedPercentage;
         totalReservedRCU = Math.ceil(reservedRCU / 100) * 100;
         unreservedRCU = Math.max(totalRCU - totalReservedRCU, 0) * cfg.hoursPerMonth;
     }
@@ -102,6 +103,7 @@ export function calculateProvisionedWrites() {
     const baseWCU = (cfg.baselineWrites * cfg.itemWCU) * cfg.overprovisionedPercentage;
     const peakWCU = (cfg.peakWrites * cfg.itemWCU) * cfg.overprovisionedPercentage;
     const totalWCU = (cfg.totalWrites / cfg.secondsPerDay * cfg.itemWCU) * cfg.overprovisionedPercentage;
+    const maxWCU = cfg.maxWrites * cfg.itemWCU * cfg.overprovisionedPercentage;
     let reservedWCU, totalReservedWCU, unreservedWCU, costReservedWCU, costReservedUpfrontWCU, costUnreservedWCU;
 
     if (cfg.workload === 'baselinePeak') {
@@ -113,7 +115,7 @@ export function calculateProvisionedWrites() {
         const peakHours = cfg.totalPeakHoursPerMonthWrites;
         unreservedWCU = (unreservedBaseWCU * baselineHours) + (unreservedPeakWCU * peakHours);
     } else {
-        reservedWCU = totalWCU * cfg.reservedPercentage;
+        reservedWCU = maxWCU * cfg.reservedPercentage;
         totalReservedWCU = Math.ceil(reservedWCU / 100) * 100;
         unreservedWCU = Math.max(totalWCU - totalReservedWCU, 0) * cfg.hoursPerMonth;
     }
