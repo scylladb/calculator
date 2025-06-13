@@ -2,8 +2,6 @@ export const cfg = {
     // Charting
     seriesReads: [],
     seriesWrites: [],
-    seriesReservedRCU: [],
-    seriesReservedWCU: [],
     seriesReadsEncoded: '',
     seriesWritesEncoded: '',
     maxReads: 0,
@@ -20,6 +18,8 @@ export const cfg = {
     peakDurationWrites: 4,
     totalReads: 0,
     totalWrites: 0,
+    totalReservedRCU: 0,
+    totalReservedWCU: 0,
     hoursPerMonth: 730,
     itemSizeB: 1024,
     storageGB: 512,

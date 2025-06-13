@@ -1,7 +1,7 @@
 import {cfg} from './config.js';
 import {updateCosts} from "./calculator.js";
-import {updateChart} from "./chart.js";
-import {updateSeriesData, updateTotalOps, encodeSeriesData, updateChartScale} from "./app.js";
+import {updateChartScale, updateSeries} from "./chart.js";
+import {updateTotalOps} from "./app.js";
 
 // Format a number with suffixes (K, M, B)
 export function formatNumber(num) {
@@ -151,18 +151,51 @@ export function updateQueryParams() {
     }, 1000);
 }
 
+// Helper to update display and input fields
+export function updateOpsDisplays() {
+    document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
+    document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
+    document.getElementById('totalReadsInp').value = cfg.totalReads;
+    document.getElementById('totalWritesInp').value = cfg.totalWrites;
+    document.getElementById('totalReads').innerText = formatNumber(cfg.totalReads);
+    document.getElementById('totalWrites').innerText = formatNumber(cfg.totalWrites);
+}
+
+// Toggle between ops params and total ops params
+export function toggleOpsParams() {
+    const opsParams = document.getElementById('opsParams');
+    const totalOpsParams = document.getElementById('totalOpsParams');
+    if (cfg.workload === "baselinePeak") {
+        opsParams.style.display = 'block';
+        totalOpsParams.style.display = 'none';
+    } else {
+        opsParams.style.display = 'none';
+        totalOpsParams.style.display = 'block';
+    }
+}
+
+// Toggle between provisioned and demand params
+export function toggleProvisionedParams() {
+    const provisionedParams = document.getElementById('provisionedParams');
+    if (cfg.pricing === 'provisioned') {
+        provisionedParams.style.display = 'block';
+    } else {
+        provisionedParams.style.display = 'none';
+    }
+}
+
 // Update all UI and calculations
 export function updateAll() {
-    if (cfg.workload === "custom") {
-        encodeSeriesData();
-    } else {
-        updateSeriesData();
-    }
+    toggleProvisionedParams();
+    toggleOpsParams();
     updateQueryParams();
     updateTotalOps();
-    updateChartScale();
-    updateChart();
     updateCosts();
+    updateOpsDisplays();
+    updateSeries();
+    updateChartScale();
+
+    console.log('Updated with cfg:', cfg);
 }
 
 // Update the displayed costs in the DOM

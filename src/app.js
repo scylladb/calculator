@@ -25,9 +25,9 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         }
     });
 
-    input.addEventListener('keydown', function (event) {
+    input.addEventListener('keydown', function () {
         if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            display.innerText = formatFunction(parseInt(event.target.value));
+            display.innerText = formatFunction(parseInt(this.value));
             setTimeout(() => {
                 slider.dispatchEvent(new Event('input', { bubbles: true }));
             }, 0);
@@ -37,8 +37,8 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         }
     });
 
-    slider.addEventListener('input', function (event) {
-        display.innerText = formatFunction(parseInt(event.target.value));
+    slider.addEventListener('input', function () {
+        display.innerText = formatFunction(parseInt(this.value));
         updateAll();
     });
 }
@@ -47,6 +47,7 @@ export function updateTotalOps() {
     // calculate total ops
     cfg.totalReads = 0;
     cfg.totalWrites = 0;
+
     // sum up all series data for both reads and writes
     for (const point of cfg.seriesReads) {
         cfg.totalReads += (point.y * 3600);
@@ -56,182 +57,27 @@ export function updateTotalOps() {
     }
 }
 
-export function updateSeriesData() {
-    // Only proceed if both encoded strings exist and are non-empty
-    if (!cfg.seriesReadsEncoded?.length || !cfg.seriesWritesEncoded?.length) return;
-
-    cfg.seriesReads = cfg.seriesReadsEncoded
-        .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
-
-    cfg.seriesWrites = cfg.seriesWritesEncoded
-        .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
-}
-
-export function encodeSeriesData() {
-    cfg.seriesReadsEncoded = cfg.seriesReads.map(p => Math.round(p.y / 1000)).join(".");
-    cfg.seriesWritesEncoded = cfg.seriesWrites.map(p => Math.round(p.y / 1000)).join(".");
-}
-
-// Helper to update display and input fields
-function updateOpsDisplays(reads, writes) {
-    document.getElementById('totalReadsDsp').innerText = formatNumber(reads);
-    document.getElementById('totalWritesDsp').innerText = formatNumber(writes);
-    document.getElementById('totalReadsInp').value = reads;
-    document.getElementById('totalWritesInp').value = writes;
-    document.getElementById('totalReads').innerText = formatNumber(reads);
-    document.getElementById('totalWrites').innerText = formatNumber(writes);
-}
-
-// Helper to show/hide ops params
-function toggleOpsParams(workload) {
-    const opsParams = document.getElementById('opsParams');
-    const totalOpsParams = document.getElementById('totalOpsParams');
-    if (workload === "baselinePeak") {
-        opsParams.style.display = 'block';
-        totalOpsParams.style.display = 'none';
-    } else {
-        opsParams.style.display = 'none';
-        totalOpsParams.style.display = 'block';
-    }
-}
-
-export function updateWorkload(workload) {
-    const base = 100000;
-    const seriesReads = [];
-    const seriesWrites = [];
-
-    for (let i = 0; i < 24; i++) {
-        let value = base;
-        switch (workload) {
-            case "dailyPeak":
-                value = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
-                break;
-            case "twiceDaily":
-                value = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
-                break;
-            case "batch":
-                value = (i >= 0 && i <= 3) ? base * 6 : base;
-                break;
-            case "sawtooth":
-                value = base + (i % 6) * base * 0.5;
-                break;
-            case "bursty":
-                value = (Math.random() < 0.3) ? base * (5 + Math.random() * 5) : base;
-                break;
-            case "rampUp":
-                value = base + (i * (base * 9 / 23));
-                break;
-            case "rampDown":
-                value = base * (1 - i / 24);
-                break;
-            case "flatline":
-                value = base;
-                break;
-            case "sinusoidal":
-                value = base + base * Math.sin((i / 12) * 2 * Math.PI);
-                break;
-            case "diurnal":
-                value = 400000 + Math.cos((i - 12) * Math.PI / 12) * 400000 * 0.9;
-                break;
-            case "nocturnal":
-                value = 400000 + Math.cos((i) * Math.PI / 12) * 400000 * 0.9;
-                break;
-            case "mountain":
-                value = base + Math.max(0, (12 - Math.abs(i - 12)) * (base / 2));
-                break;
-            case "valley":
-                value = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
-                break;
-            case "chaos":
-                value = base * (0.5 + Math.random() * 5);
-                break;
-            case "custom":
-                break;
-            default:
-                value = [
-                    150000, 130000, 110000, 100000, 100000, 110000, 170000, 300000,
-                    450000, 550000, 400000, 350000, 330000, 310000, 300000,
-                    320000, 350000, 370000, 330000, 250000, 200000, 170000,
-                    150000, 130000
-                ][i];
-        }
-        seriesReads.push({x: i, y: value});
-        seriesWrites.push({x: i, y: value * 0.7});
-    }
-
-    if (workload === "custom") {
-        updateSeriesData();
-    } else {
-        cfg.seriesReads = seriesReads;
-        cfg.seriesWrites = seriesWrites;
-        encodeSeriesData();
-    }
-    cfg.workload = workload;
-    updateTotalOps();
-    updateOpsDisplays(cfg.totalReads, cfg.totalWrites);
-    toggleOpsParams(workload);
-    chart.data.datasets[0].data = [...cfg.seriesReads];
-    chart.data.datasets[1].data = [...cfg.seriesWrites];
-    chart.update();
-}
-
-export function updateChartScale() {
-    const maxY = Math.max(...cfg.seriesReads.map(p => p.y), ...cfg.seriesWrites.map(p => p.y));
-    const overprovisionedPercentage = 0.8 + cfg.overprovisioned / 100;
-    chart.options.scales.y.max = Math.ceil(maxY * 1.25 * overprovisionedPercentage / 10000) * 10000;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const tabLabels = document.querySelectorAll('.tab-label');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabLabels.forEach(tabLabel => {
-        tabLabel.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        tabLabels.forEach(tab => tab.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-
-        this.classList.add('active');
-
-        const tabContentId = this.getAttribute('href');
-        document.getElementById(tabContentId).classList.add('active');
-        });
-    });
-
-    const select = document.getElementById("workloadSelect");
-    select.value = cfg.workload;
-    select.dispatchEvent(new Event("change"));
-});
-
-document.getElementById("workloadSelect").addEventListener('change', function () {
-    cfg.workload = this.value;
-    updateWorkload(this.value);
-    updateAll();
-});
-
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
-    const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
         cfg.pricing = 'demand';
-        provisionedParams.style.display = 'none';
         updateAll();
     }
 });
 
 document.querySelector('input[name="pricing"][value="provisioned"]').addEventListener('change', (event) => {
-    const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
         cfg.pricing = 'provisioned';
-        provisionedParams.style.display = 'block';
         updateAll();
     }
 });
 
-document.getElementById('tableClass').addEventListener('change', (event) => {
-    cfg.tableClass = event.target.value;
+document.getElementById("workload").addEventListener('change', function () {
+    cfg.workload = this.value;
+    updateAll();
+});
+
+document.getElementById('tableClass').addEventListener('change', () => {
+    cfg.tableClass = this.value;
     document.getElementById('reserved').disabled = cfg.tableClass === 'infrequentAccess';
     updateAll();
 });
@@ -443,20 +289,6 @@ setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatB
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 
-getQueryParams();
-
-const select = document.getElementById("workloadSelect");
-if ([...select.options].some(opt => opt.value === cfg.workload)) {
-    select.value = cfg.workload;
-    updateWorkload(cfg.workload);
-} else {
-    // fallback if cfg.workload isn't valid
-    select.value = "baselinePeak";
-    updateWorkload("baselinePeak");
-}
-
-updateAll();
-
 if (cfg.pricing === 'demand') {
     document.querySelector('input[name="pricing"][value="demand"]').checked = true;
     document.getElementById('provisionedParams').style.display = 'none';
@@ -465,6 +297,10 @@ if (cfg.pricing === 'demand') {
     document.getElementById('provisionedParams').style.display = 'block';
 }
 
+getQueryParams();
+
+document.getElementById('workload').value = cfg.workload;
+document.getElementById('baselineReads').value = cfg.baselineReads;
 document.getElementById('baselineReads').value = cfg.baselineReads;
 document.getElementById('baselineWrites').value = cfg.baselineWrites;
 document.getElementById('peakReads').value = cfg.peakReads;
@@ -502,7 +338,25 @@ document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
-document.addEventListener('DOMContentLoaded', function () {
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tabLabels = document.querySelectorAll('.tab-label');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabLabels.forEach(tabLabel => {
+        tabLabel.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            tabLabels.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            this.classList.add('active');
+
+            const tabContentId = this.getAttribute('href');
+            document.getElementById(tabContentId).classList.add('active');
+        });
+    });
+
     document.getElementById("saveCsvBtn").addEventListener("click", function () {
         if (!chart?.data?.datasets?.length) {
             console.warn("Chart or datasets not available");
@@ -529,4 +383,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
+
+    console.log("App initialized with workload:", cfg.workload);
+
+    updateAll();
 });
