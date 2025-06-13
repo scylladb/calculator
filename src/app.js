@@ -1,6 +1,6 @@
 import {cfg} from './config.js';
 import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
-import {chart} from "./chart.js";
+import {chart, encodeSeriesData} from "./chart.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
     const display = document.getElementById(displayId);
@@ -41,20 +41,6 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         display.innerText = formatFunction(parseInt(this.value));
         updateAll();
     });
-}
-
-export function updateTotalOps() {
-    // calculate total ops
-    cfg.totalReads = 0;
-    cfg.totalWrites = 0;
-
-    // sum up all series data for both reads and writes
-    for (const point of cfg.seriesReads) {
-        cfg.totalReads += (point.y * 3600);
-    }
-    for (const point of cfg.seriesWrites) {
-        cfg.totalWrites += (point.y * 3600);
-    }
 }
 
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
@@ -148,6 +134,8 @@ document.getElementById('peakDurationWrites').addEventListener('input', (event) 
 
 document.getElementById('totalReads').addEventListener('input', (event) => {
     const newTotal = parseInt(event.target.value);
+    cfg.workload = 'custom';
+    document.getElementById('workload').value = cfg.workload;
     if (!isNaN(newTotal) && cfg.seriesReads.length > 0) {
         const currentTotal = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
         if (currentTotal === 0) return;
@@ -169,6 +157,8 @@ document.getElementById('totalReads').addEventListener('input', (event) => {
 
 document.getElementById('totalWrites').addEventListener('input', (event) => {
     const newTotal = parseInt(event.target.value);
+    cfg.workload = 'custom';
+    document.getElementById('workload').value = cfg.workload;
     if (!isNaN(newTotal) && cfg.seriesWrites.length > 0) {
         const currentTotal = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
         if (currentTotal === 0) return;

@@ -149,13 +149,10 @@ export function updateSeries() {
         chart.data.datasets[5].data = [];
     }
 
-    chart.update();
-}
+    const allData = chart.data.datasets.flatMap(ds => ds.data);
+    const maxY = Math.max(...allData.map(p => (typeof p === 'object' && p !== null ? p.y : p)));
 
-export function updateChartScale() {
-    const maxY = Math.max(...cfg.seriesReads.map(p => p.y), ...cfg.seriesWrites.map(p => p.y));
-    const overprovisionedPercentage = 0.8 + cfg.overprovisioned / 100;
-    chart.options.scales.y.max = Math.ceil(maxY * 1.25 * overprovisionedPercentage / 10000) * 10000;
+    chart.options.scales.y.max = Math.ceil(maxY * 1.3 / 10000) * 10000;
 
     chart.update();
 }

@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {updateDisplayedCosts} from "./utils.js";
+import {updateAll, updateDisplayedCosts} from "./utils.js";
 
 function getPricing() {
     cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
@@ -57,6 +57,20 @@ function getHoursValues() {
     cfg.totalBaseHoursPerMonthWrites = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
     cfg.reservedPercentage = parseInt(document.getElementById('reserved').value) / 100.0;
     cfg.unreservedPercentage = 1 - cfg.reservedPercentage;
+}
+
+function getTotalOps() {
+    // calculate total ops
+    cfg.totalReads = 0;
+    cfg.totalWrites = 0;
+
+    // sum up all series data for both reads and writes
+    for (const point of cfg.seriesReads) {
+        cfg.totalReads += (point.y * 3600);
+    }
+    for (const point of cfg.seriesWrites) {
+        cfg.totalWrites += (point.y * 3600);
+    }
 }
 
 export function calculateProvisionedReads() {
@@ -378,6 +392,7 @@ export function updateCosts() {
     getReservedValues();
     getProvisionedValues()
     getDaxValues();
+    getTotalOps();
 
     calculateProvisionedCosts();
     calculateDemandCosts();

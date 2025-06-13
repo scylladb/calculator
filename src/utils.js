@@ -1,7 +1,6 @@
 import {cfg} from './config.js';
 import {updateCosts} from "./calculator.js";
-import {updateChartScale, updateSeries} from "./chart.js";
-import {updateTotalOps} from "./app.js";
+import {updateSeries} from "./chart.js";
 
 // Format a number with suffixes (K, M, B)
 export function formatNumber(num) {
@@ -189,14 +188,12 @@ export function updateAll() {
     toggleProvisionedParams();
     toggleOpsParams();
     updateQueryParams();
-    updateTotalOps();
     updateSeries(); // we have to update series before costs
     updateCosts();
-    updateOpsDisplays();
     updateSeries(); // update series after costs to ensure correct values
-    updateChartScale();
+    updateOpsDisplays();
 
-    console.log('Updated with cfg:', cfg);
+    // console.log('Updated with cfg:', cfg);
 }
 
 // Update the displayed costs in the DOM
