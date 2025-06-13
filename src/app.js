@@ -1,5 +1,6 @@
 import {cfg} from './config.js';
 import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
+import {chart, encodeSeriesData} from "./chart.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
     const display = document.getElementById(displayId);
@@ -11,7 +12,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         cfg.override = true;
     });
 
-    input.addEventListener('mouseover', function (event) {
+    input.addEventListener('mouseover', function () {
         input.value = parseInt(slider.value.toString());
     });
 
@@ -24,9 +25,9 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         }
     });
 
-    input.addEventListener('keydown', function (event) {
+    input.addEventListener('keydown', function () {
         if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            display.innerText = formatFunction(parseInt(event.target.value));
+            display.innerText = formatFunction(parseInt(this.value));
             setTimeout(() => {
                 slider.dispatchEvent(new Event('input', { bubbles: true }));
             }, 0);
@@ -36,49 +37,33 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         }
     });
 
-    slider.addEventListener('input', function (event) {
-        display.innerText = formatFunction(parseInt(event.target.value));
+    slider.addEventListener('input', function () {
+        display.innerText = formatFunction(parseInt(this.value));
         updateAll();
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const tabLabels = document.querySelectorAll('.tab-label');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabLabels.forEach(tabLabel => {
-        tabLabel.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        tabLabels.forEach(tab => tab.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-
-        this.classList.add('active');
-
-        const tabContentId = this.getAttribute('href');
-        document.getElementById(tabContentId).classList.add('active');
-        });
-    });
-});
-
 document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
-    const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
-        provisionedParams.style.display = 'none';
+        cfg.pricing = 'demand';
         updateAll();
     }
 });
 
 document.querySelector('input[name="pricing"][value="provisioned"]').addEventListener('change', (event) => {
-    const provisionedParams = document.getElementById('provisionedParams');
     if (event.target.checked) {
-        provisionedParams.style.display = 'block';
+        cfg.pricing = 'provisioned';
         updateAll();
     }
 });
 
-document.getElementById('tableClass').addEventListener('change', (event) => {
-    cfg.tableClass = event.target.value;
+document.getElementById("workload").addEventListener('change', function () {
+    cfg.workload = this.value;
+    updateAll();
+});
+
+document.getElementById('tableClass').addEventListener('change', () => {
+    cfg.tableClass = this.value;
     document.getElementById('reserved').disabled = cfg.tableClass === 'infrequentAccess';
     updateAll();
 });
@@ -147,9 +132,61 @@ document.getElementById('peakDurationWrites').addEventListener('input', (event) 
     updateAll();
 });
 
+document.getElementById('totalReads').addEventListener('input', (event) => {
+    const newTotal = parseInt(event.target.value);
+    cfg.workload = 'custom';
+    document.getElementById('workload').value = cfg.workload;
+    if (!isNaN(newTotal) && cfg.seriesReads.length > 0) {
+        const currentTotal = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
+        if (currentTotal === 0) return;
+
+        const scaleFactor = newTotal / currentTotal;
+        cfg.seriesReads.forEach((point, index) => {
+            point.y *= scaleFactor;
+            point.y /= 3600;
+            point.y = Math.max(0, point.y);
+            chart.data.datasets[0].data[index] = point;
+        });
+
+        cfg.totalReads = newTotal;
+        encodeSeriesData();
+        document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
+        updateAll();
+    }
+});
+
+document.getElementById('totalWrites').addEventListener('input', (event) => {
+    const newTotal = parseInt(event.target.value);
+    cfg.workload = 'custom';
+    document.getElementById('workload').value = cfg.workload;
+    if (!isNaN(newTotal) && cfg.seriesWrites.length > 0) {
+        const currentTotal = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
+        if (currentTotal === 0) return;
+
+        const scaleFactor = newTotal / currentTotal;
+        cfg.seriesWrites.forEach((point, index) => {
+            point.y *= scaleFactor;
+            point.y /= 3600;
+            point.y = Math.max(0, point.y);
+            chart.data.datasets[1].data[index] = point;
+        });
+
+        cfg.totalWrites = newTotal;
+        encodeSeriesData();
+        document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
+        updateAll();
+    }
+});
+
 document.getElementById('reserved').addEventListener('input', (event) => {
     cfg.reserved = parseInt(event.target.value);
     document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
+    updateAll();
+});
+
+document.getElementById('overprovisioned').addEventListener('input', (event) => {
+    cfg.overprovisioned = parseInt(event.target.value);
+    document.getElementById('overprovisionedDsp').innerText = `${formatNumber(cfg.overprovisioned)}%`;
     updateAll();
 });
 
@@ -233,13 +270,14 @@ setupSliderInteraction('peakReadsDsp', 'peakReadsInp', 'peakReads', formatNumber
 setupSliderInteraction('peakWritesDsp', 'peakWritesInp', 'peakWrites', formatNumber);
 setupSliderInteraction('peakDurationReadsDsp', 'peakDurationReadsInp', 'peakDurationReads', value => value);
 setupSliderInteraction('peakDurationWritesDsp', 'peakDurationWritesInp', 'peakDurationWrites', value => value);
+setupSliderInteraction('totalReadsDsp', 'totalReadsInp', 'totalReads', formatNumber);
+setupSliderInteraction('totalWritesDsp', 'totalWritesInp', 'totalWrites', formatNumber);
 setupSliderInteraction('reservedDsp', 'reservedInp', 'reserved', value => `${value}%`);
+setupSliderInteraction('overprovisionedDsp', 'overprovisionedInp', 'overprovisioned', value => `${value}%`);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
-
-getQueryParams();
 
 if (cfg.pricing === 'demand') {
     document.querySelector('input[name="pricing"][value="demand"]').checked = true;
@@ -249,18 +287,25 @@ if (cfg.pricing === 'demand') {
     document.getElementById('provisionedParams').style.display = 'block';
 }
 
+getQueryParams();
+
+document.getElementById('workload').value = cfg.workload;
+document.getElementById('baselineReads').value = cfg.baselineReads;
 document.getElementById('baselineReads').value = cfg.baselineReads;
 document.getElementById('baselineWrites').value = cfg.baselineWrites;
 document.getElementById('peakReads').value = cfg.peakReads;
 document.getElementById('peakWrites').value = cfg.peakWrites;
 document.getElementById('peakDurationReads').value = cfg.peakDurationReads;
 document.getElementById('peakDurationWrites').value = cfg.peakDurationWrites;
+document.getElementById('totalReads').value = cfg.totalReads;
+document.getElementById('totalWrites').value = cfg.totalWrites;
 document.getElementById('itemSizeB').value = cfg.itemSizeB;
 document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
 document.getElementById('reserved').value = cfg.reserved;
+document.getElementById('overprovisioned').value = cfg.overprovisioned;
 document.getElementById('readConst').value = cfg.readConst;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 document.getElementById('daxInstanceClass').value = cfg.daxInstanceClass;
@@ -271,13 +316,63 @@ document.getElementById('peakReadsDsp').innerText = formatNumber(cfg.peakReads);
 document.getElementById('peakWritesDsp').innerText = formatNumber(cfg.peakWrites);
 document.getElementById('peakDurationReadsDsp').innerText = cfg.peakDurationReads.toString();
 document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationWrites.toString();
+document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
+document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
 document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
 document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
+document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
-updateAll();
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tabLabels = document.querySelectorAll('.tab-label');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabLabels.forEach(tabLabel => {
+        tabLabel.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            tabLabels.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            this.classList.add('active');
+
+            const tabContentId = this.getAttribute('href');
+            document.getElementById(tabContentId).classList.add('active');
+        });
+    });
+
+    document.getElementById("saveCsvBtn").addEventListener("click", function () {
+        if (!chart?.data?.datasets?.length) {
+            console.warn("Chart or datasets not available");
+            return;
+        }
+
+        let csv = "Hour,Reads ops/sec,Writes ops/sec\n";
+        const datasets = chart.data.datasets;
+
+        for (let i = 0; i < datasets[0].data.length; i++) {
+            const hour = datasets[0].data[i].x;
+            const reads = datasets[0].data[i].y.toFixed(0);
+            const writes = datasets[1].data[i].y.toFixed(0);
+            csv += `${hour},${reads},${writes}\n`;
+        }
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${cfg.workload || "workload"}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    updateAll();
+});

@@ -6,18 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght,GRAD@8..144,25..151,100..1000,-200..150&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="./src/style.css">
   <link rel="icon" href="favicon.png" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/patternomaly/1.3.2/patternomaly.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/patternomaly@1.3.2/dist/patternomaly.min.js"></script>
   <script type="module" src="./src/app.js" defer></script>
   <title>ScyllaDB | DynamoDB workload calculator</title>
 </head>
-<!-- standalone class for dark background-->
 
 <body class="standalone">
   <div class="container">
@@ -25,7 +25,7 @@
       <header class="row">
         <div class="col">
           <h2 class="title">
-            <img src="./src/aws-dynamodb.svg" class="dynamo-logo"> DynamoDB Cost Calculator
+            <img src="./src/aws-dynamodb.svg" class="dynamo-logo" alt="DynamoDB"> DynamoDB Cost Calculator
           </h2>
         </div>
         <div class="col hstack gap-4 justify-content-end">
@@ -35,23 +35,31 @@
           <button id="copyLinkBtn" class="btn btn-light">
             <i class="icon-copy me-3"></i> Copy
           </button>
+          <button id="saveCsvBtn" class="btn btn-light">
+            <i class="icon-save me-3"></i> Save
+          </button>
           <p class="result"></p>
-<!--          <button class="btn btn-light">-->
-<!--            Save Settings Preset-->
-<!--          </button>-->
-<!--          <button class="btn btn-light menu-button">-->
-<!--            <i class="icon-menu"></i>-->
-<!--          </button>-->
         </div>
       </header>
       <div class="row">
-        <div class="col vstack gap-6">
+        <div class="col vstack gap-4">
           <canvas id="chart" width="800" height="400"></canvas>
-
+          <label for="reserved">Select Workload:</label>
+          <select id="workload">
+            <option value="baselinePeak">Baseline + Peak (Classic)</option>
+            <option value="businessHours">Business Hours</option>
+            <option value="dailyPeak">Unimodal (Daily Peak)</option>
+            <option value="twiceDaily">Bimodal (Twice Daily Peak)</option>
+            <option value="batch">Batch</option>
+            <option value="flatline">Flatline</option>
+            <option value="diurnal">Diurnal</option>
+            <option value="chaos">Chaos (Random)</option>
+            <option value="custom">Custom</option>
+          </select>
           <div id="costParams">
             <div class="radio-container">
               <label>
-                <input type="radio" name="pricing" value="demand" checked> Demand
+                <input type="radio" name="pricing" value="demand" checked> On-Demand
               </label>
               <label>
                 <input type="radio" name="pricing" value="provisioned"> Provisioned
@@ -76,15 +84,8 @@
             </nav>
 
             <div class="tab-content active" id="loadTabContent">
-
-
               <div id="opsParams" class="vstack gap-3">
-                <!-- <div class="lead">
-                  Operations
-                </div> -->
-
                 <div class="row-sm">
-
                   <div class="col vstack gap-3">
                     <h4 class="reads">Reads</h4>
 
@@ -154,9 +155,7 @@
                       </div>
                       <input type="range" id="peakDurationReads" min="0" max="24" value="1">
                     </div>
-
                   </div>
-
                   <div class="col vstack gap-3">
                     <h4 class="writes">Writes</h4>
 
@@ -227,32 +226,101 @@
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div id="provisionedParams" style="display: none;">
-                  <div class="row-sm">
-                    <div class="col vstack gap-3">
-                      <div class="range-group">
-                        <div class="range-group-top">
-                          <label for="reserved">Reserved Capacity:</label>
-                          <div class="inline-input">
-                            <div class="value">
-                              <input type="text" id="reservedInp">
-                              <span id="reservedDsp">0</span>
-                            </div>
-                            <div class="units">
-                            </div>
+              <div id="totalOpsParams" class="vstack gap-3" style="display: none;">
+                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <h4 class="reads">Total Reads</h4>
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="totalReads">Total:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="totalReadsInp">
+                            <span id="totalReadsDsp">500K</span>
                           </div>
-                          <span class="info-icon">
-                            <i class="icon-info-outline"></i>
-                            <span class="tooltip-text">Enter the percentage of baseline operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
-                          </span>
+                          <div class="units">ops/day</div>
                         </div>
-                        <input type="range" id="reserved" min="0" max="100" step="1" value="0">
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the total sum of read operations per day that your workload needs during a 24h period.</span>
+                        </span>
                       </div>
+                      <input type="range" id="totalReads" min="1000" max="100000000000" step="1000" value="10000000000">
+                    </div>
+                  </div>
+                  <div class="col vstack gap-3">
+                    <h4 class="writes">Total Writes</h4>
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="totalWrites">Total:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="totalWritesInp">
+                            <span id="totalWritesDsp">500K</span>
+                          </div>
+                          <div class="units">ops/day</div>
+                        </div>
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the total sum of write operations per day that your workload needs during a 24h period.</span>
+                        </span>
+                      </div>
+                      <input type="range" id="totalWrites" min="1000" max="100000000000" step="1000" value="10000000000">
                     </div>
                   </div>
                 </div>
+              </div>
 
+              <div id="provisionedParams" style="display: none;">
+                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="reserved">Reserved Capacity:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="reservedInp">
+                            <span id="reservedDsp">0</span>
+                          </div>
+                          <div class="units">
+                          </div>
+                        </div>
+                        <span class="info-icon">
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter the percentage of operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+                    </span>
+                      </div>
+                      <input type="range" id="reserved" min="0" max="100" step="1" value="0">
+                    </div>
+                  </div>
+                </div>
+                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="overprovisioned">Overprovisioned Capacity:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="overprovisionedInp">
+                            <span id="overprovisionedDsp">0</span>
+                          </div>
+                          <div class="units">
+                          </div>
+                        </div>
+                        <span class="info-icon">
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter the percentage of capacity to overprovision to avoid request throttling. Recommend a minimum +20%.</span>
+                    </span>
+                      </div>
+                      <input type="range" id="overprovisioned" min="0" max="100" step="1" value="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="itemParams">
                 <div class="row-sm">
                   <div class="col vstack gap-3">
                     <div class="range-group">
@@ -266,38 +334,38 @@
                           <div class="units"></div>
                         </div>
                         <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter your average operation size (all attributes).</span>
-                        </span>
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter your average operation size (all attributes).</span>
+                    </span>
                       </div>
                       <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
                     </div>
                   </div>
                 </div>
-
-                <div id="consistencyParams" class="vstack gap-3">
-                  <div class="range-group">
-                    <div class="range-group-top">
-                      <label>Reads: </label>
-                      <div class="inline-input">
-                        <div class="value fill">
-                          <span id="readConstDsp">Strongly Consistent</span>
-                        </div>
-                        <div class="units">
-                        </div>
-                      </div>
-                      <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
-                        as a percentage.</span>
-                    </span>
-                    </div>
-                    <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
-                  </div>
-                </div>
               </div>
 
+              <div id="consistencyParams">
+                <div class="range-group">
+                  <div class="range-group-top">
+                    <label>Reads: </label>
+                    <div class="inline-input">
+                      <div class="value fill">
+                        <span id="readConstDsp">Strongly Consistent</span>
+                      </div>
+                      <div class="units">
+                      </div>
+                    </div>
+                    <span class="info-icon">
+                <i class="icon-info-outline"></i>
+                <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
+                  as a percentage.</span>
+              </span>
+                  </div>
+                  <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
+                </div>
+              </div>
             </div>
+
             <div class="tab-content" id="tablesTabContent">
               <div id="tableParams" class="vstack gap-3">
 
@@ -360,6 +428,7 @@
               </div>
 
             </div>
+
             <div class="tab-content" id="daxTabContent">
 
               <div id="daxParams" class="vstack gap-3">
@@ -446,12 +515,11 @@
       </div>
     </div>
     <footer>
-      <img src="./src/scylladb-logo.svg" class="scylladb-logo" />
+      <img src="./src/scylladb-logo.svg" class="scylladb-logo" alt="ScyllaDB Logo"/>
       <div class="small">
-        2025 ©ScyllaDB | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.</br>
+        2025 ©ScyllaDB | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.<br>
         Amazon DynamoDB® and Dynamo Accelerator® are trademarks of Amazon.com, Inc. No endorsements by Amazon.com,
-        Inc.
-        are implied by the use of these marks.
+        Inc. are implied by the use of these marks.
       </div>
     </footer>
   </div>

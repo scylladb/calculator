@@ -1,11 +1,25 @@
 export const cfg = {
+    // Charting
+    seriesReads: [],
+    seriesWrites: [],
+    seriesReadsEncoded: '',
+    seriesWritesEncoded: '',
+    maxReads: 0,
+    maxWrites: 0,
     pricing: 'demand',
+
+    // Model
+    workload: 'baselinePeak',
     baselineReads: 100000,
     baselineWrites: 200000,
     peakReads: 250000,
     peakWrites: 500000,
     peakDurationReads: 2,
     peakDurationWrites: 4,
+    totalReads: 0,
+    totalWrites: 0,
+    totalReservedRCU: 0,
+    totalReservedWCU: 0,
     hoursPerMonth: 730,
     itemSizeB: 1024,
     storageGB: 512,
@@ -20,12 +34,17 @@ export const cfg = {
 
     // Provisioned
     pricePerRCU: 0.00013,
-    pricePerRRCU: 0.000025,
+    pricePerReservedRCU: 0.000025,
     pricePerWCU: 0.00065,
-    pricePerRWCU: 0.000128,
+    pricePerReservedWCU: 0.000128,
     pricePerRCU_IA: 0.00016,
     pricePerWCU_IA: 0.00081,
     reserved: 0,
+    overprovisioned: 0,
+
+    // Reserved
+    pricePerReservedRCUUpfront: 0.30,
+    pricePerReservedWCUUpfront: 1.50,
 
     // Replicated
     regions: 1,
