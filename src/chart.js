@@ -49,10 +49,10 @@ export function updateSeries() {
         let value = base;
         switch (cfg.workload) {
             case "dailyPeak":
-                value = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                value = i === 9 ? base * 4.5 : base;
                 break;
             case "twiceDaily":
-                value = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                value = (i === 9 || i === 18) ? base * 3.5 : base;
                 break;
             case "batch":
                 value = (i >= 0 && i <= 3) ? base * 6 : base;
