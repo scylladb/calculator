@@ -123,11 +123,11 @@ export function updateSeries() {
     chart.data.datasets[0].data = [...cfg.seriesReads];
     chart.data.datasets[1].data = [...cfg.seriesWrites];
 
-    const op = (1 + cfg.overprovisioned / 100);
     cfg.maxReads = Math.max(...cfg.seriesReads.map(p => p.y));
     cfg.maxWrites = Math.max(...cfg.seriesWrites.map(p => p.y));
 
     if (cfg.pricing === 'provisioned') {
+        const op = (1 + cfg.overprovisioned / 100);
         chart.data.datasets[2].data = chart.data.datasets[0].data.map((v, i) => {
             const y = typeof v === 'object' ? v.y : v;
             return typeof v === 'object' ? {x: v.x, y: y * op} : y * op;
@@ -142,7 +142,6 @@ export function updateSeries() {
     }
 
     if (cfg.pricing === 'provisioned' && cfg.reserved > 0) {
-        console.log(`Setting reserved RCU/WCU to ${cfg.totalReservedRCU} / ${cfg.totalReservedWCU}`);
         chart.data.datasets[4].data = Array(24).fill(cfg.totalReservedRCU) || Array(24).fill(null);
         chart.data.datasets[5].data = Array(24).fill(cfg.totalReservedWCU) || Array(24).fill(null);
     } else {

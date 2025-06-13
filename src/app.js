@@ -384,7 +384,5 @@ document.addEventListener('DOMContentLoaded', function() {
         URL.revokeObjectURL(url);
     });
 
-    console.log("App initialized with workload:", cfg.workload);
-
     updateAll();
 });

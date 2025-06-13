@@ -190,9 +190,10 @@ export function updateAll() {
     toggleOpsParams();
     updateQueryParams();
     updateTotalOps();
+    updateSeries(); // we have to update series before costs
     updateCosts();
     updateOpsDisplays();
-    updateSeries();
+    updateSeries(); // update series after costs to ensure correct values
     updateChartScale();
 
     console.log('Updated with cfg:', cfg);
