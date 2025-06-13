@@ -60,11 +60,9 @@ function getHoursValues() {
 }
 
 function getTotalOps() {
-    // calculate total ops
     cfg.totalReads = 0;
     cfg.totalWrites = 0;
 
-    // sum up all series data for both reads and writes
     for (const point of cfg.seriesReads) {
         cfg.totalReads += (point.y * 3600);
     }
@@ -81,7 +79,8 @@ export function calculateProvisionedReads() {
         (cfg.peakReads * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
     const totalRCU = ((cfg.totalReads / cfg.secondsPerDay * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
         (cfg.totalReads / cfg.secondsPerDay * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
-    const maxRCU = cfg.maxReads * cfg.itemRCU * cfg.overprovisionedPercentage;
+    const maxRCU = ((cfg.maxReads * cfg.readEventuallyConsistent * 0.5 * cfg.itemRCU) +
+        (cfg.maxReads * cfg.readStronglyConsistent * cfg.itemRCU)) * cfg.overprovisionedPercentage;
     let reservedRCU, unreservedRCU, costReservedRCU, costReservedUpfrontRCU, costUnreservedRCU;
 
     if (cfg.workload === 'baselinePeak') {
