@@ -276,7 +276,18 @@ export const chart = new Chart(ctx, {
                     if (e.target?.style)
                         e.target.style.cursor = "grabbing";
                 },
-                onDragEnd: function (e) {
+                onDragEnd: function (e, datasetIndex, index, value) {
+                    // Only update for Reads (0) and Writes (1) series
+                    if (datasetIndex === 0 || datasetIndex === 1) {
+                        chart.data.datasets[datasetIndex].data[index] = value;
+                        // Update cfg.seriesReads or cfg.seriesWrites as well
+                        if (datasetIndex === 0) {
+                            cfg.seriesReads[index].y = value.y !== undefined ? value.y : value;
+                        } else if (datasetIndex === 1) {
+                            cfg.seriesWrites[index].y = value.y !== undefined ? value.y : value;
+                        }
+                        encodeSeriesData();
+                    }
                     cfg.workload = "custom";
                     updateAll();
                     if (e.target?.style)
