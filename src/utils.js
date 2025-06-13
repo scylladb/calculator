@@ -272,14 +272,3 @@ copyLinkButton.addEventListener('click', () => {
             resultPara.textContent = 'Failed to copy: ' + err.message;
         });
 });
-
-// Disable reserved read/write fields based on table class
-export function updateReservedFields() {
-    if (cfg.tableClass === 'infrequentAccess') {
-        document.getElementById('reservedReads').disabled = true;
-        document.getElementById('reservedWrites').disabled = true;
-    } else {
-        document.getElementById('reservedReads').disabled = false;
-        document.getElementById('reservedWrites').disabled = false;
-    }
-}
