@@ -12,11 +12,13 @@ function generateData(baseline, peak, peakDuration) {
     const peakEnd = peakStart + peakDuration;
 
     for (let hour = 0; hour < 24; hour++) {
+        let value;
         if (peakDuration > 0 && hour >= peakStart && hour < peakEnd) {
-            data.push(peak);
+            value = peak;
         } else {
-            data.push(baseline);
+            value = baseline;
         }
+        data.push({ x: hour, y: value });
     }
 
     return data;
@@ -49,10 +51,10 @@ export function updateSeries() {
         let value = base;
         switch (cfg.workload) {
             case "dailyPeak":
-                value = i === 9 ? base * (4.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                value = i === 9 ? base * 4.5 : base;
                 break;
             case "twiceDaily":
-                value = (i === 9 || i === 18) ? base * (3.5 + Math.random()) : base + (Math.random() * base * 0.1);
+                value = (i === 9 || i === 18) ? base * 3.5 : base;
                 break;
             case "batch":
                 value = (i >= 0 && i <= 3) ? base * 6 : base;
@@ -141,7 +143,7 @@ export function updateSeries() {
         chart.data.datasets[3].data = [];
     }
 
-    if (cfg.pricing === 'provisioned' && cfg.reserved > 0) {
+    if (cfg.pricing === 'provisioned' && (cfg.reservedReads > 0 || cfg.reservedWrites > 0)) {
         chart.data.datasets[4].data = Array(24).fill(cfg.totalReservedRCU) || Array(24).fill(null);
         chart.data.datasets[5].data = Array(24).fill(cfg.totalReservedWCU) || Array(24).fill(null);
     } else {
@@ -260,7 +262,7 @@ export const chart = new Chart(ctx, {
                 display: true,
                 callbacks: {
                     label: function (context) {
-                        return context.dataset.label +  ': ' + formatNumber(context.raw) + ' ops/sec';
+                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
                     }
                 },
             },
