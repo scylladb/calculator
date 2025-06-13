@@ -141,7 +141,7 @@ export function updateSeries() {
         chart.data.datasets[3].data = [];
     }
 
-    if (cfg.pricing === 'provisioned' && cfg.reserved > 0) {
+    if (cfg.pricing === 'provisioned' && (cfg.reservedReads > 0 || cfg.reservedWrites > 0)) {
         chart.data.datasets[4].data = Array(24).fill(cfg.totalReservedRCU) || Array(24).fill(null);
         chart.data.datasets[5].data = Array(24).fill(cfg.totalReservedWCU) || Array(24).fill(null);
     } else {

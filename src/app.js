@@ -64,7 +64,8 @@ document.getElementById("workload").addEventListener('change', function () {
 
 document.getElementById('tableClass').addEventListener('change', () => {
     cfg.tableClass = this.value;
-    document.getElementById('reserved').disabled = cfg.tableClass === 'infrequentAccess';
+    document.getElementById('reservedReads').disabled = cfg.tableClass === 'infrequentAccess';
+    document.getElementById('reservedWrites').disabled = cfg.tableClass === 'infrequentAccess';
     updateAll();
 });
 
@@ -178,9 +179,15 @@ document.getElementById('totalWrites').addEventListener('input', (event) => {
     }
 });
 
-document.getElementById('reserved').addEventListener('input', (event) => {
-    cfg.reserved = parseInt(event.target.value);
-    document.getElementById('reservedDsp').innerText = `${formatNumber(cfg.reserved)}%`;
+document.getElementById('reservedReads').addEventListener('input', (event) => {
+    cfg.reservedReads = parseInt(event.target.value);
+    document.getElementById('reservedReadsDsp').innerText = `${formatNumber(cfg.reservedReads)}%`;
+    updateAll();
+});
+
+document.getElementById('reservedWrites').addEventListener('input', (event) => {
+    cfg.reservedWrites = parseInt(event.target.value);
+    document.getElementById('reservedWritesDsp').innerText = `${formatNumber(cfg.reservedWrites)}%`;
     updateAll();
 });
 
@@ -272,7 +279,8 @@ setupSliderInteraction('peakDurationReadsDsp', 'peakDurationReadsInp', 'peakDura
 setupSliderInteraction('peakDurationWritesDsp', 'peakDurationWritesInp', 'peakDurationWrites', value => value);
 setupSliderInteraction('totalReadsDsp', 'totalReadsInp', 'totalReads', formatNumber);
 setupSliderInteraction('totalWritesDsp', 'totalWritesInp', 'totalWrites', formatNumber);
-setupSliderInteraction('reservedDsp', 'reservedInp', 'reserved', value => `${value}%`);
+setupSliderInteraction('reservedReadsDsp', 'reservedReadsInp', 'reservedReads', value => `${value}%`);
+setupSliderInteraction('reservedWritesDsp', 'reservedWritesInp', 'reservedWrites', value => `${value}%`);
 setupSliderInteraction('overprovisionedDsp', 'overprovisionedInp', 'overprovisioned', value => `${value}%`);
 setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
@@ -304,7 +312,8 @@ document.getElementById('storageGB').value = cfg.storageGB;
 document.getElementById('regions').value = cfg.regions;
 document.getElementById('cacheSize').value = cfg.cacheSizeGB;
 document.getElementById('cacheRatio').value = cfg.cacheRatio;
-document.getElementById('reserved').value = cfg.reserved;
+document.getElementById('reservedReads').value = cfg.reservedReads;
+document.getElementById('reservedWrites').value = cfg.reservedWrites;
 document.getElementById('overprovisioned').value = cfg.overprovisioned;
 document.getElementById('readConst').value = cfg.readConst;
 document.getElementById('daxNodes').value = cfg.daxNodes;
@@ -323,7 +332,8 @@ document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.s
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
 document.getElementById('cacheRatioDsp').innerText = `${cfg.cacheRatio}/${100 - cfg.cacheRatio}`;
-document.getElementById('reservedDsp').innerText = `${cfg.reserved}%`;
+document.getElementById('reservedReadsDsp').innerText = `${cfg.reservedReads}%`;
+document.getElementById('reservedWritesDsp').innerText = `${cfg.reservedWrites}%`;
 document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;

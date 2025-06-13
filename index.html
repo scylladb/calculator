@@ -278,25 +278,41 @@
                   <div class="col vstack gap-3">
                     <div class="range-group">
                       <div class="range-group-top">
-                        <label for="reserved">Reserved Capacity:</label>
+                        <label for="reservedReads">Reserved Capacity:</label>
                         <div class="inline-input">
                           <div class="value">
-                            <input type="text" id="reservedInp">
-                            <span id="reservedDsp">0</span>
+                            <input type="text" id="reservedReadsInp">
+                            <span id="reservedReadsDsp">0</span>
                           </div>
-                          <div class="units">
-                          </div>
+                          <div class="units"></div>
                         </div>
                         <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter the percentage of operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
-                    </span>
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the percentage of read operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+                        </span>
                       </div>
-                      <input type="range" id="reserved" min="0" max="100" step="1" value="0">
+                      <input type="range" id="reservedReads" min="0" max="100" step="1" value="0">
                     </div>
                   </div>
-                </div>
-                <div class="row-sm">
+                  <div class="col vstack gap-3">
+                    <div class="range-group">
+                      <div class="range-group-top">
+                        <label for="reservedWrites">Reserved Capacity:</label>
+                        <div class="inline-input">
+                          <div class="value">
+                            <input type="text" id="reservedWritesInp">
+                            <span id="reservedWritesDsp">0</span>
+                          </div>
+                          <div class="units"></div>
+                        </div>
+                        <span class="info-icon">
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the percentage of write operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+                        </span>
+                      </div>
+                      <input type="range" id="reservedWrites" min="0" max="100" step="1" value="0">
+                    </div>
+                  </div>
                   <div class="col vstack gap-3">
                     <div class="range-group">
                       <div class="range-group-top">
@@ -306,13 +322,12 @@
                             <input type="text" id="overprovisionedInp">
                             <span id="overprovisionedDsp">0</span>
                           </div>
-                          <div class="units">
-                          </div>
+                          <div class="units"></div>
                         </div>
                         <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter the percentage of capacity to overprovision to avoid request throttling. Recommend a minimum +20%.</span>
-                    </span>
+                          <i class="icon-info-outline"></i>
+                          <span class="tooltip-text">Enter the percentage of capacity to overprovision to avoid request throttling. Recommend a minimum +20%.</span>
+                        </span>
                       </div>
                       <input type="range" id="overprovisioned" min="0" max="100" step="1" value="0">
                     </div>
@@ -526,3 +541,4 @@
 </body>
 
 </html>
+

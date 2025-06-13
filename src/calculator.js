@@ -40,7 +40,8 @@ function getConsistencyValues() {
 }
 
 function getReservedValues() {
-    cfg.reserved = parseInt(document.getElementById('reserved').value);
+    cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
+    cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
 }
 
 function getProvisionedValues() {
@@ -55,8 +56,10 @@ function getHoursValues() {
     cfg.totalPeakHoursPerMonthWrites = Number((cfg.peakDurationWrites * cfg.daysPerMonth).toFixed(1));
     cfg.totalBaseHoursPerMonthReads = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthReads;
     cfg.totalBaseHoursPerMonthWrites = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
-    cfg.reservedPercentage = parseInt(document.getElementById('reserved').value) / 100.0;
-    cfg.unreservedPercentage = 1 - cfg.reservedPercentage;
+    cfg.reservedReadsPercentage = parseInt(document.getElementById('reservedReads').value) / 100.0;
+    cfg.reservedWritesPercentage = parseInt(document.getElementById('reservedWrites').value) / 100.0;
+    cfg.unreservedReadsPercentage = 1 - cfg.reservedReadsPercentage;
+    cfg.unreservedWritesPercentage = 1 - cfg.reservedWritesPercentage;
 }
 
 function getTotalOps() {
@@ -84,7 +87,7 @@ export function calculateProvisionedReads() {
     let reservedRCU, unreservedRCU, costReservedRCU, costReservedUpfrontRCU, costUnreservedRCU;
 
     if (cfg.workload === 'baselinePeak') {
-        reservedRCU = baseRCU * cfg.reservedPercentage;
+        reservedRCU = baseRCU * cfg.reservedReadsPercentage;
         cfg.totalReservedRCU = Math.ceil(reservedRCU / 100) * 100;
         const unreservedBaseRCU = Math.max(baseRCU - cfg.totalReservedRCU, 0);
         const unreservedPeakRCU = Math.max(peakRCU - cfg.totalReservedRCU, 0);
@@ -92,7 +95,7 @@ export function calculateProvisionedReads() {
         const peakHours = cfg.totalPeakHoursPerMonthReads;
         unreservedRCU = (unreservedBaseRCU * baselineHours) + (unreservedPeakRCU * peakHours);
     } else {
-        reservedRCU = maxRCU * cfg.reservedPercentage;
+        reservedRCU = maxRCU * cfg.reservedReadsPercentage;
         cfg.totalReservedRCU = Math.ceil(reservedRCU / 100) * 100;
         unreservedRCU = Math.max(totalRCU - cfg.totalReservedRCU, 0) * cfg.hoursPerMonth;
     }
@@ -118,7 +121,7 @@ export function calculateProvisionedWrites() {
     let reservedWCU, unreservedWCU, costReservedWCU, costReservedUpfrontWCU, costUnreservedWCU;
 
     if (cfg.workload === 'baselinePeak') {
-        reservedWCU = baseWCU * cfg.reservedPercentage;
+        reservedWCU = baseWCU * cfg.reservedWritesPercentage;
         cfg.totalReservedWCU = Math.ceil(reservedWCU / 100) * 100;
         const unreservedBaseWCU = Math.max(baseWCU - cfg.totalReservedWCU, 0);
         const unreservedPeakWCU = Math.max(peakWCU - cfg.totalReservedWCU, 0);
@@ -126,7 +129,7 @@ export function calculateProvisionedWrites() {
         const peakHours = cfg.totalPeakHoursPerMonthWrites;
         unreservedWCU = (unreservedBaseWCU * baselineHours) + (unreservedPeakWCU * peakHours);
     } else {
-        reservedWCU = maxWCU * cfg.reservedPercentage;
+        reservedWCU = maxWCU * cfg.reservedWritesPercentage;
         cfg.totalReservedWCU = Math.ceil(reservedWCU / 100) * 100;
         unreservedWCU = Math.max(totalWCU - cfg.totalReservedWCU, 0) * cfg.hoursPerMonth;
     }

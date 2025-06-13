@@ -53,12 +53,19 @@ export function getQueryParams() {
     assignParam('cacheSizeGB', parseInt);
     assignParam('cacheRatio', parseInt);
     assignParam('reserved', parseInt);
+    assignParam('reservedReads', parseInt);
+    assignParam('reservedWrites', parseInt);
     assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
 
     if (cfg.pricing === 'provisioned' || cfg.pricing === 'demand') {
         const radio = document.querySelector(`input[name="pricing"][value="${cfg.pricing}"]`);
         if (radio) radio.checked = true;
+    }
+
+    if (cfg.reserved > 0) {
+        cfg.reservedReads = cfg.reserved;
+        cfg.reservedWrites = cfg.reserved;
     }
 
     if (cfg.workload === 'custom') {
@@ -117,7 +124,8 @@ export function updateQueryParams() {
         setOrDelete('peakDurationWrites', cfg.peakDurationWrites);
         setOrDelete('totalReads', cfg.totalReads);
         setOrDelete('totalWrites', cfg.totalWrites);
-        setOrDelete('reserved', cfg.reserved);
+        setOrDelete('reservedReads', cfg.reservedReads);
+        setOrDelete('reservedWrites', cfg.reservedWrites);
         setOrDelete('overprovisioned', cfg.overprovisioned);
         setOrDelete('readConst', cfg.readConst);
         setOrDelete('seriesReads', cfg.seriesReadsEncoded);
@@ -264,3 +272,14 @@ copyLinkButton.addEventListener('click', () => {
             resultPara.textContent = 'Failed to copy: ' + err.message;
         });
 });
+
+// Disable reserved read/write fields based on table class
+export function updateReservedFields() {
+    if (cfg.tableClass === 'infrequentAccess') {
+        document.getElementById('reservedReads').disabled = true;
+        document.getElementById('reservedWrites').disabled = true;
+    } else {
+        document.getElementById('reservedReads').disabled = false;
+        document.getElementById('reservedWrites').disabled = false;
+    }
+}
