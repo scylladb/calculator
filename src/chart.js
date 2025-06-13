@@ -12,11 +12,13 @@ function generateData(baseline, peak, peakDuration) {
     const peakEnd = peakStart + peakDuration;
 
     for (let hour = 0; hour < 24; hour++) {
+        let value;
         if (peakDuration > 0 && hour >= peakStart && hour < peakEnd) {
-            data.push(peak);
+            value = peak;
         } else {
-            data.push(baseline);
+            value = baseline;
         }
+        data.push({ x: hour, y: value });
     }
 
     return data;
@@ -260,7 +262,7 @@ export const chart = new Chart(ctx, {
                 display: true,
                 callbacks: {
                     label: function (context) {
-                        return context.dataset.label +  ': ' + formatNumber(context.raw) + ' ops/sec';
+                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
                     }
                 },
             },
