@@ -57,13 +57,13 @@ document.querySelector('input[name="pricing"][value="provisioned"]').addEventLis
     }
 });
 
-document.getElementById("workload").addEventListener('change', function () {
-    cfg.workload = this.value;
+document.getElementById("workload").addEventListener('change', (event) => {
+    cfg.workload = event.target.value;
     updateAll();
 });
 
-document.getElementById('tableClass').addEventListener('change', () => {
-    cfg.tableClass = this.value;
+document.getElementById('tableClass').addEventListener('change', (event) => {
+    cfg.tableClass = event.target.value;
     document.getElementById('reservedReads').disabled = cfg.tableClass === 'infrequentAccess';
     document.getElementById('reservedWrites').disabled = cfg.tableClass === 'infrequentAccess';
     updateAll();
