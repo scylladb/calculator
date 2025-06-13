@@ -147,6 +147,7 @@ export function updateQueryParams() {
         }
 
         window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+        console.log('Updated with cfg:', cfg);
     }, 1000);
 }
 
@@ -187,13 +188,11 @@ export function toggleProvisionedParams() {
 export function updateAll() {
     toggleProvisionedParams();
     toggleOpsParams();
-    updateQueryParams();
     updateSeries(); // we have to update series before costs
     updateCosts();
     updateSeries(); // update series after costs to ensure correct values
     updateOpsDisplays();
-
-    // console.log('Updated with cfg:', cfg);
+    updateQueryParams();
 }
 
 // Update the displayed costs in the DOM
