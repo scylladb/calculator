@@ -52,7 +52,7 @@ export function calculateScyllaPricing(cfg) {
     // Choose the cheapest option
     const best = nodeOptions.reduce((a, b) => (a.cost < b.cost ? a : b));
 
-    // Return breakdown
+    // Form the recommendation
     const recommendation = {
         replication,
         requiredVCPUs,
@@ -63,6 +63,5 @@ export function calculateScyllaPricing(cfg) {
         bestMonthlyCost: best.cost
     };
 
-    console.log('ScyllaDB Pricing Recommendation:', recommendation);
     return recommendation;
 }
