@@ -44,16 +44,22 @@ export function calculateScyllaPricing(cfg) {
         const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
         const usableStoragePerNode = spec.storage * DEFAULT_STORAGE_UTILIZATION;
         const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
-        const nodes = Math.max(nodesForVCPU, nodesForStorage);
+        let nodes = Math.max(nodesForVCPU, nodesForStorage);
+        // Ensure nodes is a multiple of 3
+        if (nodes % 3 !== 0) {
+            nodes = nodes + (3 - (nodes % 3));
+        }
         const cost = nodes * spec.price * (cfg.regions || 1);
         return { type, nodes, cost };
     });
 
-    // Choose the cheapest option
-    const best = nodeOptions.reduce((a, b) => (a.cost < b.cost ? a : b));
+    // Choose the option with the least nodes, then lowest cost if tie
+    const minNodes = Math.min(...nodeOptions.map(opt => opt.nodes));
+    const bestCandidates = nodeOptions.filter(opt => opt.nodes === minNodes);
+    const best = bestCandidates.reduce((a, b) => (a.cost < b.cost ? a : b));
 
     // Form the recommendation
-    const recommendation = {
+    return {
         replication,
         requiredVCPUs,
         requiredStorage,
@@ -62,6 +68,4 @@ export function calculateScyllaPricing(cfg) {
         bestNodeCount: best.nodes,
         bestMonthlyCost: best.cost
     };
-
-    return recommendation;
 }

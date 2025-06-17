@@ -19,13 +19,14 @@ describe('calculateScyllaPricing', () => {
         expect(result.requiredVCPUs).toBe(6); // ((20000+10000)*3)/15000 = 6
         expect(result.requiredStorage).toBe(18000); // (3000/0.5)*3 = 18000
         expect(result.nodeOptions.length).toBe(9); // 10 instance types
-        expect(result.bestInstanceType).toBe('i7ie.large'); // cheapest for this config
-        expect(result.bestNodeCount).toBe(16); // max(ceil(6/2), ceil(18000/(1250*0.9))) = max(3, 16) = 16
-        expect(result.bestMonthlyCost).toBe(61.152); // 16*1.911*2 = 61.152
+        expect(result.bestInstanceType).toBe('i7ie.3xlarge'); // least nodes for this config
+        expect(result.bestNodeCount % 3).toBe(0); // nodes should be a multiple of 3
+        expect(result.bestNodeCount).toBe(3); // max(ceil(6/12), ceil(18000/(7500*0.9))) = max(1, 3) = 3 (rounded up to next multiple of 3)
+        expect(result.bestMonthlyCost).toBeCloseTo(82.476, 3); // 3*13.746*2 = 82.476
         // console.log('ScyllaDB Pricing Result:', result);
     });
 
-    it('should handle RF=2 and RF=3 correctly', () => {
+    it('should handle RF=2 correctly', () => {
         // RF=2
         let cfg = {
             peakReads: 10000,
@@ -39,12 +40,15 @@ describe('calculateScyllaPricing', () => {
         expect(result.replication).toBe(2); // input
         expect(result.requiredVCPUs).toBe(2); // ((10000+5000)*2)/15000 = 2
         expect(result.requiredStorage).toBe(4000); // (1000/0.5)*2 = 4000
-        // i7ie.large: max(ceil(2/2), ceil(4000/(1250*0.9))) = max(1, 4) = 4
-        const best_2 = result.nodeOptions.find(n => n.type === 'i7ie.large');
-        expect(best_2.nodes).toBe(4);
+        // i7ie.large: max(ceil(2/2), ceil(4000/(1250*0.9))) = max(1, 4) = 4, rounded up to 6
+        let recommendation = result.nodeOptions.find(n => n.type === 'i7ie.large');
+        expect(recommendation.nodes).toBe(6);
+        // Remove bestInstanceType check here (not present on nodeOption)
+    });
 
+    it('should handle RF=3 correctly', () => {
         // RF=3
-        cfg = {
+        let cfg = {
             peakReads: 10000,
             peakWrites: 5000,
             storageGB: 1000,
@@ -52,13 +56,16 @@ describe('calculateScyllaPricing', () => {
             scyllaCompressionRatio: 0.5,
             regions: 1
         };
-        result = calculateScyllaPricing(cfg);
+        let result = calculateScyllaPricing(cfg);
         expect(result.replication).toBe(3); // input
         expect(result.requiredVCPUs).toBe(3); // ((10000+5000)*3)/15000 = 3
         expect(result.requiredStorage).toBe(6000); // (1000/0.5)*3 = 6000
         // i7ie.large: max(ceil(3/2), ceil(6000/(1250*0.9))) = max(2, 6) = 6
-        const best_3 = result.nodeOptions.find(n => n.type === 'i7ie.large');
-        expect(best_3.nodes).toBe(6);
+        let recommendation = result.nodeOptions.find(n => n.type === 'i7ie.large');
+        expect(recommendation.nodes).toBe(6);
+        expect(result.bestInstanceType).toBe('i7ie.xlarge'); // least nodes for this config
+        expect(result.bestNodeCount).toBe(3); // max(ceil(3/4), ceil(6000/(2500*0.9))) = max(1, 3) = 3
+        expect(result.bestMonthlyCost).toBeCloseTo(13.746, 3); // 3*4.582*1 = 13.746
     });
 
     it('should handle high ops/sec and large storage', () => {
@@ -73,9 +80,12 @@ describe('calculateScyllaPricing', () => {
         const result = calculateScyllaPricing(cfg);
         expect(result.requiredVCPUs).toBe(40); // ((100000+100000)*3)/15000 = 40
         expect(result.requiredStorage).toBe(300000); // (50000/0.5)*3 = 300000
-        // i7ie.12xlarge: max(ceil(40/48), ceil(300000/(30000*0.9))) = max(1, 12) = 12
-        const best_hi = result.nodeOptions.find(n => n.type === 'i7ie.12xlarge');
-        expect(best_hi.nodes).toBe(12);
+        // i7ie.48xlarge: max(ceil(40/192), ceil(300000/(120000*0.9))) = max(1, 3) = 3 (rounded up to next multiple of 3)
+        let recommendation = result.nodeOptions.find(n => n.type === 'i7ie.48xlarge');
+        expect(recommendation.nodes).toBe(3);
+        expect(result.bestInstanceType).toBe('i7ie.48xlarge');
+        // The cost: 3 * 219.931 * 1 = 659.793
+        expect(result.bestMonthlyCost).toBeCloseTo(659.793, 3);
     });
 
     it('should handle small storage and low ops/sec', () => {
@@ -90,8 +100,9 @@ describe('calculateScyllaPricing', () => {
         const result = calculateScyllaPricing(cfg);
         expect(result.requiredVCPUs).toBe(1); // ((100+100)*2)/15000 = 1
         expect(result.requiredStorage).toBe(40); // (10/0.5)*2 = 40
-        // i7ie.large: max(ceil(1/2), ceil(40/(1250*0.9))) = max(1, 1) = 1
-        const best_lo = result.nodeOptions.find(n => n.type === 'i7ie.large');
-        expect(best_lo.nodes).toBe(1);
+        // i7ie.large: max(ceil(1/2), ceil(40/(1250*0.9))) = max(1, 1) = 1, rounded up to 3
+        let recommendation = result.nodeOptions.find(n => n.type === 'i7ie.large');
+        expect(recommendation.nodes).toBe(3);
+        expect(result.bestInstanceType).toBe('i7ie.large');
     });
 });
