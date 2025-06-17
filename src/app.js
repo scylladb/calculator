@@ -321,7 +321,7 @@ document.getElementById('peakDurationReadsDsp').innerText = cfg.peakDurationRead
 document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationWrites.toString();
 document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
 document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
-document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
+document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.round(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
