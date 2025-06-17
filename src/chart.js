@@ -144,8 +144,8 @@ export function updateSeries() {
     }
 
     if (cfg.pricing === 'provisioned' && (cfg.reservedReads > 0 || cfg.reservedWrites > 0)) {
-        chart.data.datasets[4].data = Array(24).fill(cfg.totalReservedRCU) || Array(24).fill(null);
-        chart.data.datasets[5].data = Array(24).fill(cfg.totalReservedWCU) || Array(24).fill(null);
+        chart.data.datasets[4].data = Array(24).fill(cfg.totalReservedRCU / cfg.itemRCU) || Array(24).fill(null);
+        chart.data.datasets[5].data = Array(24).fill(cfg.totalReservedWCU / cfg.itemWCU) || Array(24).fill(null);
     } else {
         chart.data.datasets[4].data = [];
         chart.data.datasets[5].data = [];

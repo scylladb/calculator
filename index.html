@@ -278,7 +278,7 @@
                   <div class="col vstack gap-3">
                     <div class="range-group">
                       <div class="range-group-top">
-                        <label for="reservedReads">Reserved Capacity:</label>
+                        <label for="reservedReads">Read Reserved Capacity:</label>
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="reservedReadsInp">
@@ -297,7 +297,7 @@
                   <div class="col vstack gap-3">
                     <div class="range-group">
                       <div class="range-group-top">
-                        <label for="reservedWrites">Reserved Capacity:</label>
+                        <label for="reservedWrites">Write Reserved Capacity:</label>
                         <div class="inline-input">
                           <div class="value">
                             <input type="text" id="reservedWritesInp">
@@ -326,7 +326,8 @@
                         </div>
                         <span class="info-icon">
                           <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the percentage of capacity to overprovision to avoid request throttling. Recommend a minimum +20%.</span>
+                          <span class="tooltip-text">Provisioned capacity should be 20% above consumed capacity to avoid throttling.
+                            DynamoDB's burst capacity is limited and not guaranteed.</span>
                         </span>
                       </div>
                       <input type="range" id="overprovisioned" min="0" max="100" step="1" value="0">
@@ -353,7 +354,7 @@
                       <span class="tooltip-text">Enter your average operation size (all attributes).</span>
                     </span>
                       </div>
-                      <input type="range" id="itemSizeB" min="64" max="409600" step="64" value="1024">
+                      <input type="range" id="itemSizeB" min="1" max="409600" step="1" value="1024">
                     </div>
                   </div>
                 </div>
@@ -376,7 +377,7 @@
                   as a percentage.</span>
               </span>
                   </div>
-                  <input type="range" id="readConst" class="slider" min="0" max="100" value="100">
+                  <input type="range" id="readConst" class="slider" min="0" max="100" step="100" value="100">
                 </div>
               </div>
             </div>

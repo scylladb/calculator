@@ -209,17 +209,11 @@ document.getElementById('itemSizeB').addEventListener('input', function (event) 
     const slider = event.target;
     const value = parseInt(slider.value);
 
-    if (value <= 1024) {
-        slider.step = 64;
-    } else {
-        slider.step = 1024;
-    }
-
     let displayValue;
     if (value < 1024) {
         displayValue = `${value} B`;
     } else {
-        displayValue = `${Math.floor(value / 1024)} KB`;
+        displayValue = `${Math.round(value / 1024)} KB`;
     }
     cfg.itemSizeB = value;
     document.getElementById('itemSizeDsp').innerText = displayValue;
@@ -282,7 +276,7 @@ setupSliderInteraction('totalWritesDsp', 'totalWritesInp', 'totalWrites', format
 setupSliderInteraction('reservedReadsDsp', 'reservedReadsInp', 'reservedReads', value => `${value}%`);
 setupSliderInteraction('reservedWritesDsp', 'reservedWritesInp', 'reservedWrites', value => `${value}%`);
 setupSliderInteraction('overprovisionedDsp', 'overprovisionedInp', 'overprovisioned', value => `${value}%`);
-setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
+setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.round(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
@@ -327,7 +321,7 @@ document.getElementById('peakDurationReadsDsp').innerText = cfg.peakDurationRead
 document.getElementById('peakDurationWritesDsp').innerText = cfg.peakDurationWrites.toString();
 document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
 document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
-document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.floor(cfg.itemSizeB / 1024)} KB`;
+document.getElementById('itemSizeDsp').innerText = cfg.itemSizeB < 1024 ? `${cfg.itemSizeB} B` : `${Math.round(cfg.itemSizeB / 1024)} KB`;
 document.getElementById('storageDsp').innerText = cfg.storageGB >= 1024 ? (cfg.storageGB / 1024).toFixed(2) + ' TB' : cfg.storageGB + ' GB';
 document.getElementById('regionsDsp').innerText = cfg.regions.toString();
 document.getElementById('cacheSizeDsp').innerText = cfg.cacheSizeGB >= 1024 ? (cfg.cacheSizeGB / 1024).toFixed(2) + ' TB' : cfg.cacheSizeGB + ' GB';
@@ -337,7 +331,6 @@ document.getElementById('reservedWritesDsp').innerText = `${cfg.reservedWrites}%
 document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
-
 
 document.addEventListener('DOMContentLoaded', function() {
     const tabLabels = document.querySelectorAll('.tab-label');
