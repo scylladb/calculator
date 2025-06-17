@@ -332,7 +332,6 @@ document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
-
 document.addEventListener('DOMContentLoaded', function() {
     const tabLabels = document.querySelectorAll('.tab-label');
     const tabContents = document.querySelectorAll('.tab-content');
