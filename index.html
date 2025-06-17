@@ -326,7 +326,8 @@
                         </div>
                         <span class="info-icon">
                           <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the percentage of capacity to overprovision to avoid request throttling. Recommend a minimum +20%.</span>
+                          <span class="tooltip-text">Provisioned capacity should be 20% above consumed capacity to avoid throttling.
+                            DynamoDB's burst capacity is limited and not guaranteed.</span>
                         </span>
                       </div>
                       <input type="range" id="overprovisioned" min="0" max="100" step="1" value="0">
