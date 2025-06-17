@@ -3,9 +3,9 @@ import { calculateScyllaPricing } from '../src/calculatorScyllaDB.js';
 describe('calculateScyllaPricing', () => {
     it('should calculate correct node count and cost for i7ie.large', () => {
         const cfg = {
-            peakReads: 20000,
-            peakWrites: 10000,
-            storageGB: 3000,
+            peakReads: 20_000,
+            peakWrites: 10_000,
+            storageGB: 3_000,
             scyllaReplication: 3,
             scyllaCompressionRatio: 0.5,
             regions: 2,
@@ -26,6 +26,55 @@ describe('calculateScyllaPricing', () => {
         // Check bestInstanceType is one of the types
         expect(cfg.expectedTypes).toContain(result.bestInstanceType);
         // Check node count and cost are positive
+        expect(result.bestNodeCount).toBeGreaterThan(0);
+        expect(result.bestMonthlyCost).toBeGreaterThan(0);
+    });
+
+    it('should handle RF=2 and RF=3 correctly', () => {
+        [2, 3].forEach(rf => {
+            const cfg = {
+                peakReads: 10_000,
+                peakWrites: 5_000,
+                storageGB: 1_000,
+                scyllaReplication: rf,
+                scyllaCompressionRatio: 0.5,
+                regions: 1
+            };
+            const result = calculateScyllaPricing(cfg);
+            expect(result.replication).toBe(rf);
+            expect(result.bestNodeCount).toBeGreaterThan(0);
+            expect(result.bestMonthlyCost).toBeGreaterThan(0);
+        });
+    });
+
+    it('should handle high ops/sec and large storage', () => {
+        const cfg = {
+            peakReads: 100_000,
+            peakWrites: 100_000,
+            storageGB: 50_000,
+            scyllaReplication: 3,
+            scyllaCompressionRatio: 0.5,
+            regions: 1
+        };
+        const result = calculateScyllaPricing(cfg);
+        expect(result.requiredVCPUs).toBeGreaterThan(0);
+        expect(result.requiredStorage).toBeGreaterThan(0);
+        expect(result.bestNodeCount).toBeGreaterThan(0);
+        expect(result.bestMonthlyCost).toBeGreaterThan(0);
+    });
+
+    it('should handle small storage and low ops/sec', () => {
+        const cfg = {
+            peakReads: 100,
+            peakWrites: 100,
+            storageGB: 10,
+            scyllaReplication: 2,
+            scyllaCompressionRatio: 0.5,
+            regions: 1
+        };
+        const result = calculateScyllaPricing(cfg);
+        expect(result.requiredVCPUs).toBeGreaterThan(0);
+        expect(result.requiredStorage).toBeGreaterThan(0);
         expect(result.bestNodeCount).toBeGreaterThan(0);
         expect(result.bestMonthlyCost).toBeGreaterThan(0);
     });
