@@ -23,6 +23,8 @@ export const cfg = {
     hoursPerMonth: 730,
     itemSizeB: 1024,
     storageGB: 512,
+    itemRCU: 1,
+    itemWCU: 1,
     tableClass: 'standard',
     readConst: 100,
 
