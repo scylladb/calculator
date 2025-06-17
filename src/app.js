@@ -209,17 +209,11 @@ document.getElementById('itemSizeB').addEventListener('input', function (event) 
     const slider = event.target;
     const value = parseInt(slider.value);
 
-    if (value <= 1024) {
-        slider.step = 64;
-    } else {
-        slider.step = 1024;
-    }
-
     let displayValue;
     if (value < 1024) {
         displayValue = `${value} B`;
     } else {
-        displayValue = `${Math.floor(value / 1024)} KB`;
+        displayValue = `${Math.round(value / 1024)} KB`;
     }
     cfg.itemSizeB = value;
     document.getElementById('itemSizeDsp').innerText = displayValue;
@@ -282,7 +276,7 @@ setupSliderInteraction('totalWritesDsp', 'totalWritesInp', 'totalWrites', format
 setupSliderInteraction('reservedReadsDsp', 'reservedReadsInp', 'reservedReads', value => `${value}%`);
 setupSliderInteraction('reservedWritesDsp', 'reservedWritesInp', 'reservedWrites', value => `${value}%`);
 setupSliderInteraction('overprovisionedDsp', 'overprovisionedInp', 'overprovisioned', value => `${value}%`);
-setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.floor(value / 1024)} KB`);
+setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value < 1024 ? `${value} B` : `${Math.round(value / 1024)} KB`);
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
