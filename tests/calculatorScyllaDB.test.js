@@ -43,7 +43,6 @@ describe('calculateScyllaPricing', () => {
         // i7ie.large: max(ceil(2/2), ceil(4000/(1250*0.9))) = max(1, 4) = 4, rounded up to 6
         let recommendation = result.nodeOptions.find(n => n.type === 'i7ie.large');
         expect(recommendation.nodes).toBe(6);
-        // Remove bestInstanceType check here (not present on nodeOption)
     });
 
     it('should handle RF=3 correctly', () => {
