@@ -36,13 +36,13 @@ export function calculateScyllaPricing(cfg) {
 
     // Storage (apply compression, then replication)
     const rawStorage = cfg.storageGB;
-    const compressedStorage = rawStorage / (cfg.scyllaCompressionRatio || DEFAULT_COMPRESSION_RATIO);
+    const compressedStorage = rawStorage * (cfg.scyllaCompressionRatio || DEFAULT_COMPRESSION_RATIO);
     const requiredStorage = Math.ceil(compressedStorage * replication);
 
     // Calculate node counts for each family
     const nodeOptions = Object.entries(INSTANCE_TYPES).map(([type, spec]) => {
         const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
-        const usableStoragePerNode = spec.storage * DEFAULT_STORAGE_UTILIZATION;
+        const usableStoragePerNode = spec.storage / DEFAULT_STORAGE_UTILIZATION;
         const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
         let nodes = Math.max(nodesForVCPU, nodesForStorage);
         // Ensure nodes is a multiple of replication factor (3 for ScyllaDB)
