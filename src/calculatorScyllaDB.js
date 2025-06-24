@@ -45,9 +45,9 @@ export function calculateScyllaPricing(cfg) {
         const usableStoragePerNode = spec.storage * DEFAULT_STORAGE_UTILIZATION;
         const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
         let nodes = Math.max(nodesForVCPU, nodesForStorage);
-        // Ensure nodes is a multiple of 3
-        if (nodes % 3 !== 0) {
-            nodes = nodes + (3 - (nodes % 3));
+        // Ensure nodes is a multiple of replication factor (3 for ScyllaDB)
+        if (nodes % replication !== 0) {
+            nodes = nodes + (replication - (nodes % replication));
         }
         const cost = nodes * spec.price * (cfg.regions || 1);
         return { type, nodes, cost };
