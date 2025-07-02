@@ -73,5 +73,24 @@ export const cfg = {
     ],
 
     // Other
-    override: false
+    override: false,
+
+    // ScyllaDB Pricing
+    priceScylla: {
+        'i7ie.large':      { vcpu: 2,  storage: 1250, price: 1.911 },
+        'i7ie.xlarge':     { vcpu: 4,  storage: 2500, price: 4.582 },
+        'i7ie.2xlarge':    { vcpu: 8,  storage: 5000, price: 9.164 },
+        'i7ie.3xlarge':    { vcpu: 12, storage: 7500, price: 13.746 },
+        'i7ie.6xlarge':    { vcpu: 24, storage: 15000, price: 27.491 },
+        'i7ie.12xlarge':   { vcpu: 48, storage: 30000, price: 54.983 },
+        'i7ie.18xlarge':   { vcpu: 72, storage: 45000, price: 82.474 },
+        'i7ie.24xlarge':   { vcpu: 96, storage: 60000, price: 109.966 },
+        'i7ie.48xlarge':   { vcpu: 192, storage: 120000, price: 219.931 },
+    },
+
+    // ScyllaDB Constants
+    scyllaOpsPerVCPU: 15000,
+    scyllaCompressionRatio: 0.5,
+    scyllaStorageUtilization: 0.9,
+    scyllaReplication: 3,
 };
