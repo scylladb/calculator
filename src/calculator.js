@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {updateAll, updateDisplayedCosts} from "./utils.js";
+import {updateDisplayedCosts} from "./utils.js";
 
 function getPricing() {
     cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
