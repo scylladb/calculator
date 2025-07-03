@@ -75,6 +75,16 @@ export function getQueryParams() {
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
     }
 
+    if (cfg.service === 'scylladb') {
+        document.querySelector('.dynamo-logo').style.display = 'none';
+        document.querySelector('.scylla-logo').style.display = '';
+        document.getElementById('mainTitle').textContent = 'ScyllaDB Cost Calculator';
+    } else {
+        document.querySelector('.dynamo-logo').style.display = '';
+        document.querySelector('.scylla-logo').style.display = 'none';
+        document.getElementById('mainTitle').textContent = 'DynamoDB Cost Calculator';
+    }
+
     if(params.get('daxNodes')) {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
         cfg.daxInstanceClass = params.get('daxInstanceClass');
