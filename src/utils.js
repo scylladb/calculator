@@ -1,7 +1,7 @@
 import {cfg} from './config.js';
 import {updateCosts} from "./calculatorDynamoDB.js";
 import {updateSeries} from "./chart.js";
-import {updateScyllaCosts} from "./calculatorScyllaDB.js";
+import {updateScyllaDBCosts} from "./calculatorScyllaDB.js";
 
 // Format a number with suffixes (K, M, B)
 export function formatNumber(num) {
@@ -204,7 +204,7 @@ export function updateAll() {
     if (cfg.service === 'dynamodb') {
         updateCosts();
     } else if (cfg.service === 'scylladb') {
-        updateScyllaCosts();
+        updateScyllaDBCosts();
     }
     updateSeries(); // update series after costs to ensure correct values
     updateOpsDisplays();

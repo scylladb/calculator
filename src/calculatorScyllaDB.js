@@ -9,12 +9,11 @@ import {
     getStorage
 } from "./calculatorCommon.js";
 
-export function calculateScyllaCosts() {
+export function calculateScyllaDBCosts() {
     // Replication factor
     const replication = cfg.scyllaReplication;
 
     // Max ops/sec * replication
-    // For ScyllaDB, we consider max reads and writes
     const maxOpsPerSec = (cfg.maxReads + cfg.maxWrites) * replication;
 
     // Required vCPUs
@@ -36,7 +35,7 @@ export function calculateScyllaCosts() {
             nodes = nodes + (replication - (nodes % replication));
         }
         const cost = nodes * spec.price * (cfg.regions || 1) * cfg.hoursPerMonth;
-        return { type, nodes, cost };
+        return {type, nodes, cost};
     });
 
     // Choose the option with the least nodes, then lowest cost if tie
@@ -58,7 +57,7 @@ export function calculateScyllaCosts() {
 function calculateNetworkCosts() {
     cfg.totalReadsKB = cfg.totalReadOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalWritesKB = cfg.totalWriteOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
-    cfg.totalReplicatedWritesGB =((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
+    cfg.totalReplicatedWritesGB = ((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
     cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
@@ -93,7 +92,7 @@ function logCosts() {
     updateDisplayedCosts(logs);
 }
 
-export function updateScyllaCosts() {
+export function updateScyllaDBCosts() {
     getPricing();
     getRegions()
     getStorage();
@@ -102,13 +101,11 @@ export function updateScyllaCosts() {
     getReserved();
     getMaxOpsPerSec();
 
-    calculateScyllaCosts();
+    calculateScyllaDBCosts();
     calculateTotalOpsSec();
     calculateNetworkCosts();
 
-    cfg.costTotalMonthly = cfg.pricing === 'demand' ?
-        cfg._demandCosts.monthlyCost + cfg.costNetwork :
-        cfg._demandCosts.monthlyCost + cfg.costNetwork; //TODO: Add reserved costs
+    cfg.costTotalMonthly = cfg.pricing === 'demand' ? cfg._demandCosts.monthlyCost + cfg.costNetwork : cfg._demandCosts.monthlyCost + cfg.costNetwork; //TODO: Add reserved costs
 
     logCosts();
 }
