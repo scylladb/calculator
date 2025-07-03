@@ -1,6 +1,7 @@
 import {cfg} from './config.js';
 import {updateCosts} from "./calculator.js";
 import {updateSeries} from "./chart.js";
+import {updateScyllaCosts} from "./calculatorScyllaDB.js";
 
 // Format a number with suffixes (K, M, B)
 export function formatNumber(num) {
@@ -37,6 +38,7 @@ function assignParam(param, parser = v => v) {
 export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
 
+    assignParam('service');
     assignParam('workload');
     assignParam('baselineReads', parseInt);
     assignParam('baselineWrites', parseInt);
@@ -112,6 +114,7 @@ export function updateQueryParams() {
             }
         };
 
+        setOrDelete('service', cfg.service);
         setOrDelete('pricing', cfg.pricing);
         setOrDelete('storageGB', cfg.storageGB);
         setOrDelete('itemSizeB', cfg.itemSizeB);
@@ -197,7 +200,11 @@ export function updateAll() {
     toggleProvisionedParams();
     toggleOpsParams();
     updateSeries(); // we have to update series before costs
-    updateCosts();
+    if (cfg.service === 'dynamodb') {
+        updateCosts();
+    } else if (cfg.service === 'scylladb') {
+        updateScyllaCosts();
+    }
     updateSeries(); // update series after costs to ensure correct values
     updateOpsDisplays();
     updateQueryParams();

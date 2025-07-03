@@ -9,6 +9,7 @@ export const cfg = {
     pricing: 'demand',
 
     // Model
+    service: 'dynamodb',
     workload: 'baselinePeak',
     baselineReads: 100000,
     baselineWrites: 200000,

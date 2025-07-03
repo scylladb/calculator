@@ -85,7 +85,7 @@ export function calculateScyllaCosts() {
         nodeOptions,
         bestInstanceType: best.type,
         bestNodeCount: best.nodes,
-        bestMonthlyCost: best.cost
+        monthlyCost: best.cost
     };
 }
 
@@ -106,9 +106,9 @@ function logCosts() {
     let logs = [];
 
     if (cfg.pricing === 'demand') {
-        logs.push(`Monthly on-demand cost: ${Math.floor(cfg._demandCost.monthlyCost).toLocaleString()}`);
+        logs.push(`Monthly on-demand cost: ${Math.floor(cfg._demandCosts.monthlyCost).toLocaleString()}`);
     } else {
-        logs.push(`Monthly reserved cost: ${Math.floor(cfg._reservedCost.monthlyCost).toLocaleString()}`);
+        logs.push(`Monthly reserved cost: ${Math.floor(cfg._demandCosts.monthlyCost).toLocaleString()}`);
     }
 
     if (cfg.costNetwork !== 0) {
@@ -123,7 +123,7 @@ function logCosts() {
     updateDisplayedCosts(logs);
 }
 
-export function updateCosts() {
+export function updateScyllaCosts() {
     getPricing();
     getReplicatedRegions()
     getStorageValues();
