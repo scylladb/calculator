@@ -1,13 +1,9 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
-import {getPricing} from "./calculatorCommon.js";
+import {getPricing, getRegions} from "./calculatorCommon.js";
 
 function getTableClass() {
     cfg.tableClass = document.getElementById('tableClass').value;
-}
-
-function getReplicatedRegions() {
-    cfg.regions = parseInt(document.getElementById('regions').value);
 }
 
 function getDaxValues() {
@@ -384,7 +380,7 @@ function logCosts() {
 export function updateCosts() {
     getPricing();
     getTableClass();
-    getReplicatedRegions()
+    getRegions()
     getStorageValues();
     getConsistencyValues();
     getHoursValues();

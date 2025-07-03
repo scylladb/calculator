@@ -1,12 +1,6 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
-import {getPricing} from "./calculatorCommon.js";
-
-
-
-function getReplicatedRegions() {
-    cfg.regions = parseInt(document.getElementById('regions').value);
-}
+import {getPricing, getRegions} from "./calculatorCommon.js";
 
 function getStorageValues() {
     cfg.storageGB = parseInt(document.getElementById('storageGB').value);
@@ -121,7 +115,7 @@ function logCosts() {
 
 export function updateScyllaCosts() {
     getPricing();
-    getReplicatedRegions()
+    getRegions()
     getStorageValues();
     getConsistencyValues();
     getReservedValues();
