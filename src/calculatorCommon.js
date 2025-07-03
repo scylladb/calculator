@@ -30,3 +30,9 @@ export function getReadConsistency() {
     cfg.readStronglyConsistent = cfg.readConst / 100;
     cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
 }
+
+export function getDAX() {
+    cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
+    cfg.cacheHitPercentage =  cfg.cacheRatio / 100;
+    cfg.cacheMissPercentage =  1 - cfg.cacheRatio / 100;
+}

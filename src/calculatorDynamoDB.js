@@ -1,6 +1,7 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
 import {
+    getDAX,
     getItemSize,
     getPricing,
     getReadConsistency,
@@ -9,11 +10,7 @@ import {
     getTableClass
 } from "./calculatorCommon.js";
 
-function getDaxValues() {
-    cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
-    cfg.cacheHitPercentage =  cfg.cacheRatio / 100;
-    cfg.cacheMissPercentage =  1 - cfg.cacheRatio / 100;
-}
+
 function getReservedValues() {
     cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
     cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
@@ -370,7 +367,7 @@ export function updateCosts() {
     getHoursValues();
     getReservedValues();
     getProvisionedValues()
-    getDaxValues();
+    getDAX();
     getTotalOps();
 
     calculateProvisionedCosts();
