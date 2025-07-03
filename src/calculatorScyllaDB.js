@@ -31,28 +31,21 @@ function getOverprovisionedValues() {
     cfg.overprovisionedPercentage = 1 + (cfg.overprovisioned / 100.0);
 }
 
-function getTotalOps() {
-    cfg.totalReads = 0;
-    cfg.totalWrites = 0;
-
-    for (const point of cfg.seriesReads) {
-        cfg.totalReads += (point.y * 3600);
-    }
-    for (const point of cfg.seriesWrites) {
-        cfg.totalWrites += (point.y * 3600);
-    }
+function getMaxOpsPerSec() {
+    cfg.maxReads = Math.max(...cfg.seriesReads.map(point => point.y));
+    cfg.maxWrites = Math.max(...cfg.seriesWrites.map(point => point.y));
 }
 
 export function calculateScyllaCosts() {
     // Replication factor
     const replication = cfg.scyllaReplication;
 
-    // Total ops/sec (RCU + WCU) * replication
-    // For ScyllaDB, we consider peak reads and writes
-    const totalOps = (cfg.peakReads + cfg.peakWrites) * replication;
+    // Max ops/sec * replication
+    // For ScyllaDB, we consider max reads and writes
+    const maxOpsPerSec = (cfg.maxReads + cfg.maxWrites) * replication;
 
     // Required vCPUs
-    const requiredVCPUs = Math.ceil(totalOps / cfg.scyllaOpsPerVCPU);
+    const requiredVCPUs = Math.ceil(maxOpsPerSec / cfg.scyllaOpsPerVCPU);
 
     // Storage (apply compression, then replication)
     const rawStorage = cfg.storageGB;
@@ -69,7 +62,7 @@ export function calculateScyllaCosts() {
         if (nodes % replication !== 0) {
             nodes = nodes + (replication - (nodes % replication));
         }
-        const cost = nodes * spec.price * (cfg.regions || 1);
+        const cost = nodes * spec.price * (cfg.regions || 1) * cfg.hoursPerMonth;
         return { type, nodes, cost };
     });
 
@@ -106,6 +99,10 @@ function logCosts() {
     let logs = [];
 
     if (cfg.pricing === 'demand') {
+        console.log('Minimum required vCPUs: ' + cfg._demandCosts.requiredVCPUs);
+        console.log('Required storage (GB): ' + cfg._demandCosts.requiredStorage);
+        console.log('Best instance type: ' + cfg._demandCosts.bestInstanceType);
+        console.log('Best node count: ' + cfg._demandCosts.bestNodeCount);
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg._demandCosts.monthlyCost).toLocaleString()}`);
     } else {
         logs.push(`Monthly reserved cost: ${Math.floor(cfg._demandCosts.monthlyCost).toLocaleString()}`);
@@ -130,15 +127,15 @@ export function updateScyllaCosts() {
     getConsistencyValues();
     getReservedValues();
     getOverprovisionedValues()
-    getTotalOps();
+    getMaxOpsPerSec();
 
     calculateScyllaCosts();
     calculateTotalOpsSec();
     calculateNetworkCosts();
 
     cfg.costTotalMonthly = cfg.pricing === 'demand' ?
-        cfg._demandCosts + cfg.costNetwork :
-        cfg._demandCosts + cfg.costNetwork; //TODO: Add reserved costs
+        cfg._demandCosts.monthlyCost + cfg.costNetwork :
+        cfg._demandCosts.monthlyCost + cfg.costNetwork; //TODO: Add reserved costs
 
     logCosts();
 }
