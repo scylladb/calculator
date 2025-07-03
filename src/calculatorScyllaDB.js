@@ -1,9 +1,8 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
+import {getPricing} from "./calculatorCommon.js";
 
-function getPricing() {
-    cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
-}
+
 
 function getReplicatedRegions() {
     cfg.regions = parseInt(document.getElementById('regions').value);

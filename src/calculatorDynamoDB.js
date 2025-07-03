@@ -1,9 +1,6 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
-
-function getPricing() {
-    cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
-}
+import {getPricing} from "./calculatorCommon.js";
 
 function getTableClass() {
     cfg.tableClass = document.getElementById('tableClass').value;
