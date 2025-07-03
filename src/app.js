@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
+import {formatBytes, formatNumber, getQueryParams, setServiceLogo, toggleService, updateAll} from "./utils.js";
 import {chart, encodeSeriesData} from "./chart.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
@@ -333,6 +333,9 @@ document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Event
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
 document.addEventListener('DOMContentLoaded', function() {
+    setServiceLogo();
+    document.getElementById('mainTitle').addEventListener('click', toggleService);
+
     const tabLabels = document.querySelectorAll('.tab-label');
     const tabContents = document.querySelectorAll('.tab-content');
 

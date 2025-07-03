@@ -75,16 +75,6 @@ export function getQueryParams() {
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
     }
 
-    if (cfg.service === 'scylladb') {
-        document.querySelector('.dynamo-logo').style.display = 'none';
-        document.querySelector('.scylla-logo').style.display = '';
-        document.getElementById('mainTitle').textContent = 'ScyllaDB Cost Calculator';
-    } else {
-        document.querySelector('.dynamo-logo').style.display = '';
-        document.querySelector('.scylla-logo').style.display = 'none';
-        document.getElementById('mainTitle').textContent = 'DynamoDB Cost Calculator';
-    }
-
     if(params.get('daxNodes')) {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
         cfg.daxInstanceClass = params.get('daxInstanceClass');
@@ -289,3 +279,22 @@ copyLinkButton.addEventListener('click', () => {
             resultPara.textContent = 'Failed to copy: ' + err.message;
         });
 });
+
+export function setServiceLogo() {
+    const params = new URLSearchParams(window.location.search);
+    const isScylla = params.get('service') === 'scylladb';
+    document.querySelector('.dynamo-logo').style.display = isScylla ? 'none' : '';
+    document.querySelector('.scylla-logo').style.display = isScylla ? '' : 'none';
+    document.getElementById('mainTitle').textContent = isScylla ? 'ScyllaDB Cost Calculator' : 'DynamoDB Cost Calculator';
+}
+
+export function toggleService() {
+    const params = new URLSearchParams(window.location.search);
+    const isScylla = params.get('service') === 'scylladb';
+    if (isScylla) {
+        params.delete('service');
+    } else {
+        params.set('service', 'scylladb');
+    }
+    window.location.search = params.toString();
+}
