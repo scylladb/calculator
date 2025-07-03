@@ -1,18 +1,6 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
-import {getPricing, getRegions} from "./calculatorCommon.js";
-
-function getStorageValues() {
-    cfg.storageGB = parseInt(document.getElementById('storageGB').value);
-    cfg.itemSizeKB = parseInt(document.getElementById('itemSizeB').value) * (1 / 1024);
-    cfg.itemSizeKB = cfg.itemSizeKB > 1 ? Math.round(cfg.itemSizeKB) : cfg.itemSizeKB;
-}
-
-function getConsistencyValues() {
-    cfg.readConst = parseInt(document.getElementById('readConst').value);
-    cfg.readStronglyConsistent = cfg.readConst / 100;
-    cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
-}
+import {getPricing, getReadConsistency, getRegions, getStorage} from "./calculatorCommon.js";
 
 function getReservedValues() {
     cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
@@ -116,8 +104,9 @@ function logCosts() {
 export function updateScyllaCosts() {
     getPricing();
     getRegions()
-    getStorageValues();
-    getConsistencyValues();
+    getStorage();
+    getReadConsistency();
+
     getReservedValues();
     getOverprovisionedValues()
     getMaxOpsPerSec();

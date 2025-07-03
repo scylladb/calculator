@@ -1,34 +1,19 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
-import {getPricing, getRegions, getTableClass} from "./calculatorCommon.js";
-
+import {
+    getItemSize,
+    getPricing,
+    getReadConsistency,
+    getRegions,
+    getStorage,
+    getTableClass
+} from "./calculatorCommon.js";
 
 function getDaxValues() {
     cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
     cfg.cacheHitPercentage =  cfg.cacheRatio / 100;
     cfg.cacheMissPercentage =  1 - cfg.cacheRatio / 100;
 }
-
-function getStorageValues() {
-    cfg.storageGB = parseInt(document.getElementById('storageGB').value);
-    cfg.itemSizeKB = parseInt(document.getElementById('itemSizeB').value) * (1 / 1024);
-    cfg.itemSizeKB = cfg.itemSizeKB > 1 ? Math.round(cfg.itemSizeKB) : cfg.itemSizeKB;
-    cfg.itemRRU = Math.ceil(cfg.itemSizeKB / 4.0);
-    cfg.itemWRU = Math.ceil(cfg.itemSizeKB);
-    cfg.itemRCU = Math.ceil(cfg.itemSizeKB / 4.0);
-    cfg.itemWCU = Math.ceil(cfg.itemSizeKB);
-}
-
-function getConsistencyValues() {
-    cfg.readConst = parseInt(document.getElementById('readConst').value);
-    cfg.readStronglyConsistent = cfg.readConst / 100;
-    cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
-    cfg.readTransactional = 0;
-    cfg.readNonTransactional = 1 - cfg.readTransactional;
-    cfg.writeTransactional = 0;
-    cfg.writeNonTransactional = 1 - cfg.writeTransactional;
-}
-
 function getReservedValues() {
     cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
     cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
@@ -378,8 +363,10 @@ export function updateCosts() {
     getPricing();
     getRegions()
     getTableClass();
-    getStorageValues();
-    getConsistencyValues();
+    getStorage();
+    getItemSize();
+    getReadConsistency();
+
     getHoursValues();
     getReservedValues();
     getProvisionedValues()
