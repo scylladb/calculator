@@ -1,11 +1,6 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
-import {getPricing, getReadConsistency, getRegions, getStorage} from "./calculatorCommon.js";
-
-function getReservedValues() {
-    cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
-    cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
-}
+import {getPricing, getReadConsistency, getRegions, getReserved, getStorage} from "./calculatorCommon.js";
 
 function getOverprovisionedValues() {
     cfg.overprovisioned = parseInt(document.getElementById('overprovisioned').value);
@@ -107,7 +102,7 @@ export function updateScyllaCosts() {
     getStorage();
     getReadConsistency();
 
-    getReservedValues();
+    getReserved();
     getOverprovisionedValues()
     getMaxOpsPerSec();
 

@@ -31,6 +31,15 @@ export function getReadConsistency() {
     cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
 }
 
+export function getReserved() {
+    cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
+    cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
+    cfg.reservedReadsPercentage = parseInt(document.getElementById('reservedReads').value) / 100.0;
+    cfg.reservedWritesPercentage = parseInt(document.getElementById('reservedWrites').value) / 100.0;
+    cfg.unreservedReadsPercentage = 1 - cfg.reservedReadsPercentage;
+    cfg.unreservedWritesPercentage = 1 - cfg.reservedWritesPercentage;
+}
+
 export function getDAX() {
     cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
     cfg.cacheHitPercentage =  cfg.cacheRatio / 100;

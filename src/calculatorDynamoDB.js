@@ -5,20 +5,12 @@ import {
     getItemSize,
     getPricing,
     getReadConsistency,
-    getRegions,
+    getRegions, getReserved,
     getStorage,
     getTableClass
 } from "./calculatorCommon.js";
 
 
-function getReservedValues() {
-    cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
-    cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
-    cfg.reservedReadsPercentage = parseInt(document.getElementById('reservedReads').value) / 100.0;
-    cfg.reservedWritesPercentage = parseInt(document.getElementById('reservedWrites').value) / 100.0;
-    cfg.unreservedReadsPercentage = 1 - cfg.reservedReadsPercentage;
-    cfg.unreservedWritesPercentage = 1 - cfg.reservedWritesPercentage;
-}
 
 function getProvisionedValues() {
     cfg.overprovisioned = parseInt(document.getElementById('overprovisioned').value);
@@ -365,7 +357,7 @@ export function updateCosts() {
     getReadConsistency();
 
     getHoursValues();
-    getReservedValues();
+    getReserved();
     getProvisionedValues()
     getDAX();
     getTotalOps();
