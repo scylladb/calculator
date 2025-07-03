@@ -25,8 +25,8 @@
       <header class="row">
         <div class="col">
           <h2 class="title">
-            <img src="./src/aws-dynamodb.svg" class="dynamo-logo" alt="DynamoDB">
-            <img src="./src/scylladb-icon.svg" class="scylla-logo" alt="ScyllaDB" style="display:none;">
+            <img src="./src/aws-dynamodb.svg" class="dynamodb logo" alt="DynamoDB">
+            <img src="./src/scylladb-icon.svg" class="scylladb logo" alt="ScyllaDB" style="display:none;">
             <span id="mainTitle">DynamoDB Cost Calculator</span>
           </h2>
         </div>
@@ -63,8 +63,14 @@
               <label>
                 <input type="radio" name="pricing" value="demand" checked> On-Demand
               </label>
-              <label>
-                <input type="radio" name="pricing" value="provisioned"> Provisioned
+              <label class="dynamodb">
+                <input type="radio" name="pricing" value="provisioned" class="dynamodb"> Provisioned
+              </label>
+              <label class="scylladb">
+                <input type="radio" name="pricing" value="flex" class="scylladb"> Flex
+              </label>
+              <label class="scylladb">
+                <input type="radio" name="pricing" value="reserved" class="scylladb"> Reserved
               </label>
             </div>
             <div id="costs" class="costs"></div>
@@ -80,8 +86,8 @@
               <a href="tablesTabContent" class="tab-label" id="tablesTab">
                 <i class="icon-table me-3"></i> Tables
               </a>
-              <a href="daxTabContent" class="tab-label" id="daxTab">
-                <i class="icon-rocket me-3"></i> Accelerator
+              <a href="daxTabContent" class="tab-label dynamodb" id="daxTab">
+                <i class="icon-rocket me-3 dynamodb"></i> Accelerator
               </a>
             </nav>
 
@@ -407,9 +413,9 @@
                   <input type="range" id="storageGB" min="128" max="1048576" step="1" value="512">
                 </div>
 
-                <h4>Table Class</h4>
+                <h4 class="dynamodb">Table Class</h4>
 
-                <div class="hstack gap-3 align-items-center">
+                <div class="hstack gap-3 align-items-center dynamodb">
                   <label for="tableClass" class="flex-grow">Table Class:</label>
                   <select id="tableClass">
                     <option value="standard">Standard</option>

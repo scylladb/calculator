@@ -197,6 +197,7 @@ export function toggleProvisionedParams() {
 
 // Update all UI and calculations
 export function updateAll() {
+    toggleServiceParams()
     toggleProvisionedParams();
     toggleOpsParams();
     updateSeries(); // we have to update series before costs
@@ -280,17 +281,17 @@ copyLinkButton.addEventListener('click', () => {
         });
 });
 
-export function setServiceLogo() {
-    const params = new URLSearchParams(window.location.search);
-    const isScylla = params.get('service') === 'scylladb';
-    document.querySelector('.dynamo-logo').style.display = isScylla ? 'none' : '';
-    document.querySelector('.scylla-logo').style.display = isScylla ? '' : 'none';
+export function toggleServiceParams() {
+    assignParam('service');
+    const isScylla = cfg.service === 'scylladb';
+    document.querySelectorAll('.dynamodb').forEach(el => el.style.display = isScylla ? 'none' : '');
+    document.querySelectorAll('.scylladb').forEach(el => el.style.display = isScylla ? '' : 'none');
     document.getElementById('mainTitle').textContent = isScylla ? 'ScyllaDB Cost Calculator' : 'DynamoDB Cost Calculator';
 }
 
 export function toggleService() {
     const params = new URLSearchParams(window.location.search);
-    const isScylla = params.get('service') === 'scylladb';
+    const isScylla = cfg.service === 'scylladb';
     if (isScylla) {
         params.delete('service');
     } else {
