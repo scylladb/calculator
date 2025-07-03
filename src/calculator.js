@@ -42,6 +42,10 @@ function getConsistencyValues() {
 function getReservedValues() {
     cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
     cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
+    cfg.reservedReadsPercentage = parseInt(document.getElementById('reservedReads').value) / 100.0;
+    cfg.reservedWritesPercentage = parseInt(document.getElementById('reservedWrites').value) / 100.0;
+    cfg.unreservedReadsPercentage = 1 - cfg.reservedReadsPercentage;
+    cfg.unreservedWritesPercentage = 1 - cfg.reservedWritesPercentage;
 }
 
 function getProvisionedValues() {
@@ -56,10 +60,6 @@ function getHoursValues() {
     cfg.totalPeakHoursPerMonthWrites = Number((cfg.peakDurationWrites * cfg.daysPerMonth).toFixed(1));
     cfg.totalBaseHoursPerMonthReads = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthReads;
     cfg.totalBaseHoursPerMonthWrites = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
-    cfg.reservedReadsPercentage = parseInt(document.getElementById('reservedReads').value) / 100.0;
-    cfg.reservedWritesPercentage = parseInt(document.getElementById('reservedWrites').value) / 100.0;
-    cfg.unreservedReadsPercentage = 1 - cfg.reservedReadsPercentage;
-    cfg.unreservedWritesPercentage = 1 - cfg.reservedWritesPercentage;
 }
 
 function getTotalOps() {
