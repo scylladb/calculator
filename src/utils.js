@@ -60,9 +60,10 @@ export function getQueryParams() {
     assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
 
-    if (cfg.pricing === 'provisioned' || cfg.pricing === 'demand') {
-        const radio = document.querySelector(`input[name="pricing"][value="${cfg.pricing}"]`);
-        if (radio) radio.checked = true;
+    const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
+    const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
+    if (radio) {
+        radio.checked = true;
     }
 
     if (cfg.reserved > 0) {
@@ -75,7 +76,7 @@ export function getQueryParams() {
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
     }
 
-    if(params.get('daxNodes')) {
+    if (params.get('daxNodes')) {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
         cfg.daxInstanceClass = params.get('daxInstanceClass');
         cfg.override = true;
@@ -89,10 +90,10 @@ export function getQueryParams() {
         updateAll();
         const jsonResponse = JSON.stringify(cfg, null, 2);
         const response = new Response(jsonResponse, {
-            headers: { 'Content-Type': 'application/json' }
+            headers: {'Content-Type': 'application/json'}
         });
         response.text().then(text => {
-            const blob = new Blob([text], { type: 'application/json' });
+            const blob = new Blob([text], {type: 'application/json'});
             window.location.href = URL.createObjectURL(blob);
         });
     }

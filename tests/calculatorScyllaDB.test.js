@@ -17,7 +17,7 @@ describe('calculateScyllaDBCosts', () => {
 
         calculateScyllaDBCosts();
 
-        const result = cfg._demandCosts;
+        const result = cfg._baseCost;
 
         expect(cfg.scyllaReplication).toBe(3);
 
@@ -40,7 +40,7 @@ describe('calculateScyllaDBCosts', () => {
 
         calculateScyllaDBCosts();
 
-        const result = cfg._demandCosts;
+        const result = cfg._baseCost;
 
         expect(result.replication).toBe(2); // input
         expect(result.requiredVCPUs).toBe(2); // ((10000+5000)*2)/15000 = 2
@@ -60,7 +60,7 @@ describe('calculateScyllaDBCosts', () => {
 
         calculateScyllaDBCosts();
 
-        const result = cfg._demandCosts;
+        const result = cfg._baseCost;
 
         expect(result.replication).toBe(3); // input
         expect(result.requiredVCPUs).toBe(3); // ((10000+5000)*3)/15000 = 3
@@ -83,7 +83,7 @@ describe('calculateScyllaDBCosts', () => {
 
         calculateScyllaDBCosts();
 
-        const result = cfg._demandCosts;
+        const result = cfg._baseCost;
 
         expect(result.requiredVCPUs).toBe(40); // ((100000+100000)*3)/15000 = 40
         expect(result.requiredStorage).toBe(75000); // 50000*0.5*3 = 75000
@@ -104,7 +104,7 @@ describe('calculateScyllaDBCosts', () => {
 
         calculateScyllaDBCosts();
 
-        const result = cfg._demandCosts;
+        const result = cfg._baseCost;
 
         expect(result.requiredVCPUs).toBe(1); // ((100+100)*2)/15000 = 1
         expect(result.requiredStorage).toBe(10); // 10*0.5*2 = 10

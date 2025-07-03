@@ -44,7 +44,7 @@ export function calculateScyllaDBCosts() {
     const bestCandidates = nodeOptions.filter(opt => opt.nodes === minNodes);
     const best = bestCandidates.reduce((a, b) => (a.cost < b.cost ? a : b));
 
-    cfg._demandCosts = {
+    cfg._baseCost = {
         replication,
         requiredVCPUs,
         requiredStorage,
@@ -72,13 +72,15 @@ function logCosts() {
     let logs = [];
 
     if (cfg.pricing === 'demand') {
-        console.log('Minimum required vCPUs: ' + cfg._demandCosts.requiredVCPUs);
-        console.log('Required storage (GB): ' + cfg._demandCosts.requiredStorage);
-        console.log('Best instance type: ' + cfg._demandCosts.bestInstanceType);
-        console.log('Best node count: ' + cfg._demandCosts.bestNodeCount);
-        logs.push(`Monthly on-demand cost: ${Math.floor(cfg._demandCosts.monthlyCost).toLocaleString()}`);
-    } else {
-        logs.push(`Monthly reserved cost: ${Math.floor(cfg._demandCosts.monthlyCost).toLocaleString()}`);
+        console.log('Minimum required vCPUs: ' + cfg._baseCost.requiredVCPUs);
+        console.log('Required storage (GB): ' + cfg._baseCost.requiredStorage);
+        console.log('Best instance type: ' + cfg._baseCost.bestInstanceType);
+        console.log('Best node count: ' + cfg._baseCost.bestNodeCount);
+        logs.push(`Monthly on-demand cost: ${Math.floor(cfg._baseCost.monthlyCost).toLocaleString()}`);
+    } else if (cfg.pricing === 'reserved') {
+        logs.push(`Monthly reserved cost: ${Math.floor(cfg._baseCost.monthlyCost * (1 - cfg.scyllaReservedDiscount)).toLocaleString()}`);
+    } else if (cfg.pricing === 'flex') {
+        logs.push(`Monthly flex cost: ${Math.floor(cfg._baseCost.monthlyCost * (1 - cfg.scyllaFlexDiscount)).toLocaleString()}`);
     }
 
     if (cfg.costNetwork !== 0) {
@@ -107,7 +109,7 @@ export function updateScyllaDBCosts() {
     calculateTotalOpsSec();
     calculateNetworkCosts();
 
-    cfg.costTotalMonthly = cfg.pricing === 'demand' ? cfg._demandCosts.monthlyCost + cfg.costNetwork : cfg._demandCosts.monthlyCost + cfg.costNetwork;
+    cfg.costTotalMonthly = cfg.pricing === 'demand' ? cfg._baseCost.monthlyCost + cfg.costNetwork : cfg._baseCost.monthlyCost + cfg.costNetwork;
 
     logCosts();
 }

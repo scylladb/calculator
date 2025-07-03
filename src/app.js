@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {formatBytes, formatNumber, getQueryParams,  toggleService, updateAll} from "./utils.js";
+import {formatBytes, formatNumber, getQueryParams, toggleService, updateAll} from "./utils.js";
 import {chart, encodeSeriesData} from "./chart.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
@@ -29,7 +29,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
         if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
             display.innerText = formatFunction(parseInt(this.value));
             setTimeout(() => {
-                slider.dispatchEvent(new Event('input', { bubbles: true }));
+                slider.dispatchEvent(new Event('input', {bubbles: true}));
             }, 0);
             input.blur();
             cfg.override = true;
@@ -43,18 +43,13 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
-    if (event.target.checked) {
-        cfg.pricing = 'demand';
-        updateAll();
-    }
-});
-
-document.querySelector('input[name="pricing"][value="provisioned"]').addEventListener('change', (event) => {
-    if (event.target.checked) {
-        cfg.pricing = 'provisioned';
-        updateAll();
-    }
+['demand', 'provisioned', 'flex', 'reserved'].forEach(type => {
+    document.querySelector(`input[name="pricing"][value="${type}"]`).addEventListener('change', (event) => {
+        if (event.target.checked) {
+            cfg.pricing = type;
+            updateAll();
+        }
+    });
 });
 
 document.getElementById("workload").addEventListener('change', (event) => {
@@ -332,7 +327,7 @@ document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const logos = document.querySelectorAll('.logo');
     logos.forEach(logo => {
         logo.addEventListener('click', toggleService);
@@ -342,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabContents = document.querySelectorAll('.tab-content');
 
     tabLabels.forEach(tabLabel => {
-        tabLabel.addEventListener('click', function(e) {
+        tabLabel.addEventListener('click', function (e) {
             e.preventDefault();
 
             tabLabels.forEach(tab => tab.classList.remove('active'));
@@ -371,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
             csv += `${hour},${reads},${writes}\n`;
         }
 
-        const blob = new Blob([csv], { type: "text/csv" });
+        const blob = new Blob([csv], {type: "text/csv"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
