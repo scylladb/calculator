@@ -1,6 +1,7 @@
 import {cfg} from './config.js';
-import {updateCosts} from "./calculator.js";
+import {updateCosts} from "./calculatorDynamoDB.js";
 import {updateSeries} from "./chart.js";
+import {updateScyllaDBCosts} from "./calculatorScyllaDB.js";
 
 // Format a number with suffixes (K, M, B)
 export function formatNumber(num) {
@@ -37,6 +38,7 @@ function assignParam(param, parser = v => v) {
 export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
 
+    assignParam('service');
     assignParam('workload');
     assignParam('baselineReads', parseInt);
     assignParam('baselineWrites', parseInt);
@@ -58,9 +60,10 @@ export function getQueryParams() {
     assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
 
-    if (cfg.pricing === 'provisioned' || cfg.pricing === 'demand') {
-        const radio = document.querySelector(`input[name="pricing"][value="${cfg.pricing}"]`);
-        if (radio) radio.checked = true;
+    const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
+    const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
+    if (radio) {
+        radio.checked = true;
     }
 
     if (cfg.reserved > 0) {
@@ -73,7 +76,7 @@ export function getQueryParams() {
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
     }
 
-    if(params.get('daxNodes')) {
+    if (params.get('daxNodes')) {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
         cfg.daxInstanceClass = params.get('daxInstanceClass');
         cfg.override = true;
@@ -87,10 +90,10 @@ export function getQueryParams() {
         updateAll();
         const jsonResponse = JSON.stringify(cfg, null, 2);
         const response = new Response(jsonResponse, {
-            headers: { 'Content-Type': 'application/json' }
+            headers: {'Content-Type': 'application/json'}
         });
         response.text().then(text => {
-            const blob = new Blob([text], { type: 'application/json' });
+            const blob = new Blob([text], {type: 'application/json'});
             window.location.href = URL.createObjectURL(blob);
         });
     }
@@ -112,6 +115,7 @@ export function updateQueryParams() {
             }
         };
 
+        setOrDelete('service', cfg.service);
         setOrDelete('pricing', cfg.pricing);
         setOrDelete('storageGB', cfg.storageGB);
         setOrDelete('itemSizeB', cfg.itemSizeB);
@@ -194,16 +198,20 @@ export function toggleProvisionedParams() {
 
 // Update all UI and calculations
 export function updateAll() {
+    toggleServiceParams()
     toggleProvisionedParams();
     toggleOpsParams();
     updateSeries(); // we have to update series before costs
-    updateCosts();
+    if (cfg.service === 'dynamodb') {
+        updateCosts();
+    } else if (cfg.service === 'scylladb') {
+        updateScyllaDBCosts();
+    }
     updateSeries(); // update series after costs to ensure correct values
     updateOpsDisplays();
     updateQueryParams();
 }
 
-// Update the displayed costs in the DOM
 export function updateDisplayedCosts(logs) {
     const costs = document.getElementById('costs');
     costs.innerHTML = logs.map(log => {
@@ -211,11 +219,12 @@ export function updateDisplayedCosts(logs) {
         if (key === '---' && value === '---') {
             return `<hr>`;
         }
+        const showDollar = !/recommended/i.test(key);
         return `
     <div class="cost-entry ${/Total.+?cost/.test(key) ? ' total lead' : ''}">
       <span class="cost-key">${key}</span>
       <span class="cost-value">
-        <span class="dollar-sign">$</span>
+        ${showDollar ? `<span class="dollar-sign">$</span>` : ''}
         <span class="number">${value}</span>
       </span>
     </div>
@@ -272,3 +281,22 @@ copyLinkButton.addEventListener('click', () => {
             resultPara.textContent = 'Failed to copy: ' + err.message;
         });
 });
+
+export function toggleServiceParams() {
+    assignParam('service');
+    const isScylla = cfg.service === 'scylladb';
+    document.querySelectorAll('.dynamodb').forEach(el => el.style.display = isScylla ? 'none' : '');
+    document.querySelectorAll('.scylladb').forEach(el => el.style.display = isScylla ? '' : 'none');
+    document.getElementById('mainTitle').textContent = isScylla ? 'ScyllaDB Cost Calculator' : 'DynamoDB Cost Calculator';
+}
+
+export function toggleService() {
+    const params = new URLSearchParams(window.location.search);
+    const isScylla = cfg.service === 'scylladb';
+    if (isScylla) {
+        params.delete('service');
+    } else {
+        params.set('service', 'scylladb');
+    }
+    window.location.search = params.toString();
+}
