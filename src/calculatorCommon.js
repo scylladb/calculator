@@ -7,3 +7,7 @@ export function getPricing() {
 export function getRegions() {
     cfg.regions = parseInt(document.getElementById('regions').value);
 }
+
+export function getTableClass() {
+    cfg.tableClass = document.getElementById('tableClass').value;
+}
