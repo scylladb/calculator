@@ -52,6 +52,10 @@ export function getTotalOpsPerDay() {
     }
 }
 
+export function getMaxOpsPerSec() {
+    cfg.maxReads = Math.max(...cfg.seriesReads.map(point => point.y));
+    cfg.maxWrites = Math.max(...cfg.seriesWrites.map(point => point.y));
+}
 
 export function getReserved() {
     cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);

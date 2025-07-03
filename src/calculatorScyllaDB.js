@@ -1,11 +1,13 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
-import {getPricing, getReadConsistency, getRegions, getReserved, getStorage} from "./calculatorCommon.js";
-
-function getMaxOpsPerSec() {
-    cfg.maxReads = Math.max(...cfg.seriesReads.map(point => point.y));
-    cfg.maxWrites = Math.max(...cfg.seriesWrites.map(point => point.y));
-}
+import {
+    getMaxOpsPerSec,
+    getPricing,
+    getReadConsistency,
+    getRegions,
+    getReserved,
+    getStorage
+} from "./calculatorCommon.js";
 
 export function calculateScyllaCosts() {
     // Replication factor
