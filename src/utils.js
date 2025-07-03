@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {updateCosts} from "./calculator.js";
+import {updateCosts} from "./calculatorDynamoDB.js";
 import {updateSeries} from "./chart.js";
 import {updateScyllaCosts} from "./calculatorScyllaDB.js";
 
