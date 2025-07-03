@@ -70,12 +70,12 @@ function calculateTotalOpsSec() {
 
 function logCosts() {
     let logs = [];
+    logs.push('Recommended vCPUs: ' + cfg._baseCost.requiredVCPUs);
+    logs.push('Recommended storage (GB): ' + cfg._baseCost.requiredStorage);
+    logs.push('Recommended instance type: ' + cfg._baseCost.bestInstanceType);
+    logs.push('Recommended node count: ' + cfg._baseCost.bestNodeCount);
 
     if (cfg.pricing === 'demand') {
-        console.log('Minimum required vCPUs: ' + cfg._baseCost.requiredVCPUs);
-        console.log('Required storage (GB): ' + cfg._baseCost.requiredStorage);
-        console.log('Best instance type: ' + cfg._baseCost.bestInstanceType);
-        console.log('Best node count: ' + cfg._baseCost.bestNodeCount);
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg._baseCost.monthlyCost).toLocaleString()}`);
     } else if (cfg.pricing === 'reserved') {
         logs.push(`Monthly reserved cost: ${Math.floor(cfg._baseCost.monthlyCost * (1 - cfg.scyllaReservedDiscount)).toLocaleString()}`);

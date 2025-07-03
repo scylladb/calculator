@@ -212,7 +212,6 @@ export function updateAll() {
     updateQueryParams();
 }
 
-// Update the displayed costs in the DOM
 export function updateDisplayedCosts(logs) {
     const costs = document.getElementById('costs');
     costs.innerHTML = logs.map(log => {
@@ -220,11 +219,12 @@ export function updateDisplayedCosts(logs) {
         if (key === '---' && value === '---') {
             return `<hr>`;
         }
+        const showDollar = !/recommended/i.test(key);
         return `
     <div class="cost-entry ${/Total.+?cost/.test(key) ? ' total lead' : ''}">
       <span class="cost-key">${key}</span>
       <span class="cost-value">
-        <span class="dollar-sign">$</span>
+        ${showDollar ? `<span class="dollar-sign">$</span>` : ''}
         <span class="number">${value}</span>
       </span>
     </div>
