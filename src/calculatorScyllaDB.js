@@ -2,11 +2,6 @@ import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
 import {getPricing, getReadConsistency, getRegions, getReserved, getStorage} from "./calculatorCommon.js";
 
-function getOverprovisionedValues() {
-    cfg.overprovisioned = parseInt(document.getElementById('overprovisioned').value);
-    cfg.overprovisionedPercentage = 1 + (cfg.overprovisioned / 100.0);
-}
-
 function getMaxOpsPerSec() {
     cfg.maxReads = Math.max(...cfg.seriesReads.map(point => point.y));
     cfg.maxWrites = Math.max(...cfg.seriesWrites.map(point => point.y));
@@ -103,7 +98,6 @@ export function updateScyllaCosts() {
     getReadConsistency();
 
     getReserved();
-    getOverprovisionedValues()
     getMaxOpsPerSec();
 
     calculateScyllaCosts();

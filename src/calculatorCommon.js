@@ -16,6 +16,15 @@ export function getStorage() {
     cfg.storageGB = parseInt(document.getElementById('storageGB').value);
 }
 
+export function getHours() {
+    cfg.daysPerMonth = 365 / 12;
+    cfg.secondsPerDay = 24 * 60 * 60;
+    cfg.totalPeakHoursPerMonthReads = Number((cfg.peakDurationReads * cfg.daysPerMonth).toFixed(1));
+    cfg.totalPeakHoursPerMonthWrites = Number((cfg.peakDurationWrites * cfg.daysPerMonth).toFixed(1));
+    cfg.totalBaseHoursPerMonthReads = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthReads;
+    cfg.totalBaseHoursPerMonthWrites = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
+}
+
 export function getItemSize() {
     cfg.itemSizeKB = parseInt(document.getElementById('itemSizeB').value) * (1 / 1024);
     cfg.itemSizeKB = cfg.itemSizeKB > 1 ? Math.round(cfg.itemSizeKB) : cfg.itemSizeKB;
@@ -38,6 +47,11 @@ export function getReserved() {
     cfg.reservedWritesPercentage = parseInt(document.getElementById('reservedWrites').value) / 100.0;
     cfg.unreservedReadsPercentage = 1 - cfg.reservedReadsPercentage;
     cfg.unreservedWritesPercentage = 1 - cfg.reservedWritesPercentage;
+}
+
+export function getOverprovisioned() {
+    cfg.overprovisioned = parseInt(document.getElementById('overprovisioned').value);
+    cfg.overprovisionedPercentage = 1 + (cfg.overprovisioned / 100.0);
 }
 
 export function getDAX() {

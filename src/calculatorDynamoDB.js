@@ -1,30 +1,14 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
 import {
-    getDAX,
-    getItemSize,
+    getDAX, getHours,
+    getItemSize, getOverprovisioned,
     getPricing,
     getReadConsistency,
     getRegions, getReserved,
     getStorage,
     getTableClass
 } from "./calculatorCommon.js";
-
-
-
-function getProvisionedValues() {
-    cfg.overprovisioned = parseInt(document.getElementById('overprovisioned').value);
-    cfg.overprovisionedPercentage = 1 + (cfg.overprovisioned / 100.0);
-}
-
-function getHoursValues() {
-    cfg.daysPerMonth = 365 / 12;
-    cfg.secondsPerDay = 24 * 60 * 60;
-    cfg.totalPeakHoursPerMonthReads = Number((cfg.peakDurationReads * cfg.daysPerMonth).toFixed(1));
-    cfg.totalPeakHoursPerMonthWrites = Number((cfg.peakDurationWrites * cfg.daysPerMonth).toFixed(1));
-    cfg.totalBaseHoursPerMonthReads = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthReads;
-    cfg.totalBaseHoursPerMonthWrites = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
-}
 
 function getTotalOps() {
     cfg.totalReads = 0;
@@ -356,9 +340,9 @@ export function updateCosts() {
     getItemSize();
     getReadConsistency();
 
-    getHoursValues();
+    getHours();
     getReserved();
-    getProvisionedValues()
+    getOverprovisioned()
     getDAX();
     getTotalOps();
 
