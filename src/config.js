@@ -17,8 +17,8 @@ export const cfg = {
     peakWrites: 500000,
     peakDurationReads: 2,
     peakDurationWrites: 4,
-    totalReads: 0,
-    totalWrites: 0,
+    totalReads: 0, // per day
+    totalWrites: 0, // per day
     totalReservedRCU: 0,
     totalReservedWCU: 0,
     hoursPerMonth: 730,

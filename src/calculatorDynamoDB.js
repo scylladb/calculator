@@ -7,20 +7,9 @@ import {
     getReadConsistency,
     getRegions, getReserved,
     getStorage,
-    getTableClass
+    getTableClass, getTotalOpsPerDay
 } from "./calculatorCommon.js";
 
-function getTotalOps() {
-    cfg.totalReads = 0;
-    cfg.totalWrites = 0;
-
-    for (const point of cfg.seriesReads) {
-        cfg.totalReads += (point.y * 3600);
-    }
-    for (const point of cfg.seriesWrites) {
-        cfg.totalWrites += (point.y * 3600);
-    }
-}
 
 export function calculateProvisionedReads() {
     const costPerRCU = (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
@@ -344,7 +333,7 @@ export function updateCosts() {
     getReserved();
     getOverprovisioned()
     getDAX();
-    getTotalOps();
+    getTotalOpsPerDay();
 
     calculateProvisionedCosts();
     calculateDemandCosts();

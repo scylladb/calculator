@@ -40,6 +40,19 @@ export function getReadConsistency() {
     cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
 }
 
+export function getTotalOpsPerDay() {
+    cfg.totalReads = 0;
+    cfg.totalWrites = 0;
+
+    for (const point of cfg.seriesReads) {
+        cfg.totalReads += (point.y * 3600);
+    }
+    for (const point of cfg.seriesWrites) {
+        cfg.totalWrites += (point.y * 3600);
+    }
+}
+
+
 export function getReserved() {
     cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
     cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
