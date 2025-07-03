@@ -1,6 +1,7 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
 import {
+    getItemSize,
     getMaxOpsPerSec,
     getPricing,
     getReadConsistency,
@@ -96,6 +97,7 @@ export function updateScyllaDBCosts() {
     getPricing();
     getRegions()
     getStorage();
+    getItemSize();
     getReadConsistency();
 
     getReserved();
@@ -105,7 +107,7 @@ export function updateScyllaDBCosts() {
     calculateTotalOpsSec();
     calculateNetworkCosts();
 
-    cfg.costTotalMonthly = cfg.pricing === 'demand' ? cfg._demandCosts.monthlyCost + cfg.costNetwork : cfg._demandCosts.monthlyCost + cfg.costNetwork; //TODO: Add reserved costs
+    cfg.costTotalMonthly = cfg.pricing === 'demand' ? cfg._demandCosts.monthlyCost + cfg.costNetwork : cfg._demandCosts.monthlyCost + cfg.costNetwork;
 
     logCosts();
 }
