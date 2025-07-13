@@ -70,10 +70,6 @@ function calculateTotalOpsSec() {
 
 function logCosts() {
     let logs = [];
-    logs.push('Recommended vCPUs: ' + cfg._baseCost.requiredVCPUs);
-    logs.push('Recommended storage (GB): ' + cfg._baseCost.requiredStorage);
-    logs.push('Recommended instance type: ' + cfg._baseCost.bestInstanceType);
-    logs.push('Recommended node count: ' + cfg._baseCost.bestNodeCount);
 
     if (cfg.pricing === 'demand') {
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg._baseCost.monthlyCost).toLocaleString()}`);
