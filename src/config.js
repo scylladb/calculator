@@ -77,7 +77,7 @@ export const cfg = {
     override: false,
 
     // ScyllaDB Pricing
-    priceScylla: {
+    scyllaPrice: {
         'i7ie.large': {vcpu: 2, storage: 1250, price: 1.911},
         'i7ie.xlarge': {vcpu: 4, storage: 2500, price: 4.582},
         'i7ie.2xlarge': {vcpu: 8, storage: 5000, price: 9.164},

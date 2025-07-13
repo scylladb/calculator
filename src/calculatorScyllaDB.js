@@ -26,7 +26,7 @@ export function calculateScyllaDBCosts() {
     const requiredStorage = Math.ceil(compressedStorage * replication);
 
     // Calculate node counts for each family
-    const nodeOptions = Object.entries(cfg.priceScylla).map(([type, spec]) => {
+    const nodeOptions = Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
         const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
         const usableStoragePerNode = spec.storage / cfg.scyllaStorageUtilization;
         const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
