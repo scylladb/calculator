@@ -436,6 +436,14 @@
                 <input id="cacheRatio" max="100" min="0" step="1" type="range" value="0"/>
               </div>
               <h4>Recommended Instances</h4>
+              <div class="hstack gap-3 align-items-center">
+                <input type="checkbox" id="daxOverride"/>
+                <label class="flex-grow" for="daxOverride">Override</label>
+                <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">This will disable the automatic recommendations for the number of nodes and instance class. You can then manually set the values below.</span>
+                </span>
+              </div>
               <div class="range-group">
                 <div class="range-group-top">
                   <label for="daxNodes">Number of Nodes:</label>
@@ -451,11 +459,11 @@
                     <span class="tooltip-text">This is the recommended number of nodes for your workload.</span>
                   </span>
                 </div>
-                <input id="daxNodes" max="48" min="0" step="1" type="range" value="0"/>
+                <input id="daxNodes" max="48" min="0" step="1" type="range" value="0" disabled/>
               </div>
               <div class="hstack gap-3 align-items-center">
                 <label class="flex-grow" for="daxInstanceClass">Instance Class:</label>
-                <select id="daxInstanceClass">
+                <select id="daxInstanceClass" disabled>
                   <option value="dax.r5.large">dax.r5.large</option>
                   <option value="dax.r5.xlarge">dax.r5.xlarge</option>
                   <option value="dax.r5.2xlarge">dax.r5.2xlarge</option>
@@ -495,14 +503,18 @@
               <h4>Recommended Instances</h4>
               <div class="hstack gap-3 align-items-center">
                 <input type="checkbox" id="scyllaOverride"/>
-                <label for="scyllaOverride">Override Recommendations</label>
+                <label class="flex-grow" for="scyllaOverride">Override</label>
+                <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">This will disable the automatic recommendations for the number of nodes and instance class. You can then manually set the values below.</span>
+                </span>
               </div>
               <div class="range-group">
                 <div class="range-group-top">
                   <label for="scyllaNodes">Number of Nodes:</label>
                   <div class="inline-input">
                     <div class="value">
-                      <input id="scyllaNodesInp" type="text"/>
+                      <input id="scyllaNodesInp" type="text" disabled/>
                       <span id="scyllaNodesDsp">0</span>
                     </div>
                     <div class="units"></div>
@@ -512,11 +524,11 @@
                     <span class="tooltip-text">This is the recommended number of nodes for your ScyllaDB cluster. This is based on the replication factor and the expected workload.</span>
                   </span>
                 </div>
-                <input id="scyllaNodes" max="180" min="2" step="1" type="range" value="0"/>
+                <input id="scyllaNodes" max="180" min="2" step="1" type="range" value="0" disabled/>
               </div>
               <div class="hstack gap-3 align-items-center">
                 <label class="flex-grow" for="scyllaInstanceClass">Instance Class:</label>
-                <select id="scyllaInstanceClass">
+                <select id="scyllaInstanceClass" disabled>
                   <option value="i7ie.large">i7ie.large</option>
                   <option value="i7ie.xlarge">i7ie.xlarge</option>
                   <option value="i7ie.2xlarge">i7ie.2xlarge</option>

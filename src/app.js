@@ -252,6 +252,15 @@ document.getElementById('daxInstanceClass').addEventListener('change', (event) =
     updateAll();
 });
 
+document.getElementById('daxOverride').addEventListener('change', (event) => {
+    cfg.daxOverride = event.target.checked;
+    document.getElementById('daxNodesInp').disabled = !cfg.daxOverride;
+    document.getElementById('daxNodes').disabled = !cfg.daxOverride;
+    document.getElementById('daxInstanceClass').disabled = !cfg.daxOverride;
+    updateAll();
+});
+
+
 document.getElementById('replication').addEventListener('input', (event) => {
     cfg.replication = parseInt(event.target.value);
     document.getElementById('replicationDsp').innerText = `${formatNumber(cfg.replication)}`;
@@ -271,6 +280,9 @@ document.getElementById('scyllaInstanceClass').addEventListener('change', (event
 
 document.getElementById('scyllaOverride').addEventListener('change', (event) => {
     cfg.scyllaOverride = event.target.checked;
+    document.getElementById('scyllaNodesInp').disabled = !cfg.scyllaOverride;
+    document.getElementById('scyllaNodes').disabled = !cfg.scyllaOverride;
+    document.getElementById('scyllaInstanceClass').disabled = !cfg.scyllaOverride;
     updateAll();
 });
 
