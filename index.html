@@ -1,625 +1,547 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght,GRAD@8..144,25..151,100..1000,-200..150&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="./src/style.css">
-  <link rel="icon" href="favicon.png" type="image/x-icon">
+    rel="stylesheet"/>
+  <link href="./src/style.css" rel="stylesheet"/>
+  <link href="favicon.png" rel="icon" type="image/x-icon"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/patternomaly@1.3.2/dist/patternomaly.min.js"></script>
-  <script type="module" src="./src/app.js" defer></script>
+  <script defer src="./src/app.js" type="module"></script>
   <title>ScyllaDB | DynamoDB workload calculator</title>
 </head>
-
 <body class="standalone">
-  <div class="container">
-    <div class="card">
-      <header class="row">
-        <div class="col">
-          <h2 class="title">
-            <img src="./src/aws-dynamodb.svg" class="dynamodb logo" alt="DynamoDB">
-            <img src="./src/scylladb-icon.svg" class="scylladb logo" alt="ScyllaDB" style="display:none;">
-            <span id="mainTitle">DynamoDB Cost Calculator</span>
-          </h2>
-        </div>
-        <div class="col hstack gap-4 justify-content-end">
-          <button id="shareBtn" class="btn btn-primary">
-            <i class="icon-scale-up me-3"></i> Share
-          </button>
-          <button id="copyLinkBtn" class="btn btn-light">
-            <i class="icon-copy me-3"></i> Copy
-          </button>
-          <button id="saveCsvBtn" class="btn btn-light">
-            <i class="icon-save me-3"></i> Save
-          </button>
-          <p class="result"></p>
-        </div>
-      </header>
-      <div class="row">
-        <div class="col vstack gap-4">
-          <canvas id="chart" width="800" height="400"></canvas>
-          <label for="workload">Select Workload:</label>
-          <select id="workload">
-            <option value="baselinePeak">Baseline + Peak (Classic)</option>
-            <option value="businessHours">Business Hours</option>
-            <option value="dailyPeak">Unimodal (Daily Peak)</option>
-            <option value="twiceDaily">Bimodal (Twice Daily Peak)</option>
-            <option value="batch">Batch (Overnight)</option>
-            <option value="flatline">Flatline</option>
-            <option value="diurnal">Diurnal</option>
-            <option value="chaos">Chaos (Random)</option>
-            <option value="custom">Custom</option>
-          </select>
-          <div id="costParams">
-            <div class="radio-container">
-              <label>
-                <input type="radio" name="pricing" value="demand" checked> On-Demand
-              </label>
-              <label class="dynamodb">
-                <input type="radio" name="pricing" value="provisioned" class="dynamodb"> Provisioned
-              </label>
-              <label class="scylladb">
-                <input type="radio" name="pricing" value="flex" class="scylladb"> Flex
-              </label>
-              <label class="scylladb">
-                <input type="radio" name="pricing" value="reserved" class="scylladb"> Reserved
-              </label>
-            </div>
-            <div id="costs" class="costs"></div>
+<div class="container">
+  <div class="card">
+    <header class="row">
+      <div class="col">
+        <h2 class="title">
+          <img alt="DynamoDB" class="dynamodb logo" src="./src/aws-dynamodb.svg"/>
+          <img alt="ScyllaDB" class="scylladb logo" src="./src/scylladb-icon.svg" style="display: none;"/>
+          <span id="mainTitle">DynamoDB Cost Calculator</span>
+        </h2>
+      </div>
+      <div class="col hstack gap-4 justify-content-end">
+        <button class="btn btn-primary" id="shareBtn"><i class="icon-scale-up me-3"></i> Share</button>
+        <button class="btn btn-light" id="copyLinkBtn"><i class="icon-copy me-3"></i> Copy</button>
+        <button class="btn btn-light" id="saveCsvBtn"><i class="icon-save me-3"></i> Save</button>
+        <p class="result"></p>
+      </div>
+    </header>
+    <div class="row">
+      <div class="col vstack gap-4">
+        <canvas height="400" id="chart" width="800"></canvas>
+        <label for="workload">Select Workload:</label>
+        <select id="workload">
+          <option value="baselinePeak">Baseline + Peak (Classic)</option>
+          <option value="businessHours">Business Hours</option>
+          <option value="dailyPeak">Unimodal (Daily Peak)</option>
+          <option value="twiceDaily">Bimodal (Twice Daily Peak)</option>
+          <option value="batch">Batch (Overnight)</option>
+          <option value="flatline">Flatline</option>
+          <option value="diurnal">Diurnal</option>
+          <option value="chaos">Chaos (Random)</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div id="costParams">
+          <div class="radio-container">
+            <label> <input checked name="pricing" type="radio" value="demand"/> On-Demand </label>
+            <label class="dynamodb"> <input class="dynamodb" name="pricing" type="radio" value="provisioned"/>
+              Provisioned </label>
+            <label class="scylladb"> <input class="scylladb" name="pricing" type="radio" value="flex"/> Flex </label>
+            <label class="scylladb"> <input class="scylladb" name="pricing" type="radio" value="reserved"/> Reserved
+            </label>
           </div>
-
+          <div class="costs" id="costs"></div>
         </div>
-        <div class="col">
-          <div class="tabs">
-            <nav>
-              <a href="loadTabContent" class="tab-label active" id="loadTab">
-                <i class="icon-operations me-3"></i> Load
-              </a>
-              <a href="tablesTabContent" class="tab-label" id="tablesTab">
-                <i class="icon-table me-3"></i> Tables
-              </a>
-              <a href="daxTabContent" class="tab-label dynamodb" id="daxTab">
-                <i class="icon-rocket me-3 dynamodb"></i> Accelerator
-              </a>
-              <a href="scyllaTabContent" class="tab-label scylladb" id="scyllaTab">
-                  <i class="icon-database me-3 scylladb"></i> Cluster
-              </a>
-            </nav>
-
-            <div class="tab-content active" id="loadTabContent">
-              <div id="opsParams" class="vstack gap-3">
-                <div class="row-sm">
-                  <div class="col vstack gap-3">
-                    <h4 class="reads">Reads</h4>
-
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="baselineReads">Baseline:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="baselineReadsInp">
-                            <span id="baselineReadsDsp">50K</span>
-                          </div>
-                          <div class="units">
-                            ops/sec
-                          </div>
+      </div>
+      <div class="col">
+        <div class="tabs">
+          <nav>
+            <a class="tab-label active" href="loadTabContent" id="loadTab"> <i class="icon-operations me-3"></i> Load
+            </a>
+            <a class="tab-label" href="tablesTabContent" id="tablesTab"> <i class="icon-table me-3"></i> Tables </a>
+            <a class="tab-label dynamodb" href="daxTabContent" id="daxTab"> <i class="icon-rocket me-3 dynamodb"></i>
+              Accelerator </a>
+            <a class="tab-label scylladb" href="scyllaTabContent" id="scyllaTab"> <i
+              class="icon-database me-3 scylladb"></i> Cluster </a>
+          </nav>
+          <div class="tab-content active" id="loadTabContent">
+            <div class="vstack gap-3" id="opsParams">
+              <div class="row-sm">
+                <div class="col vstack gap-3">
+                  <h4 class="reads">Reads</h4>
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="baselineReads">Baseline:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="baselineReadsInp" type="text"/>
+                          <span id="baselineReadsDsp">50K</span>
                         </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the number of read operations per second that your workload
-                            needs
-                            during
-                            off-peak periods.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="baselineReads" min="1000" max="2000000" step="1000" value="50000">
-                    </div>
-
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="peakReads">Peak:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="peakReadsInp">
-                            <span id="peakReadsDsp">500K</span>
-                          </div>
-                          <div class="units">
-                            ops/sec
-                          </div>
+                        <div class="units">
+                          ops/sec
                         </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the maximum number of read operations per second that your
-                            workload
-                            needs
-                            during peak periods.</span>
-                        </span>
                       </div>
-                      <input type="range" id="peakReads" min="1000" max="2000000" step="1000" value="500000">
-                    </div>
-
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="peakDurationReads">Duration:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="peakDurationReadsInp">
-                            <span id="peakDurationReadsDsp">1</span>
-                          </div>
-                          <div class="units">
-                            hours per day
-                          </div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the number of hours per day that your workload operates at
-                            peak.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="peakDurationReads" min="0" max="24" value="1">
-                    </div>
-                  </div>
-                  <div class="col vstack gap-3">
-                    <h4 class="writes">Writes</h4>
-
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="baselineWrites">Baseline:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="baselineWritesInp">
-                            <span id="baselineWritesDsp">50K</span>
-                          </div>
-                          <div class="units">
-                            ops/sec
-                          </div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the number of write operations per second that your workload
-                            needs
-                            during
-                            off-peak periods.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="baselineWrites" min="1000" max="2000000" step="1000" value="50000">
-                    </div>
-
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="peakWrites">Peak:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="peakWritesInp">
-                            <span id="peakWritesDsp">500K</span>
-                          </div>
-                          <div class="units">
-                            ops/sec
-                          </div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the maximum number of write operations per second that your
-                            workload
-                            needs during peak periods.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="peakWrites" min="1000" max="2000000" step="1000" value="500000">
-                    </div>
-
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="peakDurationWrites">Duration:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="peakDurationWritesInp">
-                            <span id="peakDurationWritesDsp">1</span>
-                          </div>
-                          <div class="units">
-                            hours per day
-                          </div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the number of hours per day that your workload operates at
-                            peak.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="peakDurationWrites" min="0" max="24" value="1">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div id="totalOpsParams" class="vstack gap-3" style="display: none;">
-                <div class="row-sm">
-                  <div class="col vstack gap-3">
-                    <h4 class="reads">Total Reads</h4>
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="totalReads">Total:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="totalReadsInp">
-                            <span id="totalReadsDsp">500K</span>
-                          </div>
-                          <div class="units">ops/day</div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the total sum of read operations per day that your workload needs during a 24h period.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="totalReads" min="1000" max="100000000000" step="1000" value="10000000000">
-                    </div>
-                  </div>
-                  <div class="col vstack gap-3">
-                    <h4 class="writes">Total Writes</h4>
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="totalWrites">Total:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="totalWritesInp">
-                            <span id="totalWritesDsp">500K</span>
-                          </div>
-                          <div class="units">ops/day</div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the total sum of write operations per day that your workload needs during a 24h period.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="totalWrites" min="1000" max="100000000000" step="1000" value="10000000000">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div id="provisionedParams" style="display: none;">
-                <div class="row-sm">
-                  <div class="col vstack gap-3">
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="reservedReads">Read Reserved Capacity:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="reservedReadsInp">
-                            <span id="reservedReadsDsp">0</span>
-                          </div>
-                          <div class="units"></div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the percentage of read operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="reservedReads" min="0" max="100" step="1" value="0">
-                    </div>
-                  </div>
-                  <div class="col vstack gap-3">
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="reservedWrites">Write Reserved Capacity:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="reservedWritesInp">
-                            <span id="reservedWritesDsp">0</span>
-                          </div>
-                          <div class="units"></div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter the percentage of write operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="reservedWrites" min="0" max="100" step="1" value="0">
-                    </div>
-                  </div>
-                  <div class="col vstack gap-3">
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="overprovisioned">Overprovisioned Capacity:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="overprovisionedInp">
-                            <span id="overprovisionedDsp">0</span>
-                          </div>
-                          <div class="units"></div>
-                        </div>
-                        <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Provisioned capacity should be 20% above consumed capacity to avoid throttling.
-                            DynamoDB's burst capacity is limited and not guaranteed.</span>
-                        </span>
-                      </div>
-                      <input type="range" id="overprovisioned" min="0" max="100" step="1" value="0">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div id="itemParams">
-                <div class="row-sm">
-                  <div class="col vstack gap-3">
-                    <div class="range-group">
-                      <div class="range-group-top">
-                        <label for="itemSizeB">Operation Size:</label>
-                        <div class="inline-input">
-                          <div class="value">
-                            <input type="text" id="itemSizeInp">
-                            <span id="itemSizeDsp">1 </span>
-                          </div>
-                          <div class="units"></div>
-                        </div>
-                        <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter your average operation size (all attributes).</span>
-                    </span>
-                      </div>
-                      <input type="range" id="itemSizeB" min="1" max="409600" step="1" value="1024">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div id="consistencyParams">
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label>Read Consistency: </label>
-                    <div class="inline-input">
-                      <div class="value fill">
-                        <span id="readConstDsp">Strongly Consistent</span>
-                      </div>
-                      <div class="units">
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                <i class="icon-info-outline"></i>
-                <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent
-                  as a percentage.</span>
-              </span>
-                  </div>
-                  <input type="range" id="readConst" class="slider" min="0" max="100" step="100" value="100">
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-content" id="tablesTabContent">
-              <div id="tableParams" class="vstack gap-3">
-
-                <h4>Table Storage</h4>
-
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="storageGB">Storage Size:</label>
-                    <div class="inline-input">
-                      <div class="value wide">
-                        <input type="text" id="storageInp">
-                        <span id="storageDsp">512 GB</span>
-                      </div>
-                      <div class="units"></div>
-                    </div>
-                    <span class="info-icon">
-                          <i class="icon-info-outline"></i>
-                          <span class="tooltip-text">Enter your total data storage size.</span>
-                        </span>
-                  </div>
-                  <input type="range" id="storageGB" min="128" max="1048576" step="1" value="512">
-                </div>
-
-                <h4 class="dynamodb">Table Class</h4>
-
-                <div class="hstack gap-3 align-items-center dynamodb">
-                  <label for="tableClass" class="flex-grow">Table Class:</label>
-                  <select id="tableClass">
-                    <option value="standard">Standard</option>
-                    <option value="infrequentAccess">Infrequent Access</option>
-                  </select>
-                  <span class="info-icon">
-                    <i class="icon-info-outline"></i>
-                    <span class="tooltip-text">Select the table class for your workload.</span>
-                  </span>
-                </div>
-
-                <h4>Global Tables</h4>
-
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="regions">Number of Data Centers:</label>
-                    <div class="inline-input">
-                      <div class="value">
-                        <input type="text" id="regionsInp">
-                        <span id="regionsDsp">1</span>
-                      </div>
-                      <div class="units">
-                        regions
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter the number of additional regions where your data is replicated as
-                        a Global Table.</span>
-                    </span>
-                  </div>
-                  <input type="range" id="regions" min="1" max="24" step="1" value="1">
-                </div>
-              </div>
-
-            </div>
-
-            <div class="tab-content" id="daxTabContent">
-
-              <div id="daxParams" class="vstack gap-3">
-
-                <h4>Accelerator (DAX) Configuration</h4>
-
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="cacheSize">Dataset Size:</label>
-                    <div class="inline-input">
-                      <div class="value">
-                        <span id="cacheSizeDsp">0</span>
-                      </div>
-                      <div class="units">
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter the dataset memory size that your cache will use.</span>
-                    </span>
-                  </div>
-                  <input type="range" id="cacheSize" min="0" max="10240" step="64" value="0">
-                </div>
-
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="cacheRatio">Hit/Miss Ratio:</label>
-                    <div class="inline-input">
-                      <div class="value">
-                        <span id="cacheRatioDsp">0/100</span>
-                      </div>
-                      <div class="units">
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter the hit miss ratio that your cache will use.</span>
-                    </span>
-                  </div>
-                  <input type="range" id="cacheRatio" min="0" max="100" step="1" value="0">
-                </div>
-
-                <h4>Recommended Instances</h4>
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="daxNodes">Number of Nodes:</label>
-                    <div class="inline-input">
-                      <div class="value">
-                        <input type="text" id="daxNodesInp">
-                        <span id="daxNodesDsp">0</span>
-                      </div>
-                      <div class="units">
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                  <i class="icon-info-outline"></i>
-                  <span class="tooltip-text">This is the recommended number of nodes for your workload.</span>
-                </span>
-                  </div>
-                  <input type="range" id="daxNodes" min="0" max="48" step="1" value="0">
-                </div>
-
-                <div class="hstack gap-3 align-items-center">
-                  <label for="daxInstanceClass" class="flex-grow">Instance Class:</label>
-                  <select id="daxInstanceClass">
-                    <option value="dax.r5.large">dax.r5.large</option>
-                    <option value="dax.r5.xlarge">dax.r5.xlarge</option>
-                    <option value="dax.r5.2xlarge">dax.r5.2xlarge</option>
-                    <option value="dax.r5.4xlarge">dax.r5.4xlarge</option>
-                    <option value="dax.r5.8xlarge">dax.r5.8xlarge</option>
-                    <option value="dax.r5.12xlarge">dax.r5.12xlarge</option>
-                    <option value="dax.r5.16xlarge">dax.r5.16xlarge</option>
-                    <option value="dax.r5.24xlarge">dax.r5.24xlarge</option>
-                  </select>
-                  <span class="info-icon">
-                    <i class="icon-info-outline"></i>
-                    <span class="tooltip-text">This is the recommended instance class for your workload.</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-content scylladb" id="scyllaTabContent" style="display: none;">
-
-              <div id="scyllaParams" class="vstack gap-3">
-
-                <h4>Cluster Configuration</h4>
-
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="scyllaReplication">Replication Factor:</label>
-                    <div class="inline-input">
-                      <div class="value">
-                        <input type="text" id="scyllaReplicationInp">
-                        <span id="scyllaReplicationDsp">0</span>
-                      </div>
-                      <div class="units">
-                      </div>
-                    </div>
-                    <span class="info-icon">
-                      <i class="icon-info-outline"></i>
-                      <span class="tooltip-text">Enter the replication factor for your ScyllaDB cluster.
-                        This is the number of copies of each piece of data that will be stored across the cluster.
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the number of read operations per second that your workload needs during off-peak periods.</span>
                       </span>
-                    </span>
-                  </div>
-                  <input type="range" id="scyllaReplication" min="3" max="12" step="3" value="3">
-                </div>
-
-                <h4>Recommended Instances</h4>
-                <div class="range-group">
-                  <div class="range-group-top">
-                    <label for="scyllaNodes">Number of Nodes:</label>
-                    <div class="inline-input">
-                      <div class="value">
-                        <input type="text" id="scyllaNodesInp">
-                        <span id="scyllaNodesDsp">0</span>
-                      </div>
-                      <div class="units">
-                      </div>
                     </div>
-                    <span class="info-icon">
-                  <i class="icon-info-outline"></i>
-                  <span class="tooltip-text">This is the recommended number of nodes for your ScyllaDB cluster.
-                        This is based on the replication factor and the expected workload.</span>
-                </span>
+                    <input id="baselineReads" max="2000000" min="1000" step="1000" type="range" value="50000"/>
                   </div>
-                  <input type="range" id="scyllaNodes" min="2" max="180" step="1" value="0">
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="peakReads">Peak:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="peakReadsInp" type="text"/>
+                          <span id="peakReadsDsp">500K</span>
+                        </div>
+                        <div class="units">
+                          ops/sec
+                        </div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the maximum number of read operations per second that your workload needs during peak periods.</span>
+                      </span>
+                    </div>
+                    <input id="peakReads" max="2000000" min="1000" step="1000" type="range" value="500000"/>
+                  </div>
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="peakDurationReads">Duration:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="peakDurationReadsInp" type="text"/>
+                          <span id="peakDurationReadsDsp">1</span>
+                        </div>
+                        <div class="units">
+                          hours per day
+                        </div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
+                      </span>
+                    </div>
+                    <input id="peakDurationReads" max="24" min="0" type="range" value="1"/>
+                  </div>
                 </div>
-
-                <div class="hstack gap-3 align-items-center">
-                  <label for="scyllaInstanceClass" class="flex-grow">Instance Class:</label>
-                  <select id="scyllaInstanceClass">
-                    <option value="i7ie.large">i7ie.large</option>
-                    <option value="i7ie.xlarge">i7ie.xlarge</option>
-                    <option value="i7ie.2xlarge">i7ie.2xlarge</option>
-                    <option value="i7ie.3xlarge">i7ie.3xlarge</option>
-                    <option value="i7ie.6xlarge">i7ie.6xlarge</option>
-                    <option value="i7ie.12xlarge">i7ie.12xlarge</option>
-                    <option value="i7ie.18xlarge">i7ie.18xlarge</option>
-                    <option value="i7ie.24xlarge">i7ie.24xlarge</option>
-                    <option value="i7ie.48xlarge">i7ie.48xlarge</option>
-                  </select>
+                <div class="col vstack gap-3">
+                  <h4 class="writes">Writes</h4>
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="baselineWrites">Baseline:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="baselineWritesInp" type="text"/>
+                          <span id="baselineWritesDsp">50K</span>
+                        </div>
+                        <div class="units">
+                          ops/sec
+                        </div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the number of write operations per second that your workload needs during off-peak periods.</span>
+                      </span>
+                    </div>
+                    <input id="baselineWrites" max="2000000" min="1000" step="1000" type="range" value="50000"/>
+                  </div>
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="peakWrites">Peak:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="peakWritesInp" type="text"/>
+                          <span id="peakWritesDsp">500K</span>
+                        </div>
+                        <div class="units">
+                          ops/sec
+                        </div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the maximum number of write operations per second that your workload needs during peak periods.</span>
+                      </span>
+                    </div>
+                    <input id="peakWrites" max="2000000" min="1000" step="1000" type="range" value="500000"/>
+                  </div>
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="peakDurationWrites">Duration:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="peakDurationWritesInp" type="text"/>
+                          <span id="peakDurationWritesDsp">1</span>
+                        </div>
+                        <div class="units">
+                          hours per day
+                        </div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the number of hours per day that your workload operates at peak.</span>
+                      </span>
+                    </div>
+                    <input id="peakDurationWrites" max="24" min="0" type="range" value="1"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="vstack gap-3" id="totalOpsParams" style="display: none;">
+              <div class="row-sm">
+                <div class="col vstack gap-3">
+                  <h4 class="reads">Total Reads</h4>
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="totalReads">Total:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="totalReadsInp" type="text"/>
+                          <span id="totalReadsDsp">500K</span>
+                        </div>
+                        <div class="units">ops/day</div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the total sum of read operations per day that your workload needs during a 24h period.</span>
+                      </span>
+                    </div>
+                    <input id="totalReads" max="100000000000" min="1000" step="1000" type="range" value="10000000000"/>
+                  </div>
+                </div>
+                <div class="col vstack gap-3">
+                  <h4 class="writes">Total Writes</h4>
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="totalWrites">Total:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="totalWritesInp" type="text"/>
+                          <span id="totalWritesDsp">500K</span>
+                        </div>
+                        <div class="units">ops/day</div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the total sum of write operations per day that your workload needs during a 24h period.</span>
+                      </span>
+                    </div>
+                    <input id="totalWrites" max="100000000000" min="1000" step="1000" type="range" value="10000000000"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="provisionedParams" style="display: none;">
+              <div class="row-sm">
+                <div class="col vstack gap-3">
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="reservedReads">Read Reserved Capacity:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="reservedReadsInp" type="text"/>
+                          <span id="reservedReadsDsp">0</span>
+                        </div>
+                        <div class="units"></div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the percentage of read operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+                      </span>
+                    </div>
+                    <input id="reservedReads" max="100" min="0" step="1" type="range" value="0"/>
+                  </div>
+                </div>
+                <div class="col vstack gap-3">
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="reservedWrites">Write Reserved Capacity:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="reservedWritesInp" type="text"/>
+                          <span id="reservedWritesDsp">0</span>
+                        </div>
+                        <div class="units"></div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the percentage of write operations covered by reserved capacity. Reserved capacity can only be used with DynamoDB Standard table class.</span>
+                      </span>
+                    </div>
+                    <input id="reservedWrites" max="100" min="0" step="1" type="range" value="0"/>
+                  </div>
+                </div>
+                <div class="col vstack gap-3">
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="overprovisioned">Overprovisioned Capacity:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="overprovisionedInp" type="text"/>
+                          <span id="overprovisionedDsp">0</span>
+                        </div>
+                        <div class="units"></div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Provisioned capacity should be 20% above consumed capacity to avoid throttling. DynamoDB's burst capacity is limited and not guaranteed.</span>
+                      </span>
+                    </div>
+                    <input id="overprovisioned" max="100" min="0" step="1" type="range" value="0"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="itemParams">
+              <div class="row-sm">
+                <div class="col vstack gap-3">
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="itemSizeB">Operation Size:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="itemSizeInp" type="text"/>
+                          <span id="itemSizeDsp">1 </span>
+                        </div>
+                        <div class="units"></div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter your average operation size (all attributes).</span>
+                      </span>
+                    </div>
+                    <input id="itemSizeB" max="409600" min="1" step="1" type="range" value="1024"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="consistencyParams">
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label>Read Consistency: </label>
+                  <div class="inline-input">
+                    <div class="value fill">
+                      <span id="readConstDsp">Strongly Consistent</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
                   <span class="info-icon">
                     <i class="icon-info-outline"></i>
-                    <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+                    <span class="tooltip-text">Enter read operations as eventually consistent or strongly consistent as a percentage.</span>
                   </span>
                 </div>
+                <input class="slider" id="readConst" max="100" min="0" step="100" type="range" value="100"/>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tablesTabContent">
+            <div class="vstack gap-3" id="tableParams">
+              <h4>Table Storage</h4>
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label for="storageGB">Storage Size:</label>
+                  <div class="inline-input">
+                    <div class="value wide">
+                      <input id="storageInp" type="text"/>
+                      <span id="storageDsp">512 GB</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">Enter your total data storage size.</span>
+                  </span>
+                </div>
+                <input id="storageGB" max="1048576" min="128" step="1" type="range" value="512"/>
+              </div>
+              <h4 class="dynamodb">Table Class</h4>
+              <div class="hstack gap-3 align-items-center dynamodb">
+                <label class="flex-grow" for="tableClass">Table Class:</label>
+                <select id="tableClass">
+                  <option value="standard">Standard</option>
+                  <option value="infrequentAccess">Infrequent Access</option>
+                </select>
+                <span class="info-icon">
+                  <i class="icon-info-outline"></i>
+                  <span class="tooltip-text">Select the table class for your workload.</span>
+                </span>
+              </div>
+              <h4>Global Tables</h4>
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label for="regions">Number of Data Centers:</label>
+                  <div class="inline-input">
+                    <div class="value">
+                      <input id="regionsInp" type="text"/>
+                      <span id="regionsDsp">1</span>
+                    </div>
+                    <div class="units">
+                      regions
+                    </div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">Enter the number of additional regions where your data is replicated as a Global Table.</span>
+                  </span>
+                </div>
+                <input id="regions" max="24" min="1" step="1" type="range" value="1"/>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="daxTabContent">
+            <div class="vstack gap-3" id="daxParams">
+              <h4>Accelerator (DAX) Configuration</h4>
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label for="cacheSize">Dataset Size:</label>
+                  <div class="inline-input">
+                    <div class="value">
+                      <span id="cacheSizeDsp">0</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">Enter the dataset memory size that your cache will use.</span>
+                  </span>
+                </div>
+                <input id="cacheSize" max="10240" min="0" step="64" type="range" value="0"/>
+              </div>
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label for="cacheRatio">Hit/Miss Ratio:</label>
+                  <div class="inline-input">
+                    <div class="value">
+                      <span id="cacheRatioDsp">0/100</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">Enter the hit miss ratio that your cache will use.</span>
+                  </span>
+                </div>
+                <input id="cacheRatio" max="100" min="0" step="1" type="range" value="0"/>
+              </div>
+              <h4>Recommended Instances</h4>
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label for="daxNodes">Number of Nodes:</label>
+                  <div class="inline-input">
+                    <div class="value">
+                      <input id="daxNodesInp" type="text"/>
+                      <span id="daxNodesDsp">0</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">This is the recommended number of nodes for your workload.</span>
+                  </span>
+                </div>
+                <input id="daxNodes" max="48" min="0" step="1" type="range" value="0"/>
+              </div>
+              <div class="hstack gap-3 align-items-center">
+                <label class="flex-grow" for="daxInstanceClass">Instance Class:</label>
+                <select id="daxInstanceClass">
+                  <option value="dax.r5.large">dax.r5.large</option>
+                  <option value="dax.r5.xlarge">dax.r5.xlarge</option>
+                  <option value="dax.r5.2xlarge">dax.r5.2xlarge</option>
+                  <option value="dax.r5.4xlarge">dax.r5.4xlarge</option>
+                  <option value="dax.r5.8xlarge">dax.r5.8xlarge</option>
+                  <option value="dax.r5.12xlarge">dax.r5.12xlarge</option>
+                  <option value="dax.r5.16xlarge">dax.r5.16xlarge</option>
+                  <option value="dax.r5.24xlarge">dax.r5.24xlarge</option>
+                </select>
+                <span class="info-icon">
+                  <i class="icon-info-outline"></i>
+                  <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content scylladb" id="scyllaTabContent" style="display: none;">
+            <div class="vstack gap-3" id="scyllaParams">
+              <h4>Cluster Configuration</h4>
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label for="scyllaReplication">Replication Factor:</label>
+                  <div class="inline-input">
+                    <div class="value">
+                      <input id="scyllaReplicationInp" type="text"/>
+                      <span id="scyllaReplicationDsp">0</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">Enter the replication factor for your ScyllaDB cluster. This is the number of copies of each piece of data that will be stored across the cluster. </span>
+                  </span>
+                </div>
+                <input id="scyllaReplication" max="12" min="3" step="3" type="range" value="3"/>
+              </div>
+              <h4>Recommended Instances</h4>
+              <div class="range-group">
+                <div class="range-group-top">
+                  <label for="scyllaNodes">Number of Nodes:</label>
+                  <div class="inline-input">
+                    <div class="value">
+                      <input id="scyllaNodesInp" type="text"/>
+                      <span id="scyllaNodesDsp">0</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">This is the recommended number of nodes for your ScyllaDB cluster. This is based on the replication factor and the expected workload.</span>
+                  </span>
+                </div>
+                <input id="scyllaNodes" max="180" min="2" step="1" type="range" value="0"/>
+              </div>
+              <div class="hstack gap-3 align-items-center">
+                <label class="flex-grow" for="scyllaInstanceClass">Instance Class:</label>
+                <select id="scyllaInstanceClass">
+                  <option value="i7ie.large">i7ie.large</option>
+                  <option value="i7ie.xlarge">i7ie.xlarge</option>
+                  <option value="i7ie.2xlarge">i7ie.2xlarge</option>
+                  <option value="i7ie.3xlarge">i7ie.3xlarge</option>
+                  <option value="i7ie.6xlarge">i7ie.6xlarge</option>
+                  <option value="i7ie.12xlarge">i7ie.12xlarge</option>
+                  <option value="i7ie.18xlarge">i7ie.18xlarge</option>
+                  <option value="i7ie.24xlarge">i7ie.24xlarge</option>
+                  <option value="i7ie.48xlarge">i7ie.48xlarge</option>
+                </select>
+                <span class="info-icon">
+                  <i class="icon-info-outline"></i>
+                  <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <footer>
-      <img src="./src/scylladb-logo.svg" class="scylladb-logo" alt="ScyllaDB Logo"/>
-      <div class="small">
-        2025 ©ScyllaDB | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.<br>
-        Amazon DynamoDB® and Dynamo Accelerator® are trademarks of Amazon.com, Inc. No endorsements by Amazon.com,
-        Inc. are implied by the use of these marks.
-      </div>
-    </footer>
   </div>
+  <footer>
+    <img alt="ScyllaDB Logo" class="scylladb-logo" src="./src/scylladb-logo.svg"/>
+    <div class="small">
+      2025 ©ScyllaDB | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.<br/>
+      Amazon DynamoDB® and Dynamo Accelerator® are trademarks of Amazon.com, Inc. No endorsements by Amazon.com, Inc.
+      are implied by the use of these marks.
+    </div>
+  </footer>
+</div>
 </body>
-
 </html>
-
