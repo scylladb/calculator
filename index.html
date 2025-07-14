@@ -483,22 +483,16 @@
           <div class="tab-content scylladb" id="scyllaTabContent" style="display: none;">
             <div class="vstack gap-3" id="scyllaParams">
               <h4>Cluster Configuration</h4>
-              <div class="range-group">
-                <div class="range-group-top">
-                  <label for="replication">Replication Factor:</label>
-                  <div class="inline-input">
-                    <div class="value">
-                      <input id="replicationInp" type="text"/>
-                      <span id="replicationDsp">0</span>
-                    </div>
-                    <div class="units"></div>
-                  </div>
-                  <span class="info-icon">
-                    <i class="icon-info-outline"></i>
-                    <span class="tooltip-text">Enter the replication factor for your ScyllaDB cluster. This is the number of copies of each piece of data that will be stored across the cluster. </span>
-                  </span>
-                </div>
-                <input id="replication" max="12" min="3" step="3" type="range" value="3"/>
+              <div class="hstack gap-3 align-items-center">
+                <label class="flex-grow" for="replication">Replication Factor:</label>
+                <select id="replication">
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+                <span class="info-icon">
+                  <i class="icon-info-outline"></i>
+                  <span class="tooltip-text">Enter the replication factor for your ScyllaDB cluster. This is the number of copies of each piece of data that will be stored across the cluster.</span>
+                </span>
               </div>
               <h4>Recommended Instances</h4>
               <div class="hstack gap-3 align-items-center">

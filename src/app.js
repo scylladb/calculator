@@ -260,10 +260,8 @@ document.getElementById('daxOverride').addEventListener('change', (event) => {
     updateAll();
 });
 
-
-document.getElementById('replication').addEventListener('input', (event) => {
-    cfg.replication = parseInt(event.target.value);
-    document.getElementById('replicationDsp').innerText = `${formatNumber(cfg.replication)}`;
+document.getElementById('replication').addEventListener('change', (event) => {
+    cfg.replication = event.target.value;
     updateAll();
 });
 
@@ -301,7 +299,6 @@ setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
-setupSliderInteraction('replicationDsp', 'replicationInp', 'replication', value => value);
 setupSliderInteraction('scyllaNodesDsp', 'scyllaNodesInp', 'scyllaNodes', value => value);
 
 if (cfg.pricing === 'demand') {
@@ -358,7 +355,6 @@ document.getElementById('reservedWritesDsp').innerText = `${cfg.reservedWrites}%
 document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
-document.getElementById('replicationDsp').innerText = `${cfg.replication}`;
 document.getElementById('scyllaNodesDsp').innerText = `${cfg.scyllaNodes}`;
 
 document.addEventListener('DOMContentLoaded', function () {
