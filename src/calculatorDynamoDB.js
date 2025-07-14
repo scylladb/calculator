@@ -1,13 +1,17 @@
 import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
 import {
-    getDAX, getHours,
-    getItemSize, getOverprovisioned,
+    getDAX,
+    getHours,
+    getItemSize,
+    getOverprovisioned,
     getPricing,
     getReadConsistency,
-    getRegions, getReserved,
+    getRegions,
+    getReserved,
     getStorage,
-    getTableClass, getTotalOpsPerDay
+    getTableClass,
+    getTotalOpsPerDay
 } from "./calculatorCommon.js";
 
 
@@ -189,7 +193,7 @@ export function calculateDemandCosts() {
 function calculateNetworkCosts() {
     cfg.totalReadsKB = cfg.totalReadOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalWritesKB = cfg.totalWriteOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
-    cfg.totalReplicatedWritesGB =((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
+    cfg.totalReplicatedWritesGB = ((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
     cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
 }
 
@@ -220,7 +224,7 @@ function findBestDaxCombination(targetRPS) {
 }
 
 function calculateDaxCosts() {
-    if(cfg.override) {
+    if (cfg.daxOverride) {
         cfg.daxInstanceClassCost = cfg.daxInstanceClassCosts.find(instance => instance.instance === cfg.daxInstanceClass).price * cfg.daxNodes;
         cfg.dynamoDaxCost = cfg.hoursPerMonth * cfg.daxInstanceClassCost;
         return;

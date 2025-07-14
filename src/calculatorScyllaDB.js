@@ -11,8 +11,18 @@ import {
 } from "./calculatorCommon.js";
 
 export function calculateScyllaDBCosts() {
+    if (cfg.scyllaOverride) {
+        cfg._baseCost = {
+            bestInstanceType: cfg.scyllaInstanceClass,
+            bestNodeCount: cfg.scyllaNodes,
+            monthlyCost: cfg.scyllaPrice[cfg.scyllaInstanceClass].price * cfg.scyllaNodes * (cfg.regions || 1) * cfg.hoursPerMonth
+        }
+
+        return;
+    }
+
     // Replication factor
-    const replication = cfg.scyllaReplication;
+    const replication = cfg.replication;
 
     // Max ops/sec * replication
     const maxOpsPerSec = (cfg.maxReads + cfg.maxWrites) * replication;
@@ -43,6 +53,13 @@ export function calculateScyllaDBCosts() {
     const minNodes = Math.min(...nodeOptions.map(opt => opt.nodes));
     const bestCandidates = nodeOptions.filter(opt => opt.nodes === minNodes);
     const best = bestCandidates.reduce((a, b) => (a.cost < b.cost ? a : b));
+
+    cfg.scyllaNodes = best.nodes;
+    cfg.scyllaInstanceClass = best.type;
+
+    document.getElementById('scyllaInstanceClass').value = best.type;
+    document.getElementById('scyllaNodes').value = best.nodes;
+    document.getElementById('scyllaNodesDsp').innerText = best.nodes;
 
     cfg._baseCost = {
         replication,

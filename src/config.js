@@ -28,6 +28,7 @@ export const cfg = {
     itemWCU: 1,
     tableClass: 'standard',
     readConst: 100,
+    replication: 3,
 
     // Demand
     pricePerRRU: 0.000000125,
@@ -73,8 +74,7 @@ export const cfg = {
         {instance: "dax.r5.24xlarge", memory: 768, nps: 1000000, price: 12.24000000},
     ],
 
-    // Other
-    override: false,
+    daxOverride: false,
 
     // ScyllaDB Pricing
     scyllaPrice: {
@@ -89,11 +89,14 @@ export const cfg = {
         'i7ie.48xlarge': {vcpu: 192, storage: 120000, price: 219.931},
     },
 
+    scyllaNodes: 0,
+    scyllaInstanceClass: 'i7ie.large',
+    scyllaOverride: false,
+
     // ScyllaDB Constants
     scyllaOpsPerVCPU: 15000,
     scyllaCompressionRatio: 0.5,
     scyllaStorageUtilization: 0.9,
-    scyllaReplication: 3,
     scyllaFlexDiscount: 0.175,
     scyllaReservedDiscount: 0.25,
 };

@@ -11,7 +11,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxReads = 20000;
         cfg.maxWrites = 10000;
         cfg.storageGB = 3000;
-        cfg.scyllaReplication = 3;
+        cfg.replication = 3;
         cfg.scyllaCompressionRatio = 0.5;
         cfg.regions = 2;
 
@@ -19,13 +19,13 @@ describe('calculateScyllaDBCosts', () => {
 
         const result = cfg._baseCost;
 
-        expect(cfg.scyllaReplication).toBe(3);
+        expect(cfg.replication).toBe(3);
 
         expect(result.requiredVCPUs).toBe(6);
         expect(result.requiredStorage).toBe(4500);
         expect(result.nodeOptions.length).toBeGreaterThan(0);
         expect(result.bestInstanceType).toBe('i7ie.xlarge');
-        expect(result.bestNodeCount % cfg.scyllaReplication).toBe(0);
+        expect(result.bestNodeCount % cfg.replication).toBe(0);
         expect(result.bestNodeCount).toBe(3);
         expect(result.monthlyCost).toBeCloseTo(20069.16, 3); // 3*4.582*2*730 = 20,069.16
     });
@@ -34,7 +34,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxReads = 10000;
         cfg.maxWrites = 5000;
         cfg.storageGB = 1000;
-        cfg.scyllaReplication = 2;
+        cfg.replication = 2;
         cfg.scyllaCompressionRatio = 0.5;
         cfg.regions = 1;
 
@@ -54,7 +54,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxReads = 10000;
         cfg.maxWrites = 5000;
         cfg.storageGB = 1000;
-        cfg.scyllaReplication = 3;
+        cfg.replication = 3;
         cfg.scyllaCompressionRatio = 0.5;
         cfg.regions = 1;
 
@@ -77,7 +77,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxReads = 100000;
         cfg.maxWrites = 100000;
         cfg.storageGB = 50000;
-        cfg.scyllaReplication = 3;
+        cfg.replication = 3;
         cfg.scyllaCompressionRatio = 0.5;
         cfg.regions = 1;
 
@@ -98,7 +98,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxReads = 100;
         cfg.maxWrites = 100;
         cfg.storageGB = 10;
-        cfg.scyllaReplication = 2;
+        cfg.replication = 2;
         cfg.scyllaCompressionRatio = 0.5;
         cfg.regions = 1;
 

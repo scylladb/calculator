@@ -59,7 +59,7 @@ export function getQueryParams() {
     assignParam('reservedWrites', parseInt);
     assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
-    assignParam('scyllaReplication', parseInt);
+    assignParam('replication', parseInt);
 
     const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
     const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
@@ -77,10 +77,14 @@ export function getQueryParams() {
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
     }
 
-    if (params.get('daxNodes')) {
+    if (params.get('daxOverride') === 'true') {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
         cfg.daxInstanceClass = params.get('daxInstanceClass');
-        cfg.override = true;
+    }
+
+    if (params.get('scyllaOverride') === 'true') {
+        cfg.scyllaNodes = parseInt(params.get('scyllaNodes'));
+        cfg.scyllaInstanceClass = params.get('scyllaInstanceClass');
     }
 
     if (params.get('standalone') === 'false') {
@@ -111,6 +115,8 @@ export function updateQueryParams() {
         const setOrDelete = (key, value, defaultValue = undefined) => {
             if (defaultValue !== undefined && value === defaultValue) {
                 params.delete(key);
+            } else if (value === false) {
+                params.delete(key);
             } else {
                 params.set(key, value.toString());
             }
@@ -136,7 +142,9 @@ export function updateQueryParams() {
         setOrDelete('seriesReads', cfg.seriesReadsEncoded);
         setOrDelete('seriesWrites', cfg.seriesWritesEncoded);
         setOrDelete('workload', cfg.workload);
-        setOrDelete('scyllaReplication', cfg.scyllaReplication);
+        setOrDelete('replication', cfg.replication);
+        setOrDelete('daxOverride', cfg.daxOverride);
+        setOrDelete('scyllaOverride', cfg.scyllaOverride);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
@@ -146,12 +154,20 @@ export function updateQueryParams() {
             setOrDelete('cacheRatio', cfg.cacheRatio);
         }
 
-        if (cfg.daxNodes === 0) {
-            params.delete('daxNodes');
-            params.delete('daxInstanceClass');
-        } else {
+        if (cfg.daxOverride) {
             setOrDelete('daxNodes', cfg.daxNodes);
             setOrDelete('daxInstanceClass', cfg.daxInstanceClass);
+        } else {
+            params.delete('daxNodes');
+            params.delete('daxInstanceClass');
+        }
+
+        if (cfg.scyllaOverride) {
+            setOrDelete('scyllaNodes', cfg.scyllaNodes);
+            setOrDelete('scyllaInstanceClass', cfg.scyllaInstanceClass);
+        } else {
+            params.delete('scyllaNodes');
+            params.delete('scyllaInstanceClass');
         }
 
         if (cfg.regions === 1) {
