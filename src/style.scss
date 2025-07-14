@@ -39,7 +39,7 @@ body {
   margin: 0;
   padding: var(--spacer-xs);
   display: flex;
-  min-height: calc(100vh - (2*var(--spacer-sm)));
+  min-height: calc(100vh - (2 * var(--spacer-sm)));
   flex-direction: column;
   align-items: center;
 
@@ -47,11 +47,11 @@ body {
     padding: var(--spacer-sm);
   }
 
-  &.standalone{
+  &.standalone {
     color: var(--light);
     background-color: var(--bg-color);
-    background-image:     svg-url(blob-svg($brand-blue, $brand-teal)),
-                          svg-url(wave-svg($brand-blue, $brand-teal, $brand-yellow));
+    background-image: svg-url(blob-svg($brand-blue, $brand-teal)),
+    svg-url(wave-svg($brand-blue, $brand-teal, $brand-yellow));
     background-repeat: no-repeat, no-repeat;
     background-size: 100% auto, 100% auto;
     background-position: top right, bottom left;
@@ -87,7 +87,7 @@ small, .small {
 }
 
 .card {
-  background-color:  var(--card-bg);
+  background-color: var(--card-bg);
   padding: var(--spacer-sm);
   border-radius: var(--border-radius-md);
   box-shadow: 0px var(--spacer-xs) var(--spacer) -1px rgba(12, 19, 37, 0.50);
@@ -115,7 +115,6 @@ small, .small {
   justify-content: center;
   margin: 0;
 }
-
 
 
 #costParams {
@@ -185,7 +184,7 @@ small, .small {
 }
 
 .tabs {
-  nav{
+  nav {
     display: flex;
     margin-bottom: var(--spacer-sm);
 
@@ -288,12 +287,12 @@ small, .small {
             color: var(--text-color);
             max-width: 100%;
 
-            &+span {
+            & + span {
               opacity: 0;
             }
           }
 
-          &+span {
+          & + span {
             border-bottom: 1px solid var(--border-color);
             pointer-events: none;
             position: absolute;
@@ -301,10 +300,12 @@ small, .small {
             right: 0;
           }
         }
+
         span {
           transition: opacity .3s;
         }
       }
+
       .units {
         font-weight: 500;
         font-size: var(--font-size-body);
@@ -399,6 +400,7 @@ input[type=range] {
     transition: all 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
     cursor: pointer;
   }
+
   &::-moz-range-track {
     background: var(--secondary-bg);
     height: $range-track-height;
@@ -480,7 +482,7 @@ input[type="radio"]:checked::after {
   width: var(--spacer-sm);
   height: var(--spacer-sm);
   text-align: center;
-  
+
   i {
     font-size: 18px;
   }
@@ -504,15 +506,9 @@ input[type="radio"]:checked::after {
     bottom: 0;
     right: 20px;
     opacity: 0;
-    transition: opacity 0.2s;    
+    transition: opacity 0.2s;
     font-size: 12px;
     line-height: 1.4em;
     font-weight: normal;
   }
 }
-
-
-
-
-
-
