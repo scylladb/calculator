@@ -62,6 +62,7 @@ export function getQueryParams() {
     assignParam('replication', parseInt);
     assignParam('storageCompression', parseInt);
     assignParam('storageUtilization', parseInt);
+    assignParam('networkCompression', parseInt);
 
     const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
     const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
@@ -149,6 +150,7 @@ export function updateQueryParams() {
         setOrDelete('scyllaOverride', cfg.scyllaOverride);
         setOrDelete('storageCompression', cfg.storageCompression);
         setOrDelete('storageUtilization', cfg.storageUtilization);
+        setOrDelete('networkCompression', cfg.networkCompression);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');

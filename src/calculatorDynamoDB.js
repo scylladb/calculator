@@ -194,7 +194,7 @@ function calculateNetworkCosts() {
     cfg.totalReadsKB = cfg.totalReadOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalWritesKB = cfg.totalWriteOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalReplicatedWritesGB = ((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
-    cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
+    cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.networkRegionPerGB;
 }
 
 function findBestDaxCombination(targetRPS) {

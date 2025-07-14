@@ -7,7 +7,8 @@ import {
     getReadConsistency,
     getRegions,
     getReserved,
-    getStorage
+    getStorage,
+    getTotalOpsPerDay
 } from "./calculatorCommon.js";
 
 export function calculateScyllaDBCosts() {
@@ -72,17 +73,18 @@ export function calculateScyllaDBCosts() {
     };
 }
 
-function calculateNetworkCosts() {
-    cfg.totalReadsKB = cfg.totalReadOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
-    cfg.totalWritesKB = cfg.totalWriteOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
-    cfg.totalReplicatedWritesGB = ((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
-    cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
-}
+function calculateScyllaDBNetworkCosts() {
+    const compressionFactor = 1 - (cfg.networkCompression / 100.0);
 
-function calculateTotalOpsSec() {
-    cfg.totalReadOpsSec = cfg.baselineReads;
-    cfg.totalWriteOpsSec = cfg.baselineWrites;
-    cfg.totalOpsSec = cfg.totalReadOpsSec + cfg.totalWriteOpsSec;
+    const totalReadsGB = cfg.totalReads * cfg.daysPerMonth * cfg.itemSizeKB / (1024 * 1024);
+    const totalWritesGB = cfg.totalWrites * cfg.daysPerMonth * cfg.itemSizeKB / (1024 * 1024);
+
+    // Each write generates 2 cross-zone operations, which is compressed
+    const writesPerZoneGB = totalWritesGB * compressionFactor * 2 * cfg.regions;
+    // Reads are zone aware, so we only consider cross-region reads
+    const readsPerZoneGB = totalReadsGB * compressionFactor * (cfg.regions - 1);
+
+    cfg.costNetwork = ((readsPerZoneGB + writesPerZoneGB) * cfg.networkZonePerGB);
 }
 
 function logCosts() {
@@ -116,11 +118,11 @@ export function updateScyllaDBCosts() {
     getReadConsistency();
 
     getReserved();
+    getTotalOpsPerDay();
     getMaxOpsPerSec();
 
     calculateScyllaDBCosts();
-    calculateTotalOpsSec();
-    calculateNetworkCosts();
+    calculateScyllaDBNetworkCosts();
 
     cfg.costTotalMonthly = cfg.pricing === 'demand' ? cfg._baseCost.monthlyCost + cfg.costNetwork : cfg._baseCost.monthlyCost + cfg.costNetwork;
 

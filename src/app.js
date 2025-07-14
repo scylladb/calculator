@@ -279,6 +279,13 @@ document.getElementById('storageUtilization').addEventListener('input', (event) 
     updateAll();
 });
 
+document.getElementById('networkCompression').addEventListener('input', (event) => {
+    const networkCompression = parseInt(event.target.value);
+    document.getElementById('networkCompressionDsp').innerText = networkCompression;
+    cfg.networkCompression = networkCompression;
+    updateAll();
+});
+
 document.getElementById('scyllaNodes').addEventListener('input', (event) => {
     cfg.scyllaNodes = parseInt(event.target.value);
     document.getElementById('scyllaNodesDsp').innerText = `${formatNumber(cfg.scyllaNodes)}`;
@@ -315,6 +322,7 @@ setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
 setupSliderInteraction('storageCompressionDsp', 'storageCompressionInp', 'storageCompression', value => value);
 setupSliderInteraction('storageUtilizationDsp', 'storageUtilizationInp', 'storageUtilization', value => value);
+setupSliderInteraction('networkCompressionDsp', 'networkCompressionInp', 'networkCompression', value => value);
 setupSliderInteraction('scyllaNodesDsp', 'scyllaNodesInp', 'scyllaNodes', value => value);
 
 if (cfg.pricing === 'demand') {
@@ -351,6 +359,7 @@ document.getElementById('daxInstanceClass').value = cfg.daxInstanceClass;
 document.getElementById('replication').value = cfg.replication;
 document.getElementById('storageCompression').value = cfg.storageCompression;
 document.getElementById('storageUtilization').value = cfg.storageUtilization;
+document.getElementById('networkCompression').value = cfg.networkCompression;
 document.getElementById('scyllaNodes').value = cfg.scyllaNodes;
 document.getElementById('scyllaInstanceClass').value = cfg.scyllaInstanceClass;
 document.getElementById('scyllaOverride').checked = cfg.scyllaOverride;
@@ -376,6 +385,7 @@ document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 document.getElementById('scyllaNodesDsp').innerText = `${cfg.scyllaNodes}`;
 document.getElementById('storageCompressionDsp').innerText = `${cfg.storageCompression}`;
 document.getElementById('storageUtilizationDsp').innerText = `${cfg.storageUtilization}`;
+document.getElementById('networkCompressionDsp').innerText = `${cfg.networkCompression}`;
 
 document.addEventListener('DOMContentLoaded', function () {
     const logos = document.querySelectorAll('.logo');

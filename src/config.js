@@ -22,7 +22,9 @@ export const cfg = {
     totalReservedRCU: 0,
     totalReservedWCU: 0,
     hoursPerMonth: 730,
+    daysPerMonth: 365 / 12,
     itemSizeB: 1024,
+    itemSizeKB: 1,
     storageGB: 512,
     itemRCU: 1,
     itemWCU: 1,
@@ -31,6 +33,7 @@ export const cfg = {
     replication: 3,
     storageCompression: 50,
     storageUtilization: 90,
+    networkCompression: 50,
 
     // Demand
     pricePerRRU: 0.000000125,
@@ -58,7 +61,8 @@ export const cfg = {
     regions: 1,
 
     // Data Transfer
-    priceIntraRegPerGB: 0.02,
+    networkRegionPerGB: 0.02,
+    networkZonePerGB: 0.01,
 
     // DAX Node Costs
     cacheSizeGB: 0,
@@ -97,7 +101,6 @@ export const cfg = {
 
     // ScyllaDB Constants
     scyllaOpsPerVCPU: 15000,
-
     scyllaFlexDiscount: 0.175,
     scyllaReservedDiscount: 0.25,
 };
