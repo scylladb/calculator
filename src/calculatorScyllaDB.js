@@ -30,15 +30,15 @@ export function calculateScyllaDBCosts() {
     // Required vCPUs
     const requiredVCPUs = Math.ceil(maxOpsPerSec / cfg.scyllaOpsPerVCPU);
 
-    // Storage (apply compression, then replication)
+    // Storage (apply storageCompression, then replication)
     const rawStorage = cfg.storageGB;
-    const compressedStorage = rawStorage * (cfg.compression / 100);
+    const compressedStorage = rawStorage * (1 - (cfg.storageCompression / 100.0));
     const requiredStorage = Math.ceil(compressedStorage * replication);
 
     // Calculate node counts for each family
     const nodeOptions = Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
         const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
-        const usableStoragePerNode = spec.storage / cfg.scyllaStorageUtilization;
+        const usableStoragePerNode = spec.storage / (1 - (cfg.storageUtilization / 100.0));
         const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
         let nodes = Math.max(nodesForVCPU, nodesForStorage);
         // Ensure nodes is a multiple of replication factor (3 for ScyllaDB)

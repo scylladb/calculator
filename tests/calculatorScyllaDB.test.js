@@ -12,7 +12,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxWrites = 10000;
         cfg.storageGB = 3000;
         cfg.replication = 3;
-        cfg.compression = 0.5;
+        cfg.storageCompression = 0.5;
         cfg.regions = 2;
 
         calculateScyllaDBCosts();
@@ -35,7 +35,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxWrites = 5000;
         cfg.storageGB = 1000;
         cfg.replication = 2;
-        cfg.compression = 0.5;
+        cfg.storageCompression = 0.5;
         cfg.regions = 1;
 
         calculateScyllaDBCosts();
@@ -55,7 +55,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxWrites = 5000;
         cfg.storageGB = 1000;
         cfg.replication = 3;
-        cfg.compression = 0.5;
+        cfg.storageCompression = 0.5;
         cfg.regions = 1;
 
         calculateScyllaDBCosts();
@@ -78,7 +78,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxWrites = 100000;
         cfg.storageGB = 50000;
         cfg.replication = 3;
-        cfg.compression = 0.5;
+        cfg.storageCompression = 0.5;
         cfg.regions = 1;
 
         calculateScyllaDBCosts();
@@ -99,7 +99,7 @@ describe('calculateScyllaDBCosts', () => {
         cfg.maxWrites = 100;
         cfg.storageGB = 10;
         cfg.replication = 2;
-        cfg.compression = 0.5;
+        cfg.storageCompression = 0.5;
         cfg.regions = 1;
 
         calculateScyllaDBCosts();

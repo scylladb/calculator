@@ -368,20 +368,37 @@
               </div>
               <div class="range-group scylladb">
                 <div class="range-group-top">
-                  <label for="compression">Storage Compression Ratio:</label>
+                  <label for="storageCompression">Storage Compression:</label>
                   <div class="inline-input">
                     <div class="value">
-                      <input id="compressionInp" type="text"/>
-                      <span id="compressionDsp">50</span>
+                      <input id="storageCompressionInp" type="text"/>
+                      <span id="storageCompressionDsp">50</span>
                     </div>
                     <div class="units"></div>
                   </div>
                   <span class="info-icon">
-                        <i class="icon-info-outline"></i>
-                        <span class="tooltip-text">Enter the compression ratio as a percentage for your ScyllaDB cluster. This is the ratio of the size of the data stored in the cluster to the size of the data on disk.</span>
-                      </span>
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">Enter storage compression as a percentage for your ScyllaDB cluster. This is the ratio of the size of the data stored in the cluster to the size of the data on disk.</span>
+                  </span>
                 </div>
-                <input id="compression" max="100" min="0" step="1" type="range" value="50"/>
+                <input id="storageCompression" max="100" min="0" step="1" type="range" value="50"/>
+              </div>
+              <div class="range-group scylladb">
+                <div class="range-group-top">
+                  <label for="storageUtilization">Storage Utilization:</label>
+                  <div class="inline-input">
+                    <div class="value">
+                      <input id="storageUtilizationInp" type="text"/>
+                      <span id="storageUtilizationDsp">90</span>
+                    </div>
+                    <div class="units"></div>
+                  </div>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">Enter storage utilization as a percentage for your ScyllaDB cluster. This is the amount of storage that is actually used for data, as opposed to the total storage allocated.</span>
+                  </span>
+                </div>
+                <input id="storageUtilization" max="100" min="0" step="1" type="range" value="90"/>
               </div>
               <h4 class="dynamodb">Table Class</h4>
               <div class="hstack gap-3 align-items-center dynamodb">

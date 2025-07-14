@@ -265,10 +265,17 @@ document.getElementById('replication').addEventListener('change', (event) => {
     updateAll();
 });
 
-document.getElementById('compression').addEventListener('input', (event) => {
-    const compression = parseInt(event.target.value);
-    document.getElementById('compressionDsp').innerText = compression;
-    cfg.compression = compression;
+document.getElementById('storageCompression').addEventListener('input', (event) => {
+    const storageCompression = parseInt(event.target.value);
+    document.getElementById('storageCompressionDsp').innerText = storageCompression;
+    cfg.storageCompression = storageCompression;
+    updateAll();
+});
+
+document.getElementById('storageUtilization').addEventListener('input', (event) => {
+    const storageUtilization = parseInt(event.target.value);
+    document.getElementById('storageUtilizationDsp').innerText = storageUtilization;
+    cfg.storageUtilization = storageUtilization;
     updateAll();
 });
 
@@ -306,7 +313,8 @@ setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
-setupSliderInteraction('compressionDsp', 'compressionInp', 'compression', value => value);
+setupSliderInteraction('storageCompressionDsp', 'storageCompressionInp', 'storageCompression', value => value);
+setupSliderInteraction('storageUtilizationDsp', 'storageUtilizationInp', 'storageUtilization', value => value);
 setupSliderInteraction('scyllaNodesDsp', 'scyllaNodesInp', 'scyllaNodes', value => value);
 
 if (cfg.pricing === 'demand') {
@@ -341,7 +349,8 @@ document.getElementById('readConst').value = cfg.readConst;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 document.getElementById('daxInstanceClass').value = cfg.daxInstanceClass;
 document.getElementById('replication').value = cfg.replication;
-document.getElementById('compression').value = cfg.compression;
+document.getElementById('storageCompression').value = cfg.storageCompression;
+document.getElementById('storageUtilization').value = cfg.storageUtilization;
 document.getElementById('scyllaNodes').value = cfg.scyllaNodes;
 document.getElementById('scyllaInstanceClass').value = cfg.scyllaInstanceClass;
 document.getElementById('scyllaOverride').checked = cfg.scyllaOverride;
@@ -365,7 +374,8 @@ document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 document.getElementById('scyllaNodesDsp').innerText = `${cfg.scyllaNodes}`;
-document.getElementById('compressionDsp').innerText = `${cfg.compression}`;
+document.getElementById('storageCompressionDsp').innerText = `${cfg.storageCompression}`;
+document.getElementById('storageUtilizationDsp').innerText = `${cfg.storageUtilization}`;
 
 document.addEventListener('DOMContentLoaded', function () {
     const logos = document.querySelectorAll('.logo');

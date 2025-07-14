@@ -14,6 +14,8 @@ export function getTableClass() {
 
 export function getStorage() {
     cfg.storageGB = parseInt(document.getElementById('storageGB').value);
+    cfg.storageCompression = parseInt(document.getElementById('storageCompression').value);
+    cfg.storageUtilization = parseInt(document.getElementById('storageUtilization').value);
 }
 
 export function getHours() {
@@ -73,6 +75,6 @@ export function getOverprovisioned() {
 
 export function getDAX() {
     cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
-    cfg.cacheHitPercentage =  cfg.cacheRatio / 100;
-    cfg.cacheMissPercentage =  1 - cfg.cacheRatio / 100;
+    cfg.cacheHitPercentage = cfg.cacheRatio / 100;
+    cfg.cacheMissPercentage = 1 - cfg.cacheRatio / 100;
 }
