@@ -29,6 +29,7 @@ export const cfg = {
     tableClass: 'standard',
     readConst: 100,
     replication: 3,
+    compression: 50,
 
     // Demand
     pricePerRRU: 0.000000125,
@@ -95,7 +96,6 @@ export const cfg = {
 
     // ScyllaDB Constants
     scyllaOpsPerVCPU: 15000,
-    scyllaCompressionRatio: 0.5,
     scyllaStorageUtilization: 0.9,
     scyllaFlexDiscount: 0.175,
     scyllaReservedDiscount: 0.25,

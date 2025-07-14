@@ -60,6 +60,7 @@ export function getQueryParams() {
     assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
     assignParam('replication', parseInt);
+    assignParam('compression', parseInt);
 
     const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
     const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
@@ -145,6 +146,7 @@ export function updateQueryParams() {
         setOrDelete('replication', cfg.replication);
         setOrDelete('daxOverride', cfg.daxOverride);
         setOrDelete('scyllaOverride', cfg.scyllaOverride);
+        setOrDelete('compression', cfg.compression);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');

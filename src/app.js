@@ -265,6 +265,13 @@ document.getElementById('replication').addEventListener('change', (event) => {
     updateAll();
 });
 
+document.getElementById('compression').addEventListener('input', (event) => {
+    const compression = parseInt(event.target.value);
+    document.getElementById('compressionDsp').innerText = compression;
+    cfg.compression = compression;
+    updateAll();
+});
+
 document.getElementById('scyllaNodes').addEventListener('input', (event) => {
     cfg.scyllaNodes = parseInt(event.target.value);
     document.getElementById('scyllaNodesDsp').innerText = `${formatNumber(cfg.scyllaNodes)}`;
@@ -299,6 +306,7 @@ setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
+setupSliderInteraction('compressionDsp', 'compressionInp', 'compression', value => value);
 setupSliderInteraction('scyllaNodesDsp', 'scyllaNodesInp', 'scyllaNodes', value => value);
 
 if (cfg.pricing === 'demand') {
@@ -333,6 +341,7 @@ document.getElementById('readConst').value = cfg.readConst;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 document.getElementById('daxInstanceClass').value = cfg.daxInstanceClass;
 document.getElementById('replication').value = cfg.replication;
+document.getElementById('compression').value = cfg.compression;
 document.getElementById('scyllaNodes').value = cfg.scyllaNodes;
 document.getElementById('scyllaInstanceClass').value = cfg.scyllaInstanceClass;
 document.getElementById('scyllaOverride').checked = cfg.scyllaOverride;
@@ -356,6 +365,7 @@ document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
 document.getElementById('scyllaNodesDsp').innerText = `${cfg.scyllaNodes}`;
+document.getElementById('compressionDsp').innerText = `${cfg.compression}`;
 
 document.addEventListener('DOMContentLoaded', function () {
     const logos = document.querySelectorAll('.logo');

@@ -32,7 +32,7 @@ export function calculateScyllaDBCosts() {
 
     // Storage (apply compression, then replication)
     const rawStorage = cfg.storageGB;
-    const compressedStorage = rawStorage * (cfg.scyllaCompressionRatio);
+    const compressedStorage = rawStorage * (cfg.compression / 100);
     const requiredStorage = Math.ceil(compressedStorage * replication);
 
     // Calculate node counts for each family
