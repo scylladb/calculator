@@ -59,6 +59,7 @@ export function getQueryParams() {
     assignParam('reservedWrites', parseInt);
     assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
+    assignParam('scyllaReplication', parseInt);
 
     const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
     const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
@@ -135,6 +136,7 @@ export function updateQueryParams() {
         setOrDelete('seriesReads', cfg.seriesReadsEncoded);
         setOrDelete('seriesWrites', cfg.seriesWritesEncoded);
         setOrDelete('workload', cfg.workload);
+        setOrDelete('scyllaReplication', cfg.scyllaReplication);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
