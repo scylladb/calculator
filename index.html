@@ -89,6 +89,9 @@
               <a href="daxTabContent" class="tab-label dynamodb" id="daxTab">
                 <i class="icon-rocket me-3 dynamodb"></i> Accelerator
               </a>
+              <a href="scyllaTabContent" class="tab-label scylladb" id="scyllaTab">
+                  <i class="icon-database me-3 scylladb"></i> Cluster
+              </a>
             </nav>
 
             <div class="tab-content active" id="loadTabContent">
@@ -526,6 +529,74 @@
                     <option value="dax.r5.12xlarge">dax.r5.12xlarge</option>
                     <option value="dax.r5.16xlarge">dax.r5.16xlarge</option>
                     <option value="dax.r5.24xlarge">dax.r5.24xlarge</option>
+                  </select>
+                  <span class="info-icon">
+                    <i class="icon-info-outline"></i>
+                    <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-content scylladb" id="scyllaTabContent" style="display: none;">
+
+              <div id="scyllaParams" class="vstack gap-3">
+
+                <h4>Cluster Configuration</h4>
+
+                <div class="range-group">
+                  <div class="range-group-top">
+                    <label for="replicationFactor">Replication Factor:</label>
+                    <div class="inline-input">
+                      <div class="value">
+                        <span id="replicationFactorDsp">0</span>
+                      </div>
+                      <div class="units">
+                      </div>
+                    </div>
+                    <span class="info-icon">
+                      <i class="icon-info-outline"></i>
+                      <span class="tooltip-text">Enter the replication factor for your ScyllaDB cluster.
+                        This is the number of copies of each piece of data that will be stored across the cluster.
+                      </span>
+                    </span>
+                  </div>
+                  <input type="range" id="replicationFactor" min="3" max="9" step="3" value="3">
+                </div>
+
+                <h4>Recommended Instances</h4>
+                <div class="range-group">
+                  <div class="range-group-top">
+                    <label for="scyllaNodes">Number of Nodes:</label>
+                    <div class="inline-input">
+                      <div class="value">
+                        <input type="text" id="scyllaNodesInp">
+                        <span id="scyllaNodesDsp">0</span>
+                      </div>
+                      <div class="units">
+                      </div>
+                    </div>
+                    <span class="info-icon">
+                  <i class="icon-info-outline"></i>
+                  <span class="tooltip-text">This is the recommended number of nodes for your ScyllaDB cluster.
+                        This is based on the replication factor and the expected workload.</span>
+                </span>
+                  </div>
+                  <input type="range" id="scyllaNodes" min="2" max="180" step="1" value="0">
+                </div>
+
+                <div class="hstack gap-3 align-items-center">
+                  <label for="scyllaInstanceClass" class="flex-grow">Instance Class:</label>
+                  <select id="scyllaInstanceClass">
+                    <option value="i7ie.large">i7ie.large</option>
+                    <option value="i7ie.xlarge">i7ie.xlarge</option>
+                    <option value="i7ie.2xlarge">i7ie.2xlarge</option>
+                    <option value="i7ie.3xlarge">i7ie.3xlarge</option>
+                    <option value="i7ie.6xlarge">i7ie.6xlarge</option>
+                    <option value="i7ie.12xlarge">i7ie.12xlarge</option>
+                    <option value="i7ie.18xlarge">i7ie.18xlarge</option>
+                    <option value="i7ie.24xlarge">i7ie.24xlarge</option>
+                    <option value="i7ie.48xlarge">i7ie.48xlarge</option>
                   </select>
                   <span class="info-icon">
                     <i class="icon-info-outline"></i>
