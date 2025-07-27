@@ -29,6 +29,28 @@ function buildScyllaPrice(instances) {
     );
 }
 
+// TODO: blocked until CORS allows calculator domain
+async function fetchAndSetScyllaPrice() {
+    const url = "https://api.cloud.scylladb.com/deployment/cloud-provider/1/region/1?target=NEW_CLUSTER";
+    const response = await fetch(url);
+    const json = await response.json();
+    const instances = json.data.instances;
+    return Object.fromEntries(
+        instances
+            .filter(inst => inst.instanceFamily === 'i3en' || inst.instanceFamily === 'i7ie')
+            .map(inst => [
+                inst.externalId,
+                {
+                    vcpu: inst.cpuCount,
+                    storage: inst.totalStorage,
+                    instanceCostHourly: Number(inst.instanceCostHourly),
+                    subscriptionCostHourly: Number(inst.subscriptionCostHourly),
+                    price: Number(inst.instanceCostHourly) + Number(inst.subscriptionCostHourly),
+                }
+            ])
+    );
+}
+
 cfg.scyllaPrice = buildScyllaPrice(scyllaInstances);
 
 function calculateRequiredStorage(storageGB, storageCompression, replication) {
