@@ -11,6 +11,37 @@ import {
     getTotalOpsPerDay
 } from "./calculatorCommon.js";
 
+function calculateRequiredStorage(storageGB, storageCompression, replication) {
+    // Apply storageCompression, then replication
+    const compressedStorage = storageGB * (1 - (storageCompression / 100.0));
+    return Math.ceil(compressedStorage * replication);
+}
+
+function getBestNodeConfig(nodeOptions) {
+    // Find best (cheapest) option for this hour AND least amount of nodes
+    return nodeOptions.reduce((a, b) => {
+        if (a.cost < b.cost) return a;
+        if (b.cost < a.cost) return b;
+        // If costs are equal, prefer the one with fewer nodes
+        // TODO: maybe prefer fewer nodes within a given cost range?
+        return a.nodes <= b.nodes ? a : b;
+    });
+}
+
+function getNodeOptions(requiredVCPUs, requiredStorage, replication) {
+    return Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
+        const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
+        const usableStoragePerNode = spec.storage / (1 - (cfg.storageUtilization / 100.0));
+        const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
+        let nodes = Math.max(nodesForVCPU, nodesForStorage);
+        if (nodes % replication !== 0) {
+            nodes = nodes + (replication - (nodes % replication));
+        }
+        const cost = nodes * spec.price * (cfg.regions || 1); // per hour
+        return {type, nodes, cost};
+    });
+}
+
 export function calculateScyllaDBCosts() {
     if (cfg.scyllaOverride) {
         cfg._baseCost = {
@@ -18,58 +49,43 @@ export function calculateScyllaDBCosts() {
             bestNodeCount: cfg.scyllaNodes,
             monthlyCost: cfg.scyllaPrice[cfg.scyllaInstanceClass].price * cfg.scyllaNodes * (cfg.regions || 1) * cfg.hoursPerMonth
         }
-
         return;
     }
 
     // Replication factor
     const replication = cfg.replication;
 
-    // Max ops/sec * replication
-    const maxOpsPerSec = (cfg.maxReads + cfg.maxWrites) * replication;
+    // Storage
+    const requiredStorage = calculateRequiredStorage(cfg.storageGB, cfg.storageCompression, replication);
 
-    // Required vCPUs
-    const requiredVCPUs = Math.ceil(maxOpsPerSec / cfg.scyllaOpsPerVCPU);
+    // Calculate per-hour best node config and cost
+    const hourlyConfigs = [];
+    let totalDailyCost = 0;
+    const hours = Math.max(cfg.seriesReads.length, cfg.seriesWrites.length, 24);
 
-    // Storage (apply storageCompression, then replication)
-    const rawStorage = cfg.storageGB;
-    const compressedStorage = rawStorage * (1 - (cfg.storageCompression / 100.0));
-    const requiredStorage = Math.ceil(compressedStorage * replication);
+    for (let h = 0; h < hours; h++) {
+        const reads = cfg.seriesReads[h] ? cfg.seriesReads[h].y : 0;
+        const writes = cfg.seriesWrites[h] ? cfg.seriesWrites[h].y : 0;
+        const maxOpsPerSec = (reads + writes) * replication;
+        const requiredVCPUs = Math.ceil(maxOpsPerSec / cfg.scyllaOpsPerVCPU);
 
-    // Calculate node counts for each family
-    const nodeOptions = Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
-        const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
-        const usableStoragePerNode = spec.storage / (1 - (cfg.storageUtilization / 100.0));
-        const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
-        let nodes = Math.max(nodesForVCPU, nodesForStorage);
-        // Ensure nodes is a multiple of replication factor (3 for ScyllaDB)
-        if (nodes % replication !== 0) {
-            nodes = nodes + (replication - (nodes % replication));
-        }
-        const cost = nodes * spec.price * (cfg.regions || 1) * cfg.hoursPerMonth;
-        return {type, nodes, cost};
-    });
+        // Calculate node counts for each family
 
-    // Choose the option with the least nodes, then lowest cost if tie
-    const minNodes = Math.min(...nodeOptions.map(opt => opt.nodes));
-    const bestCandidates = nodeOptions.filter(opt => opt.nodes === minNodes);
-    const best = bestCandidates.reduce((a, b) => (a.cost < b.cost ? a : b));
+        const nodeOptions = getNodeOptions(requiredVCPUs, requiredStorage, replication);
+        const best = getBestNodeConfig(nodeOptions);
+        console.log(`Hour: ${h}, Cost: ${best.cost.toFixed(2)}, Type: ${best.type}, Nodes: ${best.nodes},  Reads:${reads}, Writes: ${writes}, MaxOpsPerSec: ${maxOpsPerSec}, RequiredVCPUs:${requiredVCPUs}`);
 
-    cfg.scyllaNodes = best.nodes;
-    cfg.scyllaInstanceClass = best.type;
+        hourlyConfigs.push({...best, hour: h});
+        totalDailyCost += best.cost;
+    }
 
-    document.getElementById('scyllaInstanceClass').value = best.type;
-    document.getElementById('scyllaNodes').value = best.nodes;
-    document.getElementById('scyllaNodesDsp').innerText = best.nodes;
+    // Calculate monthly cost
+    const monthlyCost = totalDailyCost * (cfg.daysPerMonth || 30);
 
     cfg._baseCost = {
-        replication,
-        requiredVCPUs,
-        requiredStorage,
-        nodeOptions,
-        bestInstanceType: best.type,
-        bestNodeCount: best.nodes,
-        monthlyCost: best.cost
+        hourlyConfigs,
+        dailyCost: totalDailyCost,
+        monthlyCost: monthlyCost
     };
 }
 
