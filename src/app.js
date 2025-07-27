@@ -37,7 +37,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-['demand', 'provisioned', 'flex', 'reserved'].forEach(type => {
+['demand', 'provisioned', 'annual'].forEach(type => {
     document.querySelector(`input[name="pricing"][value="${type}"]`).addEventListener('change', (event) => {
         if (event.target.checked) {
             cfg.pricing = type;

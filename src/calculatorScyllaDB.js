@@ -113,10 +113,8 @@ function logCosts() {
 
     if (cfg.pricing === 'demand') {
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg._baseCost.monthlyCost).toLocaleString()}`);
-    } else if (cfg.pricing === 'reserved') {
-        logs.push(`Monthly reserved cost: ${Math.floor(cfg._baseCost.monthlyCost * (1 - cfg.scyllaReservedDiscount)).toLocaleString()}`);
-    } else if (cfg.pricing === 'flex') {
-        logs.push(`Monthly flex cost: ${Math.floor(cfg._baseCost.monthlyCost * (1 - cfg.scyllaFlexDiscount)).toLocaleString()}`);
+    } else if (cfg.pricing === 'annual') {
+        logs.push(`Monthly reserved cost: ${Math.floor(cfg._baseCost.monthlyCost * (1 - cfg.scyllaAnnualDiscount)).toLocaleString()}`);
     }
 
     if (cfg.costNetwork !== 0) {
