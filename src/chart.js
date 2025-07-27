@@ -18,7 +18,7 @@ function generateData(baseline, peak, peakDuration) {
         } else {
             value = baseline;
         }
-        data.push({ x: hour, y: value });
+        data.push({x: hour, y: value});
     }
 
     return data;
@@ -30,11 +30,11 @@ export function decodeSeriesData() {
 
     cfg.seriesReads = cfg.seriesReadsEncoded
         .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        .map((val, i) => ({x: i, y: parseInt(val, 10) * 1000}));
 
     cfg.seriesWrites = cfg.seriesWritesEncoded
         .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        .map((val, i) => ({x: i, y: parseInt(val, 10) * 1000}));
 }
 
 export function encodeSeriesData() {
@@ -166,7 +166,7 @@ export const chart = new Chart(ctx, {
             label: 'Reads',
             data: Array(24).fill(null),
             borderColor: '#326DE6',
-            borderWidth: 3,
+            borderWidth: 2,
             backgroundColor: bluePattern,
             fill: true,
             tension: 0.5,
@@ -249,7 +249,7 @@ export const chart = new Chart(ctx, {
                 display: true,
                 position: 'bottom',
                 labels: {
-                    filter: function(item, chart) {
+                    filter: function (item, chart) {
                         // Only show legend for series 0 and 1
                         return item.datasetIndex === 0 || item.datasetIndex === 1;
                     }
@@ -262,7 +262,7 @@ export const chart = new Chart(ctx, {
                 display: true,
                 callbacks: {
                     label: function (context) {
-                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
+                        return context.dataset.label + ': ' + formatNumber(context.raw.y) + ' ops/sec';
                     }
                 },
             },
