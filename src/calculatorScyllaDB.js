@@ -59,7 +59,7 @@ export function calculateScyllaDBCosts() {
     const requiredStorage = calculateRequiredStorage(cfg.storageGB, cfg.storageCompression, replication);
 
     // Calculate per-hour best node config and cost
-    cfg.scyllaHourlyConfig = [];
+    cfg.hourlyConfig = [];
     let totalDailyCost = 0;
     const hours = Math.max(cfg.seriesReads.length, cfg.seriesWrites.length, 24);
 
@@ -72,7 +72,7 @@ export function calculateScyllaDBCosts() {
         const nodeOptions = getNodeOptions(requiredVCPUs, requiredStorage, replication);
         const best = getBestNodeConfig(nodeOptions);
 
-        cfg.scyllaHourlyConfig.push({
+        cfg.hourlyConfig.push({
             type: best.type,
             nodes: best.nodes,
             cost: best.cost.toFixed(2),
