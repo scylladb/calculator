@@ -95,6 +95,7 @@ export const cfg = {
         'i7ie.48xlarge': {vcpu: 192, storage: 120000, price: 219.931},
     },
 
+    scyllaHourlyConfig: [],
     scyllaNodes: 0,
     scyllaInstanceClass: 'i7ie.large',
     scyllaOverride: false,

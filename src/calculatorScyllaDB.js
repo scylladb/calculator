@@ -59,23 +59,29 @@ export function calculateScyllaDBCosts() {
     const requiredStorage = calculateRequiredStorage(cfg.storageGB, cfg.storageCompression, replication);
 
     // Calculate per-hour best node config and cost
-    const hourlyConfigs = [];
+    cfg.scyllaHourlyConfig = [];
     let totalDailyCost = 0;
     const hours = Math.max(cfg.seriesReads.length, cfg.seriesWrites.length, 24);
 
-    for (let h = 0; h < hours; h++) {
-        const reads = cfg.seriesReads[h] ? cfg.seriesReads[h].y : 0;
-        const writes = cfg.seriesWrites[h] ? cfg.seriesWrites[h].y : 0;
-        const maxOpsPerSec = (reads + writes) * replication;
-        const requiredVCPUs = Math.ceil(maxOpsPerSec / cfg.scyllaOpsPerVCPU);
-
-        // Calculate node counts for each family
+    for (let hour = 0; hour < hours; hour++) {
+        const reads = cfg.seriesReads[hour] ? cfg.seriesReads[hour].y : 0;
+        const writes = cfg.seriesWrites[hour] ? cfg.seriesWrites[hour].y : 0;
+        const totalOpsPerSec = (reads + writes) * replication;
+        const requiredVCPUs = Math.ceil(totalOpsPerSec / cfg.scyllaOpsPerVCPU);
 
         const nodeOptions = getNodeOptions(requiredVCPUs, requiredStorage, replication);
         const best = getBestNodeConfig(nodeOptions);
-        console.log(`Hour: ${h}, Cost: ${best.cost.toFixed(2)}, Type: ${best.type}, Nodes: ${best.nodes},  Reads:${reads}, Writes: ${writes}, MaxOpsPerSec: ${maxOpsPerSec}, RequiredVCPUs:${requiredVCPUs}`);
 
-        hourlyConfigs.push({...best, hour: h});
+        cfg.scyllaHourlyConfig.push({
+            type: best.type,
+            nodes: best.nodes,
+            cost: best.cost.toFixed(2),
+            hour: hour,
+            reads: reads.toFixed(0),
+            writes: writes.toFixed(0),
+            totalOpsPerSec: totalOpsPerSec.toFixed(0),
+            requiredVCPUs: requiredVCPUs
+        });
         totalDailyCost += best.cost;
     }
 
@@ -83,7 +89,6 @@ export function calculateScyllaDBCosts() {
     const monthlyCost = totalDailyCost * (cfg.daysPerMonth || 30);
 
     cfg._baseCost = {
-        hourlyConfigs,
         dailyCost: totalDailyCost,
         monthlyCost: monthlyCost
     };
