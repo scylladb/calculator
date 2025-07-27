@@ -1,5 +1,5 @@
-import {cfg} from './config.js';
 import {updateDisplayedCosts} from "./utils.js";
+import {cfg} from './config.js';
 import {
     getItemSize,
     getMaxOpsPerSec,
@@ -10,6 +10,26 @@ import {
     getStorage,
     getTotalOpsPerDay
 } from "./calculatorCommon.js";
+import scyllaInstances from './scyllaInstances.json';
+
+function buildScyllaPrice(instances) {
+    return Object.fromEntries(
+        instances
+            .filter(inst => inst.instanceFamily === 'i3en' || inst.instanceFamily === 'i7ie')
+            .map(inst => [
+                inst.externalId,
+                {
+                    vcpu: inst.cpuCount,
+                    storage: inst.totalStorage,
+                    instanceCostHourly: Number(inst.instanceCostHourly),
+                    subscriptionCostHourly: Number(inst.subscriptionCostHourly),
+                    price: Number(inst.instanceCostHourly) + Number(inst.subscriptionCostHourly),
+                }
+            ])
+    );
+}
+
+cfg.scyllaPrice = buildScyllaPrice(scyllaInstances);
 
 function calculateRequiredStorage(storageGB, storageCompression, replication) {
     // Apply storageCompression, then replication
