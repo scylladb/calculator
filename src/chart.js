@@ -377,10 +377,10 @@ export const chart = new Chart(ctx, {
                         }
                         if (hour !== null && cfg.hourlyConfig && cfg.hourlyConfig[hour]) {
                             const hourConfig = cfg.hourlyConfig[hour];
-                            const lines = [' ', 'Hourly Configuration', '---'];
+                            const lines = [' '];
                             Object.entries(hourConfig)
-                                .filter(([key]) => key !== 'cost')
-                                .forEach(([key, value]) => lines.push(`${key}: ${value}`));
+                                .filter(([key]) => key === 'nodes' || key === 'type' || key === 'totalOpsPerSec' || key === 'cost' || key === 'requiredVCPUs')
+                                .forEach(([key, value]) => lines.push(`◦ ${key}: ${value}`));
                             return lines;
                         }
                         return [];
