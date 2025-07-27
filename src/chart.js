@@ -348,6 +348,10 @@ export const chart = new Chart(ctx, {
                     }
                 }
             }
-        }
+        },
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
     }
 });
