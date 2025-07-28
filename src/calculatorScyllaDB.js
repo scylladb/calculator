@@ -160,7 +160,7 @@ function logCosts() {
     if (cfg.pricing === 'demand') {
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
     } else if (cfg.pricing === 'annual') {
-        logs.push(`Annualized monthly cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
+        logs.push(`Monthly amortized cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
     }
 
     if (cfg.costNetwork !== 0) {
@@ -170,7 +170,11 @@ function logCosts() {
     logs.push(`---: ---`);
 
     logs.push(`Total monthly cost: ${Math.floor(cfg.costTotalMonthly).toLocaleString()}`);
-    logs.push(`Total annual cost: ${Math.floor(cfg.costTotalMonthly * 12).toLocaleString()}`);
+
+    if (cfg.scyllaReserved > 0) {
+        logs.push(`Total upfront cost: ${Math.floor(cfg.costTotalUpfront).toLocaleString()}`);
+    }
+    logs.push(`Total annual cost: ${Math.floor(cfg.costTotalAnnual).toLocaleString()}`);
 
     updateDisplayedCosts(logs);
 }
@@ -190,9 +194,17 @@ export function updateScyllaDBCosts() {
     calculateScyllaDBNetworkCosts();
 
     cfg.costMonthly = cfg.pricing === 'demand' ? cfg._baseCost.monthlyCost :
-        cfg._baseCost.monthlyCost * (1 - cfg.scyllaAnnualDiscount);
+        cfg._baseCost.monthlyCost * (1 - cfg.scyllaDiscountAnnual);
 
     cfg.costTotalMonthly = cfg.costMonthly + (cfg.costNetwork || 0);
+
+    cfg.costTotalAnnual = cfg.costTotalMonthly * 12;
+
+    if (cfg.scyllaReserved > 0) {
+        cfg.costTotalUpfront = (cfg.scyllaReserved / 100.0 * cfg.costTotalAnnual * (1 - cfg.scyllaDiscountReserved));
+        cfg.costTotalMonthly = (1 - cfg.scyllaReserved / 100.0) * cfg.costTotalMonthly;
+        cfg.costTotalAnnual = (1 - cfg.scyllaReserved / 100.0) * cfg.costTotalAnnual;
+    }
 
     logCosts();
 }

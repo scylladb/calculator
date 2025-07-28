@@ -93,6 +93,7 @@ export const cfg = {
         i3en: 10000,
         i7ie: 15000
     },
-    scyllaAnnualDiscount: 0.25,
+    scyllaDiscountAnnual: 0.25,
+    scyllaDiscountReserved: 0.15,
     scyllaReserved: 0
 };
