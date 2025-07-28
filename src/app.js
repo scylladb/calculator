@@ -37,7 +37,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-['demand', 'provisioned', 'annual'].forEach(type => {
+['demand', 'provisioned', 'subscription'].forEach(type => {
     document.querySelector(`input[name="pricing"][value="${type}"]`).addEventListener('change', (event) => {
         if (event.target.checked) {
             cfg.pricing = type;
@@ -344,10 +344,9 @@ if (cfg.pricing === 'demand') {
 } else if (cfg.pricing === 'provisioned') {
     document.querySelector('input[name="pricing"][value="provisioned"]').checked = true;
     document.getElementById('provisionedParams').style.display = 'block';
-} else if (cfg.pricing === 'annual') {
-    document.querySelector('input[name="pricing"][value="annual"]').checked = true;
-    document.getElementById('annualParams').style.display = 'block';
-    console.log("Annual pricing selected, displaying annual parameters.");
+} else if (cfg.pricing === 'subscription') {
+    document.querySelector('input[name="pricing"][value="subscription"]').checked = true;
+    document.getElementById('subscriptionParams').style.display = 'block';
 }
 
 getQueryParams();

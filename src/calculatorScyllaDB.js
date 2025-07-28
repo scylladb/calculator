@@ -159,8 +159,8 @@ function logCosts() {
 
     if (cfg.pricing === 'demand') {
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
-    } else if (cfg.pricing === 'annual') {
-        logs.push(`Monthly amortized cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
+    } else if (cfg.pricing === 'subscription') {
+        logs.push(`Monthly subscription cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
     }
 
     if (cfg.costNetwork !== 0) {
@@ -194,7 +194,7 @@ export function updateScyllaDBCosts() {
     calculateScyllaDBNetworkCosts();
 
     cfg.costMonthly = cfg.pricing === 'demand' ? cfg._baseCost.monthlyCost :
-        cfg._baseCost.monthlyCost * (1 - cfg.scyllaDiscountAnnual);
+        cfg._baseCost.monthlyCost * (1 - cfg.scyllaDiscountSubscription);
 
     cfg.costTotalMonthly = cfg.costMonthly + (cfg.costNetwork || 0);
 

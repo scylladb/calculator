@@ -222,13 +222,13 @@ export function toggleProvisionedParams() {
     }
 }
 
-// Toggle between annual and demand params
-export function toggleAnnualParams() {
-    const annualParams = document.getElementById('annualParams');
-    if (cfg.pricing === 'annual') {
-        annualParams.style.display = 'block';
+// Toggle between subscription and demand params
+export function toggleSubscriptionParams() {
+    const subscriptionParams = document.getElementById('subscriptionParams');
+    if (cfg.pricing === 'subscription') {
+        subscriptionParams.style.display = 'block';
     } else {
-        annualParams.style.display = 'none';
+        subscriptionParams.style.display = 'none';
     }
 }
 
@@ -236,7 +236,7 @@ export function toggleAnnualParams() {
 export function updateAll() {
     toggleServiceParams()
     toggleProvisionedParams();
-    toggleAnnualParams();
+    toggleSubscriptionParams();
     toggleOpsParams();
     updateSeries(); // we have to update series before costs
     if (cfg.service === 'dynamodb') {
