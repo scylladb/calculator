@@ -60,14 +60,17 @@ function calculateRequiredStorage(storageGB, storageCompression, replication) {
 }
 
 function getBestNodeConfig(nodeOptions) {
-    // Find best (cheapest) option for this hour AND least amount of nodes
-    return nodeOptions.reduce((a, b) => {
-        if (a.cost < b.cost) return a;
-        if (b.cost < a.cost) return b;
-        // If costs are equal, prefer the one with fewer nodes
-        // TODO: maybe prefer fewer nodes within a given cost range?
-        return a.nodes <= b.nodes ? a : b;
-    });
+    // Find the minimum cost
+    const minCost = Math.min(...nodeOptions.map(opt => opt.cost));
+    // Define a tolerance (e.g., 25%)
+    // TODO: it's actually cheaper to use lots of smaller nodes than a few big ones
+    //  but it's more practical to use less nodes in general, so we use a tolerance
+    //  make this configurable in the future
+    const tolerance = 0.25;
+    // Filter options within tolerance of min cost
+    const candidates = nodeOptions.filter(opt => opt.cost <= minCost * (1 + tolerance));
+    // Return the candidate with the fewest nodes
+    return candidates.reduce((a, b) => (a.nodes <= b.nodes ? a : b));
 }
 
 function getNodeOptions(requiredVCPUs, requiredStorage, replication) {

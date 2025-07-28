@@ -379,7 +379,7 @@ export const chart = new Chart(ctx, {
                             const hourConfig = cfg.hourlyConfig[hour];
                             const lines = [' '];
                             Object.entries(hourConfig)
-                                .filter(([key]) => key === 'nodes' || key === 'type' || key === 'totalOpsPerSec' || key === 'cost' || key === 'requiredVCPUs')
+                                .filter(([key]) => key === 'nodes' || key === 'type' || key === 'totalOpsPerSec' || key === 'requiredVCPUs')
                                 .forEach(([key, value]) => lines.push(`◦ ${key}: ${value}`));
                             return lines;
                         }
