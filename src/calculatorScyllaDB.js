@@ -112,9 +112,22 @@ export function calculateScyllaDBCosts() {
         const reads = cfg.seriesReads[hour] ? cfg.seriesReads[hour].y : 0;
         const writes = cfg.seriesWrites[hour] ? cfg.seriesWrites[hour].y : 0;
         const totalOpsPerSec = (reads + writes) * replication;
-        const requiredVCPUs = Math.ceil(totalOpsPerSec / cfg.scyllaOpsPerVCPU);
 
-        const nodeOptions = getNodeOptions(requiredVCPUs, requiredStorage, replication);
+        // For each node option, calculate requiredVCPUs using the correct opsPerVCPU for the family
+        const nodeOptions = Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
+            const family = type.split('.')[0];
+            const opsPerVCPU = cfg.scyllaOpsPerVCPU[family] || 15_000;
+            const requiredVCPUs = Math.ceil(totalOpsPerSec / opsPerVCPU);
+            const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
+            const usableStoragePerNode = spec.storage / (1 - (cfg.storageUtilization / 100.0));
+            const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
+            let nodes = Math.max(nodesForVCPU, nodesForStorage);
+            if (nodes % replication !== 0) {
+                nodes = nodes + (replication - (nodes % replication));
+            }
+            const cost = nodes * spec.price * (cfg.regions || 1); // per hour
+            return {type, nodes, cost, requiredVCPUs, opsPerVCPU};
+        });
         const best = getBestNodeConfig(nodeOptions);
 
         cfg.hourlyConfig.push({
@@ -125,7 +138,8 @@ export function calculateScyllaDBCosts() {
             reads: reads.toFixed(0),
             writes: writes.toFixed(0),
             totalOpsPerSec: totalOpsPerSec.toFixed(0),
-            requiredVCPUs: requiredVCPUs
+            requiredVCPUs: best.requiredVCPUs,
+            opsPerVCPU: best.opsPerVCPU
         });
         totalDailyCost += best.cost;
     }

@@ -89,7 +89,10 @@ export const cfg = {
     scyllaPrice: {},
 
     // ScyllaDB Constants
-    scyllaOpsPerVCPU: 15000,
+    scyllaOpsPerVCPU: {
+        i3en: 10000,
+        i7ie: 15000
+    },
     scyllaFlexDiscount: 0.175,
     scyllaAnnualDiscount: 0.25,
 };
