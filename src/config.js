@@ -83,7 +83,7 @@ export const cfg = {
     daxOverride: false,
 
     hourlyConfig: [],
-    scyllaNodes: 0,
+    scyllaNodes: 3,
     scyllaInstanceClass: 'i7ie.large',
     scyllaOverride: false,
     scyllaPrice: {},
@@ -93,6 +93,5 @@ export const cfg = {
         i3en: 10000,
         i7ie: 15000
     },
-    scyllaFlexDiscount: 0.175,
     scyllaAnnualDiscount: 0.25,
 };

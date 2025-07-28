@@ -136,7 +136,7 @@ export function calculateScyllaDBCosts() {
 
     cfg._baseCost = {
         dailyCost: totalDailyCost,
-        monthlyCost: monthlyCost
+        monthlyCost: monthlyCost,
     };
 }
 

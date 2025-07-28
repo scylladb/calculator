@@ -544,49 +544,58 @@
                 </div>
                 <input id="networkCompression" max="100" min="0" step="1" type="range" value="50"/>
               </div>
-              <h4>Recommended Instances</h4>
               <div class="hstack gap-3 align-items-center">
                 <input type="checkbox" id="scyllaOverride"/>
-                <label class="flex-grow" for="scyllaOverride">Override</label>
+                <label class="flex-grow" for="scyllaOverride">Override Autoscaling</label>
                 <span class="info-icon">
                     <i class="icon-info-outline"></i>
-                    <span class="tooltip-text">This will disable the automatic recommendations for the number of nodes and instance class. You can then manually set the values below.</span>
+                    <span class="tooltip-text">This will disable autoscaling of nodes. You can then set the values manually for your cluster.</span>
                 </span>
               </div>
-              <div class="range-group">
-                <div class="range-group-top">
-                  <label for="scyllaNodes">Number of Nodes:</label>
-                  <div class="inline-input">
-                    <div class="value">
-                      <input id="scyllaNodesInp" type="text" disabled/>
-                      <span id="scyllaNodesDsp">0</span>
+              <div id="scyllaManualClusterConfiguration" style="display: none;">
+                <div class="range-group">
+                  <div class="range-group-top">
+                    <label for="scyllaNodes">Number of Nodes:</label>
+                    <div class="inline-input">
+                      <div class="value">
+                        <input id="scyllaNodesInp" type="text" disabled/>
+                        <span id="scyllaNodesDsp">2</span>
+                      </div>
+                      <div class="units"></div>
                     </div>
-                    <div class="units"></div>
-                  </div>
-                  <span class="info-icon">
+                    <span class="info-icon">
                     <i class="icon-info-outline"></i>
-                    <span class="tooltip-text">This is the recommended number of nodes for your ScyllaDB cluster. This is based on the replication factor and the expected workload.</span>
+                    <span class="tooltip-text">The number of nodes for your ScyllaDB cluster.</span>
                   </span>
+                  </div>
+                  <input id="scyllaNodes" max="180" min="2" step="1" type="range" value="2" disabled/>
                 </div>
-                <input id="scyllaNodes" max="180" min="2" step="1" type="range" value="0" disabled/>
-              </div>
-              <div class="hstack gap-3 align-items-center">
-                <label class="flex-grow" for="scyllaInstanceClass">Instance Class:</label>
-                <select id="scyllaInstanceClass" disabled>
-                  <option value="i7ie.large">i7ie.large</option>
-                  <option value="i7ie.xlarge">i7ie.xlarge</option>
-                  <option value="i7ie.2xlarge">i7ie.2xlarge</option>
-                  <option value="i7ie.3xlarge">i7ie.3xlarge</option>
-                  <option value="i7ie.6xlarge">i7ie.6xlarge</option>
-                  <option value="i7ie.12xlarge">i7ie.12xlarge</option>
-                  <option value="i7ie.18xlarge">i7ie.18xlarge</option>
-                  <option value="i7ie.24xlarge">i7ie.24xlarge</option>
-                  <option value="i7ie.48xlarge">i7ie.48xlarge</option>
-                </select>
-                <span class="info-icon">
+                <div class="hstack gap-3 align-items-center">
+                  <label class="flex-grow" for="scyllaInstanceClass">Instance Class:</label>
+                  <select id="scyllaInstanceClass" disabled>
+                    <option value="i7ie.large">i7ie.large</option>
+                    <option value="i7ie.xlarge">i7ie.xlarge</option>
+                    <option value="i7ie.2xlarge">i7ie.2xlarge</option>
+                    <option value="i7ie.3xlarge">i7ie.3xlarge</option>
+                    <option value="i7ie.6xlarge">i7ie.6xlarge</option>
+                    <option value="i7ie.12xlarge">i7ie.12xlarge</option>
+                    <option value="i7ie.18xlarge">i7ie.18xlarge</option>
+                    <option value="i7ie.24xlarge">i7ie.24xlarge</option>
+                    <option value="i7ie.48xlarge">i7ie.48xlarge</option>
+                    <option value="i3en.large">i3en.large</option>
+                    <option value="i3en.xlarge">i3en.xlarge</option>
+                    <option value="i3en.2xlarge">i3en.2xlarge</option>
+                    <option value="i3en.3xlarge">i3en.3xlarge</option>
+                    <option value="i3en.6xlarge">i3en.6xlarge</option>
+                    <option value="i3en.12xlarge">i3en.12xlarge</option>
+                    <option value="i3en.18xlarge">i3en.18xlarge</option>
+                    <option value="i3en.24xlarge">i3en.24xlarge</option>
+                  </select>
+                  <span class="info-icon">
                   <i class="icon-info-outline"></i>
-                  <span class="tooltip-text">This is the recommended instance class for your workload.</span>
+                  <span class="tooltip-text">The instance class for your ScyllaDB cluster.</span>
                 </span>
+                </div>
               </div>
             </div>
           </div>

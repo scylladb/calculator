@@ -299,6 +299,11 @@ document.getElementById('scyllaInstanceClass').addEventListener('change', (event
 
 document.getElementById('scyllaOverride').addEventListener('change', (event) => {
     cfg.scyllaOverride = event.target.checked;
+    if (cfg.scyllaOverride) {
+        document.getElementById('scyllaManualClusterConfiguration').style.display = 'block';
+    } else {
+        document.getElementById('scyllaManualClusterConfiguration').style.display = 'none';
+    }
     document.getElementById('scyllaNodesInp').disabled = !cfg.scyllaOverride;
     document.getElementById('scyllaNodes').disabled = !cfg.scyllaOverride;
     document.getElementById('scyllaInstanceClass').disabled = !cfg.scyllaOverride;
