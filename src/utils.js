@@ -63,6 +63,7 @@ export function getQueryParams() {
     assignParam('storageCompression', parseInt);
     assignParam('storageUtilization', parseInt);
     assignParam('networkCompression', parseInt);
+    assignParam('scyllaReserved', parseInt);
 
     const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
     const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
@@ -147,6 +148,7 @@ export function updateQueryParams() {
         setOrDelete('workload', cfg.workload);
         setOrDelete('replication', cfg.replication);
         setOrDelete('daxOverride', cfg.daxOverride);
+        setOrDelete('scyllaReserved', cfg.scyllaReserved);
         setOrDelete('scyllaOverride', cfg.scyllaOverride);
         setOrDelete('storageCompression', cfg.storageCompression);
         setOrDelete('storageUtilization', cfg.storageUtilization);
@@ -220,10 +222,21 @@ export function toggleProvisionedParams() {
     }
 }
 
+// Toggle between annual and demand params
+export function toggleAnnualParams() {
+    const annualParams = document.getElementById('annualParams');
+    if (cfg.pricing === 'annual') {
+        annualParams.style.display = 'block';
+    } else {
+        annualParams.style.display = 'none';
+    }
+}
+
 // Update all UI and calculations
 export function updateAll() {
     toggleServiceParams()
     toggleProvisionedParams();
+    toggleAnnualParams();
     toggleOpsParams();
     updateSeries(); // we have to update series before costs
     if (cfg.service === 'dynamodb') {

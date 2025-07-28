@@ -286,6 +286,13 @@ document.getElementById('networkCompression').addEventListener('input', (event) 
     updateAll();
 });
 
+document.getElementById('scyllaReserved').addEventListener('input', (event) => {
+    cfg.scyllaReserved = parseInt(event.target.value);
+    document.getElementById('scyllaReservedDsp').innerText = `${formatNumber(cfg.scyllaReserved)}`;
+    updateAll();
+});
+
+
 document.getElementById('scyllaNodes').addEventListener('input', (event) => {
     cfg.scyllaNodes = parseInt(event.target.value);
     document.getElementById('scyllaNodesDsp').innerText = `${formatNumber(cfg.scyllaNodes)}`;
@@ -328,6 +335,7 @@ setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value)
 setupSliderInteraction('storageCompressionDsp', 'storageCompressionInp', 'storageCompression', value => value);
 setupSliderInteraction('storageUtilizationDsp', 'storageUtilizationInp', 'storageUtilization', value => value);
 setupSliderInteraction('networkCompressionDsp', 'networkCompressionInp', 'networkCompression', value => value);
+setupSliderInteraction('scyllaReservedDsp', 'scyllaReservedInp', 'scyllaReserved', value => `${value}%`);
 setupSliderInteraction('scyllaNodesDsp', 'scyllaNodesInp', 'scyllaNodes', value => value);
 
 if (cfg.pricing === 'demand') {
@@ -336,6 +344,10 @@ if (cfg.pricing === 'demand') {
 } else if (cfg.pricing === 'provisioned') {
     document.querySelector('input[name="pricing"][value="provisioned"]').checked = true;
     document.getElementById('provisionedParams').style.display = 'block';
+} else if (cfg.pricing === 'annual') {
+    document.querySelector('input[name="pricing"][value="annual"]').checked = true;
+    document.getElementById('annualParams').style.display = 'block';
+    console.log("Annual pricing selected, displaying annual parameters.");
 }
 
 getQueryParams();
@@ -365,6 +377,7 @@ document.getElementById('replication').value = cfg.replication;
 document.getElementById('storageCompression').value = cfg.storageCompression;
 document.getElementById('storageUtilization').value = cfg.storageUtilization;
 document.getElementById('networkCompression').value = cfg.networkCompression;
+document.getElementById('scyllaReserved').value = cfg.scyllaReserved;
 document.getElementById('scyllaNodes').value = cfg.scyllaNodes;
 document.getElementById('scyllaInstanceClass').value = cfg.scyllaInstanceClass;
 document.getElementById('scyllaOverride').checked = cfg.scyllaOverride;
@@ -387,6 +400,7 @@ document.getElementById('reservedWritesDsp').innerText = `${cfg.reservedWrites}%
 document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
+document.getElementById('scyllaReservedDsp').innerText = `${cfg.scyllaReserved}%`;
 document.getElementById('scyllaNodesDsp').innerText = `${cfg.scyllaNodes}`;
 document.getElementById('storageCompressionDsp').innerText = `${cfg.storageCompression}`;
 document.getElementById('storageUtilizationDsp').innerText = `${cfg.storageUtilization}`;

@@ -326,6 +326,29 @@
                 </div>
               </div>
             </div>
+            <div id="annualParams" class="scylladb" style="display: none;">
+              <div class="row-sm">
+                <div class="col vstack gap-3">
+                  <div class="range-group">
+                    <div class="range-group-top">
+                      <label for="scyllaReserved">Reserved Capacity:</label>
+                      <div class="inline-input">
+                        <div class="value">
+                          <input id="scyllaReservedInp" type="text"/>
+                          <span id="scyllaReservedDsp">0</span>
+                        </div>
+                        <div class="units"></div>
+                      </div>
+                      <span class="info-icon">
+                        <i class="icon-info-outline"></i>
+                        <span class="tooltip-text">Enter the percentage of operations to reserve upfront, minimum term 1-year.</span>
+                      </span>
+                    </div>
+                    <input id="scyllaReserved" max="100" min="0" step="1" type="range" value="0"/>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div id="consistencyParams" class="dynamodb">
               <div class="range-group">
                 <div class="range-group-top">
