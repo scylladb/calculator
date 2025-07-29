@@ -53,10 +53,18 @@ async function fetchAndSetScyllaPrice() {
 
 cfg.scyllaPrice = buildScyllaPrice(scyllaInstances);
 
-function calculateRequiredStorage(storageGB, storageCompression, replication) {
+function calculateRequiredStorage() {
     // Apply storageCompression, then replication
-    const compressedStorage = storageGB * (1 - (storageCompression / 100.0));
-    return Math.ceil(compressedStorage * replication);
+    const compressedStorage = cfg.storageGB * (1 - (cfg.storageCompression / 100.0));
+
+    cfg._storage = {
+        replication: cfg.replication,
+        compression: cfg.storageCompression,
+        utilization: cfg.storageUtilization,
+        beforeCompression: cfg.storageGB,
+        afterCompression: compressedStorage,
+        required: Math.ceil(compressedStorage * cfg.replication)
+    }
 }
 
 function getBestNodeConfig(nodeOptions) {
@@ -82,22 +90,16 @@ export function calculateScyllaDBCosts() {
         }
         return;
     }
-
-    // Replication factor
-    const replication = cfg.replication;
-
-    // Storage
-    const requiredStorage = calculateRequiredStorage(cfg.storageGB, cfg.storageCompression, replication);
-
+    
     // Calculate per-hour best node config and cost
-    cfg.hourlyConfig = [];
+    cfg._hourlyConfig = [];
     let totalDailyCost = 0;
     const hours = Math.max(cfg.seriesReads.length, cfg.seriesWrites.length, 24);
 
     for (let hour = 0; hour < hours; hour++) {
         const reads = cfg.seriesReads[hour] ? cfg.seriesReads[hour].y : 0;
         const writes = cfg.seriesWrites[hour] ? cfg.seriesWrites[hour].y : 0;
-        const totalOpsPerSec = (reads + writes) * replication;
+        const totalOpsPerSec = (reads + writes) * cfg.replication;
 
         // For each node option, calculate requiredVCPUs using the correct opsPerVCPU for the family
         const nodeOptions = Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
@@ -107,17 +109,18 @@ export function calculateScyllaDBCosts() {
             const requiredVCPUs = Math.ceil(totalOpsPerSec / opsPerVCPU);
             const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
             const usableStoragePerNode = spec.storage / (1 - (cfg.storageUtilization / 100.0));
-            const nodesForStorage = Math.ceil(requiredStorage / usableStoragePerNode);
+            const nodesForStorage = Math.ceil(cfg._storage.required / usableStoragePerNode);
             let nodes = Math.max(nodesForVCPU, nodesForStorage);
-            if (nodes % replication !== 0) {
-                nodes = nodes + (replication - (nodes % replication));
+            if (nodes % cfg.replication !== 0) {
+                nodes = nodes + (cfg.replication - (nodes % cfg.replication));
             }
             const cost = nodes * spec.price * (cfg.regions || 1); // per hour
             return {type, nodes, cost, requiredVCPUs, opsPerVCPU};
         });
         const best = getBestNodeConfig(nodeOptions);
 
-        cfg.hourlyConfig.push({
+        cfg._hourlyConfig.push({
+            options: nodeOptions,
             type: best.type,
             nodes: best.nodes,
             cost: best.cost.toFixed(2),
@@ -126,7 +129,7 @@ export function calculateScyllaDBCosts() {
             writes: writes.toFixed(0),
             totalOpsPerSec: totalOpsPerSec.toFixed(0),
             requiredVCPUs: best.requiredVCPUs,
-            opsPerVCPU: best.opsPerVCPU
+            opsPerVCPU: best.opsPerVCPU,
         });
         totalDailyCost += best.cost;
     }
@@ -151,7 +154,15 @@ function calculateScyllaDBNetworkCosts() {
     // Reads are zone aware, so we only consider cross-region reads
     const readsPerZoneGB = totalReadsGB * compressionFactor * (cfg.regions - 1);
 
-    cfg.costNetwork = ((readsPerZoneGB + writesPerZoneGB) * cfg.networkZonePerGB);
+    cfg._networkCost = {
+        compressionFactor: compressionFactor,
+        totalReadsGB: totalReadsGB.toFixed(2),
+        totalWritesGB: totalWritesGB.toFixed(2),
+        writesPerZoneGB: writesPerZoneGB.toFixed(2),
+        readsPerZoneGB: readsPerZoneGB.toFixed(2),
+        costPerZone: (cfg.networkZonePerGB * compressionFactor).toFixed(2),
+        monthlyCost: ((readsPerZoneGB + writesPerZoneGB) * cfg.networkZonePerGB).toFixed(2),
+    }
 }
 
 function logCosts() {
@@ -163,8 +174,8 @@ function logCosts() {
         logs.push(`Monthly subscription cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
     }
 
-    if (cfg.costNetwork !== 0) {
-        logs.push(`Monthly network cost: ${Math.floor(cfg.costNetwork).toLocaleString()}`);
+    if (cfg._networkCost.monthlyCost !== 0) {
+        logs.push(`Monthly network cost: ${Math.floor(cfg._networkCost.monthlyCost).toLocaleString()}`);
     }
 
     logs.push(`---: ---`);
@@ -190,6 +201,7 @@ export function updateScyllaDBCosts() {
     getTotalOpsPerDay();
     getMaxOpsPerSec();
 
+    calculateRequiredStorage()
     calculateScyllaDBCosts();
     calculateScyllaDBNetworkCosts();
 

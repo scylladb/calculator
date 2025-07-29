@@ -95,5 +95,5 @@ export const cfg = {
     },
     scyllaDiscountSubscription: 0.25,
     scyllaDiscountReserved: 0.15,
-    scyllaReserved: 0
+    scyllaReserved: 0,
 };
