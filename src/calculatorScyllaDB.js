@@ -180,7 +180,7 @@ function logCosts() {
         logs.push(`Total monthly cost: ${Math.floor(cfg._costs.demand.total.monthly).toLocaleString()}`);
         logs.push(`Total annual cost: ${Math.floor(cfg._costs.demand.total.annual).toLocaleString()}`);
     } else if (cfg.pricing === 'subscription') {
-        logs.push(`Monthly subscription cost: ${Math.floor(cfg._costs.subscription.monthly).toLocaleString()}`);
+        logs.push(`Monthly pro subscription cost: ${Math.floor(cfg._costs.subscription.monthly).toLocaleString()}`);
         logs.push(`Total monthly cost: ${Math.floor(cfg._costs.subscription.total.monthly).toLocaleString()}`);
         logs.push(`Total annual cost: ${Math.floor(cfg._costs.subscription.total.annual).toLocaleString()}`);
     }
