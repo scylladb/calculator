@@ -6,30 +6,6 @@ const ctx = document.getElementById('chart').getContext('2d');
 const bluePattern = pattern.draw('disc', '#326DE600', '#326DE699', 6);
 const orangePattern = pattern.draw('line', '#ff550000', '#FF550099', 6);
 
-const getOrCreateTooltip = (chart) => {
-    let tooltipEl = chart.canvas.parentNode.querySelector('div');
-
-    if (!tooltipEl) {
-        tooltipEl = document.createElement('div');
-        tooltipEl.style.background = 'rgba(0, 0, 0, 0.7)';
-        tooltipEl.style.borderRadius = '3px';
-        tooltipEl.style.color = 'white';
-        tooltipEl.style.opacity = 1;
-        tooltipEl.style.pointerEvents = 'none';
-        tooltipEl.style.position = 'absolute';
-        tooltipEl.style.transform = 'translate(-50%, 0)';
-        tooltipEl.style.transition = 'all .1s ease';
-
-        const table = document.createElement('table');
-        table.style.margin = '0px';
-
-        tooltipEl.appendChild(table);
-        chart.canvas.parentNode.appendChild(tooltipEl);
-    }
-
-    return tooltipEl;
-};
-
 function generateData(baseline, peak, peakDuration) {
     const data = [];
     const peakStart = Math.floor((24 - peakDuration) / 2);
