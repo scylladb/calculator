@@ -179,6 +179,10 @@ function logCosts() {
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg._costs.demand.monthly).toLocaleString()}`);
         logs.push(`Total monthly cost: ${Math.floor(cfg._costs.demand.total.monthly).toLocaleString()}`);
         logs.push(`Total annual cost: ${Math.floor(cfg._costs.demand.total.annual).toLocaleString()}`);
+    } else if (cfg.pricing === 'flex') {
+        logs.push(`Monthly pro flex cost: ${Math.floor(cfg._costs.flex.monthly).toLocaleString()}`);
+        logs.push(`Total monthly cost: ${Math.floor(cfg._costs.flex.total.monthly).toLocaleString()}`);
+        logs.push(`Total annual cost: ${Math.floor(cfg._costs.flex.total.annual).toLocaleString()}`);
     } else if (cfg.pricing === 'subscription') {
         logs.push(`Monthly pro subscription cost: ${Math.floor(cfg._costs.subscription.monthly).toLocaleString()}`);
         logs.push(`Total monthly cost: ${Math.floor(cfg._costs.subscription.total.monthly).toLocaleString()}`);
@@ -219,6 +223,19 @@ export function updateScyllaDBCosts() {
         total: {
             monthly: baseCostMonthly + networkCostMonthly,
             annual: (baseCostMonthly + networkCostMonthly) * 12
+        }
+    }
+
+    // Flex costs
+    const flexCostMonthlyUnreserved = baseCostMonthly * (1 - reserved);
+    const flexCostMonthlyReserved = baseCostMonthly * reserved * (1 - discount);
+    const flexCostMonthly = flexCostMonthlyUnreserved + flexCostMonthlyReserved;
+    cfg._costs.flex = {
+        discount: discount,
+        monthly: flexCostMonthly,
+        total: {
+            monthly: flexCostMonthly + networkCostMonthly,
+            annual: (flexCostMonthly + networkCostMonthly) * 12,
         }
     }
 

@@ -37,7 +37,7 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-['demand', 'provisioned', 'subscription'].forEach(type => {
+['demand', 'provisioned', 'flex', 'subscription'].forEach(type => {
     document.querySelector(`input[name="pricing"][value="${type}"]`).addEventListener('change', (event) => {
         if (event.target.checked) {
             cfg.pricing = type;
@@ -344,6 +344,9 @@ if (cfg.pricing === 'demand') {
 } else if (cfg.pricing === 'provisioned') {
     document.querySelector('input[name="pricing"][value="provisioned"]').checked = true;
     document.getElementById('provisionedParams').style.display = 'block';
+} else if (cfg.pricing === 'flex') {
+    document.querySelector('input[name="pricing"][value="flex"]').checked = true;
+    document.getElementById('subscriptionParams').style.display = 'block';
 } else if (cfg.pricing === 'subscription') {
     document.querySelector('input[name="pricing"][value="subscription"]').checked = true;
     document.getElementById('subscriptionParams').style.display = 'block';
