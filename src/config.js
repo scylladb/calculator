@@ -51,7 +51,7 @@ export const cfg = {
     reserved: 0,
     reservedReads: 0,
     reservedWrites: 0,
-    overprovisioned: 0,
+    overprovisioned: 20,
 
     // Reserved
     pricePerReservedRCUUpfront: 0.30,
