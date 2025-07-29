@@ -90,7 +90,14 @@ export function updateSeries() {
                 value = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
                 break;
             case "chaos":
-                value = base * (0.5 + Math.random() * 5);
+                let seed = (new Date()).getDate();
+                // Simple LCG for repeatable pseudo-random numbers
+                const seededRandom = () => {
+                    seed = (seed * 42 + 42) % 424242;
+                    return seed / 4242424;
+                };
+                const chaosSeries = Array.from({length: 24}, () => base * (0.5 + seededRandom() * 5));
+                value = chaosSeries[i];
                 break;
             case "custom":
                 break;
