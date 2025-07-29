@@ -90,7 +90,7 @@ export function calculateScyllaDBCosts() {
         }
         return;
     }
-    
+
     // Calculate per-hour best node config and cost
     cfg._hourlyConfig = [];
     let totalDailyCost = 0;
@@ -208,7 +208,7 @@ export function updateScyllaDBCosts() {
     cfg.costMonthly = cfg.pricing === 'demand' ? cfg._baseCost.monthlyCost :
         cfg._baseCost.monthlyCost * (1 - cfg.scyllaDiscountSubscription);
 
-    cfg.costTotalMonthly = cfg.costMonthly + (cfg.costNetwork || 0);
+    cfg.costTotalMonthly = cfg.costMonthly + (cfg._networkCost.monthlyCost || 0);
 
     cfg.costTotalAnnual = cfg.costTotalMonthly * 12;
 
