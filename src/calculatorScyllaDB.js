@@ -70,17 +70,16 @@ function calculateRequiredStorage() {
 }
 
 function getBestNodeConfig(nodeOptions) {
-    // Find the minimum cost
-    const minCost = Math.min(...nodeOptions.map(opt => opt.cost));
-    // Define a tolerance (e.g., 25%)
-    // TODO: it's actually cheaper to use lots of smaller nodes than a few big ones
-    //  but it's more practical to use less nodes in general, so we use a tolerance
-    //  make this configurable in the future
-    const tolerance = 0.25;
-    // Filter options within tolerance of min cost
-    const candidates = nodeOptions.filter(opt => opt.cost <= minCost * (1 + tolerance));
-    // Return the candidate with the fewest nodes
-    return candidates.reduce((a, b) => (a.nodes <= b.nodes ? a : b));
+    // Try to find any option that does not exceed scyllaNodesMax
+    const underMax = nodeOptions.filter(opt => opt.nodes <= cfg.scyllaNodesMax);
+
+    if (underMax.length > 0) {
+        // If we have options under the max node count, pick the cheapest among them
+        return underMax.reduce((a, b) => (a.cost <= b.cost ? a : b));
+    } else {
+        // If all options exceed the max node count, pick the one with the fewest nodes
+        return nodeOptions.reduce((a, b) => (a.nodes <= b.nodes ? a : b));
+    }
 }
 
 export function calculateScyllaDBCosts() {

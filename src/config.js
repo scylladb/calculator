@@ -84,15 +84,18 @@ export const cfg = {
 
     hourlyConfig: [],
     scyllaNodes: 3,
+    scyllaNodesMax: 24, // Maximum number of ScyllaDB nodes preferred for a cluster
     scyllaInstanceClass: 'i7ie.large',
     scyllaOverride: false,
-    scyllaPrice: {},
 
     // ScyllaDB Constants
+    scyllaPrice: {},
+
     scyllaOpsPerVCPU: {
         i3en: 10000,
         i7ie: 15000
     },
+
     scyllaDiscountTiers: {
         demand: 0.0,
         flex: 0.12,
