@@ -82,7 +82,6 @@ export const cfg = {
 
     daxOverride: false,
 
-    hourlyConfig: [],
     scyllaNodes: 3,
     scyllaNodesMax: 24, // Maximum number of ScyllaDB nodes preferred for a cluster
     scyllaInstanceClass: 'i7ie.large',

@@ -1,4 +1,4 @@
-import {updateDisplayedCosts} from "./utils.js";
+import {formatBytes, updateDisplayedCosts, updateExplainedCosts} from "./utils.js";
 import {cfg} from './config.js';
 import {
     getItemSize,
@@ -156,6 +156,7 @@ function calculateScyllaDBNetworkCosts() {
     const totalWritesPerZoneGB = totalWritesGB * ratioCompression * 2 * cfg.regions;
     // Reads are zone aware, so we only consider cross-region reads
     const totalReadsPerZoneGB = totalReadsGB * ratioCompression * (cfg.regions - 1);
+    const totalPerZoneGB = totalReadsPerZoneGB + totalWritesPerZoneGB;
 
     cfg._costs.network = {
         ratioCompression: ratioCompression,
@@ -163,7 +164,8 @@ function calculateScyllaDBNetworkCosts() {
         totalWritesGB: totalWritesGB,
         totalWritesPerZoneGB: totalWritesPerZoneGB,
         totalReadsPerZoneGB: totalReadsPerZoneGB,
-        monthly: (totalReadsPerZoneGB + totalWritesPerZoneGB) * cfg.networkZonePerGB,
+        totalPerZoneGB: totalPerZoneGB,
+        monthly: totalPerZoneGB * cfg.networkZonePerGB,
     }
 }
 
@@ -191,6 +193,49 @@ function logCosts() {
     logs.push(`---: ---`);
 
     updateDisplayedCosts(logs);
+}
+
+function explainCosts() {
+    let explanation = [];
+
+    const autoscale = cfg._costs.autoscale;
+    const types = [...new Set(autoscale.map(c => c.type))].sort((a, b) => {
+        const getKey = t => {
+            const m = t.match(/\.(.)/);
+            return m ? m[1] : '';
+        };
+        return getKey(b).localeCompare(getKey(a));
+    });
+
+    const getRangeString = (min, max, suffix = '') =>
+        min === max ? `${min}${suffix}` : `${min}${suffix} - ${max}${suffix}`;
+
+    const nodeCounts = autoscale.map(c => c.nodes);
+    const vcpus = autoscale.map(c => c.requiredVCPUs);
+    const ops = autoscale.map(c => c.totalOpsPerSec);
+
+    const minNodes = Math.min(...nodeCounts);
+    const maxNodes = Math.max(...nodeCounts);
+    const minVCPUs = Math.min(...vcpus);
+    const maxVCPUs = Math.max(...vcpus);
+    const minOpsPerSec = Math.min(...ops).toLocaleString();
+    const maxOpsPerSec = Math.max(...ops).toLocaleString();
+
+    explanation.push(`Types: ${types.join(', ')}`);
+    explanation.push(`Nodes: ${getRangeString(minNodes, maxNodes)} nodes`);
+    explanation.push(`vCPUs: ${getRangeString(minVCPUs, maxVCPUs)} cores`);
+    explanation.push(`Ops: ${getRangeString(minOpsPerSec, maxOpsPerSec, ' ops/sec')}`);
+
+    explanation.push(
+        `Storage: ${cfg._costs.storage.sizeUncompressed} GB uncompressed, ` +
+        `${cfg._costs.storage.sizeCompressedGB} GB compressed, ` +
+        `${cfg._costs.storage.sizeReplicatedGB} GB replicated`
+    );
+    explanation.push(
+        `Network: ${formatBytes((cfg._costs.network.totalPerZoneGB || 0) * (1024 ** 3))} per month`
+    );
+
+    updateExplainedCosts(explanation);
 }
 
 export function updateScyllaDBCosts() {
@@ -252,4 +297,5 @@ export function updateScyllaDBCosts() {
     }
 
     logCosts();
+    explainCosts();
 }
