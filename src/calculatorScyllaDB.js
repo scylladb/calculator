@@ -55,15 +55,17 @@ cfg.scyllaPrice = buildScyllaPrice(scyllaInstances);
 
 function calculateRequiredStorage() {
     // Apply storageCompression, then replication
-    const compressedStorage = cfg.storageGB * (1 - (cfg.storageCompression / 100.0));
+    const ratioCompression = 1 - cfg.storageCompression / 100.0;
+    const ratioUtilization = 1 - cfg.storageUtilization / 100.0;
+    const sizeCompressedGB = cfg.storageGB * ratioCompression;
 
-    cfg._storage = {
+    cfg._costs.storage = {
         replication: cfg.replication,
-        compression: cfg.storageCompression,
-        utilization: cfg.storageUtilization,
-        beforeCompression: cfg.storageGB,
-        afterCompression: compressedStorage,
-        required: Math.ceil(compressedStorage * cfg.replication)
+        ratioUtilization: ratioUtilization,
+        ratioCompression: ratioCompression,
+        sizeUncompressed: cfg.storageGB,
+        sizeCompressedGB: sizeCompressedGB,
+        sizeReplicatedGB: Math.ceil(sizeCompressedGB * cfg.replication)
     }
 }
 
@@ -83,17 +85,17 @@ function getBestNodeConfig(nodeOptions) {
 
 export function calculateScyllaDBCosts() {
     if (cfg.scyllaOverride) {
-        cfg._baseCost = {
+        cfg._costs.base = {
             bestInstanceType: cfg.scyllaInstanceClass,
             bestNodeCount: cfg.scyllaNodes,
-            monthlyCost: cfg.scyllaPrice[cfg.scyllaInstanceClass].price * cfg.scyllaNodes * (cfg.regions || 1) * cfg.hoursPerMonth
+            monthly: cfg.scyllaPrice[cfg.scyllaInstanceClass].price * cfg.scyllaNodes * (cfg.regions || 1) * cfg.hoursPerMonth
         }
         return;
     }
 
     // Calculate per-hour best node config and cost
-    cfg._hourlyConfig = [];
-    let totalDailyCost = 0;
+    cfg._costs.autoscale = [];
+    let daily = 0;
     const hours = Math.max(cfg.seriesReads.length, cfg.seriesWrites.length, 24);
 
     for (let hour = 0; hour < hours; hour++) {
@@ -108,8 +110,8 @@ export function calculateScyllaDBCosts() {
             const opsPerVCPU = cfg.scyllaOpsPerVCPU[family] || 15_000;
             const requiredVCPUs = Math.ceil(totalOpsPerSec / opsPerVCPU);
             const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
-            const usableStoragePerNode = spec.storage / (1 - (cfg.storageUtilization / 100.0));
-            const nodesForStorage = Math.ceil(cfg._storage.required / usableStoragePerNode);
+            const usableStoragePerNode = spec.storage / cfg._costs.storage.ratioUtilization;
+            const nodesForStorage = Math.ceil(cfg._costs.storage.sizeReplicatedGB / usableStoragePerNode);
             let nodes = Math.max(nodesForVCPU, nodesForStorage);
             if (nodes % cfg.replication !== 0) {
                 nodes = nodes + (cfg.replication - (nodes % cfg.replication));
@@ -119,7 +121,7 @@ export function calculateScyllaDBCosts() {
         });
         const best = getBestNodeConfig(nodeOptions);
 
-        cfg._hourlyConfig.push({
+        cfg._costs.autoscale.push({
             options: nodeOptions,
             type: best.type,
             nodes: best.nodes,
@@ -131,66 +133,65 @@ export function calculateScyllaDBCosts() {
             requiredVCPUs: best.requiredVCPUs,
             opsPerVCPU: best.opsPerVCPU,
         });
-        totalDailyCost += best.cost;
+        daily += best.cost;
     }
 
     // Calculate monthly cost
-    const monthlyCost = totalDailyCost * (cfg.daysPerMonth || 30);
+    const monthly = daily * (cfg.daysPerMonth || 30);
+    const yearly = monthly * 12;
 
-    cfg._baseCost = {
-        dailyCost: totalDailyCost,
-        monthlyCost: monthlyCost,
+    cfg._costs.base = {
+        daily: daily,
+        monthly: monthly,
+        yearly: yearly,
     };
 }
 
 function calculateScyllaDBNetworkCosts() {
-    const compressionFactor = 1 - (cfg.networkCompression / 100.0);
+    const ratioCompression = 1 - cfg.networkCompression / 100.0;
 
-    const totalReadsGB = cfg.totalReads * cfg.daysPerMonth * cfg.itemSizeKB / (1024 * 1024);
-    const totalWritesGB = cfg.totalWrites * cfg.daysPerMonth * cfg.itemSizeKB / (1024 * 1024);
+    const totalReadsGB = cfg.totalReads * cfg.daysPerMonth * cfg.itemSizeKB / (1024 ** 2);
+    const totalWritesGB = cfg.totalWrites * cfg.daysPerMonth * cfg.itemSizeKB / (1024 ** 2);
 
     // Each write generates 2 cross-zone operations, which is compressed
-    const writesPerZoneGB = totalWritesGB * compressionFactor * 2 * cfg.regions;
+    const totalWritesPerZoneGB = totalWritesGB * ratioCompression * 2 * cfg.regions;
     // Reads are zone aware, so we only consider cross-region reads
-    const readsPerZoneGB = totalReadsGB * compressionFactor * (cfg.regions - 1);
+    const totalReadsPerZoneGB = totalReadsGB * ratioCompression * (cfg.regions - 1);
 
-    cfg._networkCost = {
-        compressionFactor: compressionFactor,
-        totalReadsGB: totalReadsGB.toFixed(2),
-        totalWritesGB: totalWritesGB.toFixed(2),
-        writesPerZoneGB: writesPerZoneGB.toFixed(2),
-        readsPerZoneGB: readsPerZoneGB.toFixed(2),
-        costPerZone: (cfg.networkZonePerGB * compressionFactor).toFixed(2),
-        monthlyCost: ((readsPerZoneGB + writesPerZoneGB) * cfg.networkZonePerGB).toFixed(2),
+    cfg._costs.network = {
+        ratioCompression: ratioCompression,
+        totalReadsGB: totalReadsGB,
+        totalWritesGB: totalWritesGB,
+        totalWritesPerZoneGB: totalWritesPerZoneGB,
+        totalReadsPerZoneGB: totalReadsPerZoneGB,
+        monthly: (totalReadsPerZoneGB + totalWritesPerZoneGB) * cfg.networkZonePerGB,
     }
 }
 
 function logCosts() {
     let logs = [];
 
-    if (cfg.pricing === 'demand') {
-        logs.push(`Monthly on-demand cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
-    } else if (cfg.pricing === 'subscription') {
-        logs.push(`Monthly subscription cost: ${Math.floor(cfg.costMonthly).toLocaleString()}`);
+    if (cfg._costs.network.monthly !== 0) {
+        logs.push(`Monthly network cost: ${Math.floor(cfg._costs.network.monthly).toLocaleString()}`);
     }
 
-    if (cfg._networkCost.monthlyCost !== 0) {
-        logs.push(`Monthly network cost: ${Math.floor(cfg._networkCost.monthlyCost).toLocaleString()}`);
+    if (cfg.pricing === 'demand') {
+        logs.push(`Monthly on-demand cost: ${Math.floor(cfg._costs.demand.monthly).toLocaleString()}`);
+        logs.push(`Total monthly cost: ${Math.floor(cfg._costs.demand.total.monthly).toLocaleString()}`);
+        logs.push(`Total annual cost: ${Math.floor(cfg._costs.demand.total.annual).toLocaleString()}`);
+    } else if (cfg.pricing === 'subscription') {
+        logs.push(`Monthly subscription cost: ${Math.floor(cfg._costs.subscription.monthly).toLocaleString()}`);
+        logs.push(`Total monthly cost: ${Math.floor(cfg._costs.subscription.total.monthly).toLocaleString()}`);
+        logs.push(`Total annual cost: ${Math.floor(cfg._costs.subscription.total.annual).toLocaleString()}`);
     }
 
     logs.push(`---: ---`);
-
-    logs.push(`Total monthly cost: ${Math.floor(cfg.costTotalMonthly).toLocaleString()}`);
-
-    if (cfg.scyllaReserved > 0) {
-        logs.push(`Total upfront cost: ${Math.floor(cfg.costTotalUpfront).toLocaleString()}`);
-    }
-    logs.push(`Total annual cost: ${Math.floor(cfg.costTotalAnnual).toLocaleString()}`);
 
     updateDisplayedCosts(logs);
 }
 
 export function updateScyllaDBCosts() {
+    cfg._costs = {};
     getPricing();
     getRegions()
     getStorage();
@@ -205,17 +206,33 @@ export function updateScyllaDBCosts() {
     calculateScyllaDBCosts();
     calculateScyllaDBNetworkCosts();
 
-    cfg.costMonthly = cfg.pricing === 'demand' ? cfg._baseCost.monthlyCost :
-        cfg._baseCost.monthlyCost * (1 - cfg.scyllaDiscountSubscription);
+    const discount = cfg.scyllaDiscountTiers[cfg.pricing];
+    const reserved = cfg.scyllaReserved / 100.0;
+    const baseCostMonthly = cfg._costs.base.monthly;
+    const networkCostMonthly = cfg._costs.network.monthly || 0;
 
-    cfg.costTotalMonthly = cfg.costMonthly + (cfg._networkCost.monthlyCost || 0);
+    // On-demand costs
+    cfg._costs.demand = {
+        discount: discount,
+        reserved: reserved,
+        monthly: baseCostMonthly,
+        total: {
+            monthly: baseCostMonthly + networkCostMonthly,
+            annual: (baseCostMonthly + networkCostMonthly) * 12
+        }
+    }
 
-    cfg.costTotalAnnual = cfg.costTotalMonthly * 12;
-
-    if (cfg.scyllaReserved > 0) {
-        cfg.costTotalUpfront = (cfg.scyllaReserved / 100.0 * cfg.costTotalAnnual * (1 - cfg.scyllaDiscountReserved));
-        cfg.costTotalMonthly = (1 - cfg.scyllaReserved / 100.0) * cfg.costTotalMonthly;
-        cfg.costTotalAnnual = (1 - cfg.scyllaReserved / 100.0) * cfg.costTotalAnnual;
+    // Subscription costs
+    const subCostMonthlyUnreserved = baseCostMonthly * (1 - reserved);
+    const subCostMonthlyReserved = baseCostMonthly * reserved * (1 - discount);
+    const subCostMonthly = subCostMonthlyUnreserved + subCostMonthlyReserved;
+    cfg._costs.subscription = {
+        discount: discount,
+        monthly: subCostMonthly,
+        total: {
+            monthly: subCostMonthly + networkCostMonthly,
+            annual: (subCostMonthly + networkCostMonthly) * 12,
+        }
     }
 
     logCosts();

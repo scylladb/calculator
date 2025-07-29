@@ -15,6 +15,7 @@
     src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@latest/dist/chartjs-plugin-dragdata.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/patternomaly@1.3.2/dist/patternomaly.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/decimal.js-light@2.5.1/decimal.min.js"></script>
   <script defer src="./src/app.js" type="module"></script>
   <title>ScyllaDB | DynamoDB workload calculator</title>
 </head>
@@ -332,11 +333,11 @@
                 <div class="col vstack gap-3">
                   <div class="range-group">
                     <div class="range-group-top">
-                      <label for="scyllaReserved">[WIP] Reserved Capacity:</label>
+                      <label for="scyllaReserved">Reserved Capacity:</label>
                       <div class="inline-input">
                         <div class="value">
                           <input id="scyllaReservedInp" type="text"/>
-                          <span id="scyllaReservedDsp">0</span>
+                          <span id="scyllaReservedDsp">100</span>
                         </div>
                         <div class="units"></div>
                       </div>
@@ -345,7 +346,7 @@
                         <span class="tooltip-text">Enter the percentage of operations to reserve upfront, minimum term 1-year.</span>
                       </span>
                     </div>
-                    <input id="scyllaReserved" max="100" min="0" step="1" type="range" value="0"/>
+                    <input id="scyllaReserved" max="100" min="0" step="1" type="range" value="100"/>
                   </div>
                 </div>
               </div>
