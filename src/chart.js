@@ -276,8 +276,8 @@ export const chart = new Chart(ctx, {
                         if (context.length > 0) {
                             hour = context[0].dataIndex;
                         }
-                        if (hour !== null && cfg.hourlyConfig && cfg.hourlyConfig[hour]) {
-                            const hourConfig = cfg.hourlyConfig[hour];
+                        if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
+                            const hourConfig = cfg._costs.autoscale[hour];
                             const lines = [' '];
                             Object.entries(hourConfig)
                                 .filter(([key]) => key === 'nodes' || key === 'type' || key === 'totalOpsPerSec' || key === 'requiredVCPUs')
@@ -292,8 +292,8 @@ export const chart = new Chart(ctx, {
                             hour = context[0].dataIndex;
                         }
                         let costLine = '';
-                        if (hour !== null && cfg.hourlyConfig && cfg.hourlyConfig[hour]) {
-                            const cost = cfg.hourlyConfig[hour].cost;
+                        if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
+                            const cost = cfg._costs.autoscale[hour].cost;
                             if (cost !== undefined) {
                                 costLine = `Cost: $${cost}/hr`;
                             }
