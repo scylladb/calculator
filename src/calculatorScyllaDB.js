@@ -196,7 +196,7 @@ function logCosts() {
 }
 
 function explainCosts() {
-    let explanation = [];
+    let explanations = [];
 
     const autoscale = cfg._costs.autoscale;
     const types = [...new Set(autoscale.map(c => c.type))].sort((a, b) => {
@@ -221,21 +221,21 @@ function explainCosts() {
     const minOpsPerSec = Math.min(...ops).toLocaleString();
     const maxOpsPerSec = Math.max(...ops).toLocaleString();
 
-    explanation.push(`Types: ${types.join(', ')}`);
-    explanation.push(`Nodes: ${getRangeString(minNodes, maxNodes)} nodes`);
-    explanation.push(`vCPUs: ${getRangeString(minVCPUs, maxVCPUs)} cores`);
-    explanation.push(`Ops: ${getRangeString(minOpsPerSec, maxOpsPerSec, ' ops/sec')}`);
+    explanations.push(`Types: ${types.join(', ')}`);
+    explanations.push(`Nodes: ${getRangeString(minNodes, maxNodes)} nodes`);
+    explanations.push(`vCPUs: ${getRangeString(minVCPUs, maxVCPUs)} cores`);
+    explanations.push(`Ops: ${getRangeString(minOpsPerSec, maxOpsPerSec, ' ops/sec')}`);
 
-    explanation.push(
+    explanations.push(
         `Storage: ${cfg._costs.storage.sizeUncompressed} GB uncompressed, ` +
         `${cfg._costs.storage.sizeCompressedGB} GB compressed, ` +
         `${cfg._costs.storage.sizeReplicatedGB} GB replicated`
     );
-    explanation.push(
+    explanations.push(
         `Network: ${formatBytes((cfg._costs.network.totalPerZoneGB || 0) * (1024 ** 3))} per month`
     );
 
-    updateExplainedCosts(explanation);
+    updateExplainedCosts(explanations);
 }
 
 export function updateScyllaDBCosts() {
