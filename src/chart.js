@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {formatNumber, updateAll} from "./utils.js";
+import {formatBytes, formatNumber, updateAll} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
@@ -18,7 +18,7 @@ function generateData(baseline, peak, peakDuration) {
         } else {
             value = baseline;
         }
-        data.push({ x: hour, y: value });
+        data.push({x: hour, y: value});
     }
 
     return data;
@@ -30,11 +30,11 @@ export function decodeSeriesData() {
 
     cfg.seriesReads = cfg.seriesReadsEncoded
         .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        .map((val, i) => ({x: i, y: parseInt(val, 10) * 1000}));
 
     cfg.seriesWrites = cfg.seriesWritesEncoded
         .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        .map((val, i) => ({x: i, y: parseInt(val, 10) * 1000}));
 }
 
 export function encodeSeriesData() {
@@ -90,7 +90,14 @@ export function updateSeries() {
                 value = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
                 break;
             case "chaos":
-                value = base * (0.5 + Math.random() * 5);
+                let seed = (new Date()).getDate();
+                // Simple LCG for repeatable pseudo-random numbers
+                const seededRandom = () => {
+                    seed = (seed * 42 + 42) % 424242;
+                    return seed / 4242424;
+                };
+                const chaosSeries = Array.from({length: 24}, () => base * (0.5 + seededRandom() * 5));
+                value = chaosSeries[i];
                 break;
             case "custom":
                 break;
@@ -166,7 +173,7 @@ export const chart = new Chart(ctx, {
             label: 'Reads',
             data: Array(24).fill(null),
             borderColor: '#326DE6',
-            borderWidth: 3,
+            borderWidth: 2,
             backgroundColor: bluePattern,
             fill: true,
             tension: 0.5,
@@ -249,7 +256,7 @@ export const chart = new Chart(ctx, {
                 display: true,
                 position: 'bottom',
                 labels: {
-                    filter: function(item, chart) {
+                    filter: function (item, chart) {
                         // Only show legend for series 0 and 1
                         return item.datasetIndex === 0 || item.datasetIndex === 1;
                     }
@@ -262,8 +269,37 @@ export const chart = new Chart(ctx, {
                 display: true,
                 callbacks: {
                     label: function (context) {
-                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
-                    }
+                        return context.dataset.label + ': ' + formatNumber(context.raw.y) + ' ops/sec';
+                    },
+                    afterBody: function (context) {
+                        let hour = null;
+                        if (context.length > 0) {
+                            hour = context[0].dataIndex;
+                        }
+                        if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
+                            const recommended = cfg._costs.autoscale[hour];
+                            const lines = [' '];
+                            lines.push(`◦ ${recommended.nodes} × ${recommended.type} nodes`);
+                            lines.push(`◦ ${formatNumber(recommended.totalRequiredOpsSec)} of ${formatNumber(recommended.totalAvailOpsSec)} ops/sec available`);
+                            lines.push(`◦ ${formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3))} of ${formatBytes(recommended.availableStorageGB * (1024 ** 3))} available`);
+                            return lines;
+                        }
+                        return [];
+                    },
+                    footer: (context) => {
+                        let hour = null;
+                        if (context.length > 0) {
+                            hour = context[0].dataIndex;
+                        }
+                        let costLine = '';
+                        if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
+                            const cost = cfg._costs.autoscale[hour].cost;
+                            if (cost !== undefined) {
+                                costLine = `Cost: $${cost}/hr`;
+                            }
+                        }
+                        return costLine ? [costLine] : [];
+                    },
                 },
             },
             dragData: {
