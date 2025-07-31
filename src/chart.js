@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {formatNumber, updateAll} from "./utils.js";
+import {formatBytes, formatNumber, updateAll} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
@@ -277,11 +277,11 @@ export const chart = new Chart(ctx, {
                             hour = context[0].dataIndex;
                         }
                         if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
-                            const hourConfig = cfg._costs.autoscale[hour];
+                            const recommended = cfg._costs.autoscale[hour];
                             const lines = [' '];
-                            Object.entries(hourConfig)
-                                .filter(([key]) => key === 'nodes' || key === 'type' || key === 'totalOpsPerSec' || key === 'requiredVCPUs')
-                                .forEach(([key, value]) => lines.push(`◦ ${key}: ${value}`));
+                            lines.push(`◦ ${recommended.nodes} × ${recommended.type} nodes`);
+                            lines.push(`◦ ${formatNumber(recommended.totalRequiredOpsSec)} of ${formatNumber(recommended.totalAvailOpsSec)} ops/sec available`);
+                            lines.push(`◦ ${formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3))} of ${formatBytes(recommended.availableStorageGB * (1024 ** 3))} available`);
                             return lines;
                         }
                         return [];
