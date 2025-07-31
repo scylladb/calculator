@@ -1,4 +1,4 @@
-import {formatBytes, updateDisplayedCosts, updateExplainedCosts} from "./utils.js";
+import {formatBytes, formatNumber, updateDisplayedCosts, updateExplainedCosts} from "./utils.js";
 import {cfg} from './config.js';
 import {
     getItemSize,
@@ -19,8 +19,8 @@ function buildScyllaPrice(instances) {
             .map(inst => [
                 inst.externalId,
                 {
-                    vcpu: inst.cpuCount,
-                    storage: inst.totalStorage,
+                    cpuCount: inst.cpuCount,
+                    totalStorage: inst.totalStorage,
                     instanceCostHourly: Number(inst.instanceCostHourly),
                     subscriptionCostHourly: Number(inst.subscriptionCostHourly),
                     price: Number(inst.instanceCostHourly) + Number(inst.subscriptionCostHourly),
@@ -41,8 +41,8 @@ async function fetchAndSetScyllaPrice() {
             .map(inst => [
                 inst.externalId,
                 {
-                    vcpu: inst.cpuCount,
-                    storage: inst.totalStorage,
+                    cpuCount: inst.cpuCount,
+                    totalStorage: inst.totalStorage,
                     instanceCostHourly: Number(inst.instanceCostHourly),
                     subscriptionCostHourly: Number(inst.subscriptionCostHourly),
                     price: Number(inst.instanceCostHourly) + Number(inst.subscriptionCostHourly),
@@ -54,9 +54,8 @@ async function fetchAndSetScyllaPrice() {
 cfg.scyllaPrice = buildScyllaPrice(scyllaInstances);
 
 function calculateRequiredStorage() {
-    // Apply storageCompression, then replication
-    const ratioCompression = 1 - cfg.storageCompression / 100.0;
-    const ratioUtilization = 1 - cfg.storageUtilization / 100.0;
+    const ratioCompression = cfg.storageCompression / 100.0;
+    const ratioUtilization = cfg.storageUtilization / 100.0;
     const sizeCompressedGB = cfg.storageGB * ratioCompression;
 
     cfg._costs.storage = {
@@ -92,32 +91,42 @@ export function calculateScyllaDBCosts() {
         return;
     }
 
-    // Calculate per-hour best node config and cost
+    // Calculate the best node configuration for autoscaling on an hourly basis
     cfg._costs.autoscale = [];
     let daily = 0;
     const hours = Math.max(cfg.seriesReads.length, cfg.seriesWrites.length, 24);
+    const quorum = Math.floor(cfg.replication / 2) + 1;
+    const digest = 0.35; // assume 35% of the read ops are digests (not replicated)
+    const readFactor = (1 + (quorum - 1) * digest);
+    const writeFactor = cfg.replication;
 
     for (let hour = 0; hour < hours; hour++) {
-        const reads = cfg.seriesReads[hour] ? cfg.seriesReads[hour].y : 0;
-        const writes = cfg.seriesWrites[hour] ? cfg.seriesWrites[hour].y : 0;
-        const totalOpsPerSec = (reads + writes) * cfg.replication;
+        const readOpsPerSec = cfg.seriesReads[hour] ? cfg.seriesReads[hour].y : 0;
+        const writeOpsPerSec = cfg.seriesWrites[hour] ? cfg.seriesWrites[hour].y : 0;
+        const totalOpsPerSec = readOpsPerSec + writeOpsPerSec;
+        const totalRequiredOpsSec = readOpsPerSec * readFactor + writeOpsPerSec * writeFactor;
 
         // For each node option, calculate requiredVCPUs using the correct opsPerVCPU for the family
         const nodeOptions = Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
             const family = type.split('.')[0];
-            // TODO: make sure the family specs are correct
             const opsPerVCPU = cfg.scyllaOpsPerVCPU[family] || 15_000;
-            const requiredVCPUs = Math.ceil(totalOpsPerSec / opsPerVCPU);
-            const nodesForVCPU = Math.ceil(requiredVCPUs / spec.vcpu);
-            const usableStoragePerNode = spec.storage / cfg._costs.storage.ratioUtilization;
-            const nodesForStorage = Math.ceil(cfg._costs.storage.sizeReplicatedGB / usableStoragePerNode);
+
+            const requiredVCPUs = Math.ceil(totalRequiredOpsSec / opsPerVCPU);
+            const nodesForVCPU = Math.ceil(requiredVCPUs / spec.cpuCount);
+
+            const usableStoragePerNodeGB = spec.totalStorage * cfg._costs.storage.ratioUtilization;
+            const nodesForStorage = Math.ceil(cfg._costs.storage.sizeReplicatedGB / usableStoragePerNodeGB);
+
             let nodes = Math.max(nodesForVCPU, nodesForStorage);
             if (nodes % cfg.replication !== 0) {
                 nodes = nodes + (cfg.replication - (nodes % cfg.replication));
             }
             const cost = nodes * spec.price * (cfg.regions || 1); // per hour
-            return {type, nodes, cost, requiredVCPUs, opsPerVCPU};
+            const totalAvailOpsSec = nodes * spec.cpuCount * opsPerVCPU;
+
+            return {family, type, nodes, cost, requiredVCPUs, opsPerVCPU, totalAvailOpsSec};
         });
+
         const best = getBestNodeConfig(nodeOptions);
 
         cfg._costs.autoscale.push({
@@ -126,11 +135,15 @@ export function calculateScyllaDBCosts() {
             nodes: best.nodes,
             cost: best.cost.toFixed(2),
             hour: hour,
-            reads: reads.toFixed(0),
-            writes: writes.toFixed(0),
-            totalOpsPerSec: totalOpsPerSec.toFixed(0),
-            requiredVCPUs: best.requiredVCPUs,
+            reads: readOpsPerSec.toFixed(0),
+            writes: writeOpsPerSec.toFixed(0),
             opsPerVCPU: best.opsPerVCPU,
+            totalOpsPerSec: totalOpsPerSec.toFixed(0),
+            totalRequiredOpsSec: totalRequiredOpsSec.toFixed(0),
+            totalAvailOpsSec: best.totalAvailOpsSec.toFixed(0),
+            requiredVCPUs: best.requiredVCPUs,
+            availableVCPUs: best.nodes * cfg.scyllaPrice[best.type].vcpu,
+            availableStorageGB: (best.nodes * cfg.scyllaPrice[best.type].totalStorage).toFixed(2),
         });
         daily += best.cost;
     }
@@ -199,41 +212,41 @@ function explainCosts() {
     let explanations = [];
 
     const autoscale = cfg._costs.autoscale;
-    const types = [...new Set(autoscale.map(c => c.type))].sort((a, b) => {
-        const getKey = t => {
-            const m = t.match(/\.(.)/);
-            return m ? m[1] : '';
-        };
-        return getKey(b).localeCompare(getKey(a));
-    });
 
-    const getRangeString = (min, max, suffix = '') =>
-        min === max ? `${min}${suffix}` : `${min}${suffix} - ${max}${suffix}`;
+    const ops = autoscale.map(c => Number(c.totalOpsPerSec) || 0);
 
-    const nodeCounts = autoscale.map(c => c.nodes);
-    const vcpus = autoscale.map(c => c.requiredVCPUs);
-    const ops = autoscale.map(c => c.totalOpsPerSec);
+    const minOpsIdx = ops.indexOf(Math.min(...ops));
+    const maxOpsIdx = ops.indexOf(Math.max(...ops));
+    const minCluster = autoscale[minOpsIdx] || {};
+    const maxCluster = autoscale[maxOpsIdx] || {};
 
-    const minNodes = Math.min(...nodeCounts);
-    const maxNodes = Math.max(...nodeCounts);
-    const minVCPUs = Math.min(...vcpus);
-    const maxVCPUs = Math.max(...vcpus);
-    const minOpsPerSec = Math.min(...ops).toLocaleString();
-    const maxOpsPerSec = Math.max(...ops).toLocaleString();
+    const minOpsUsed = minCluster.totalOpsPerSec ? minCluster.totalRequiredOpsSec : 0;
+    const maxOpsUsed = maxCluster.totalOpsPerSec ? maxCluster.totalRequiredOpsSec : 0;
+    const minOpsAvail = minCluster.totalAvailOpsSec ? minCluster.totalAvailOpsSec : 0;
+    const maxOpsAvail = maxCluster.totalAvailOpsSec ? maxCluster.totalAvailOpsSec : 0;
 
-    explanations.push(`Types: ${types.join(', ')}`);
-    explanations.push(`Nodes: ${getRangeString(minNodes, maxNodes)} nodes`);
-    explanations.push(`vCPUs: ${getRangeString(minVCPUs, maxVCPUs)} cores`);
-    explanations.push(`Ops: ${getRangeString(minOpsPerSec, maxOpsPerSec, ' ops/sec')}`);
+    const minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes`;
+    const maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes`;
 
-    explanations.push(
-        `Storage: ${cfg._costs.storage.sizeUncompressed} GB uncompressed, ` +
-        `${cfg._costs.storage.sizeCompressedGB} GB compressed, ` +
-        `${cfg._costs.storage.sizeReplicatedGB} GB replicated`
-    );
-    explanations.push(
-        `Network: ${formatBytes((cfg._costs.network.totalPerZoneGB || 0) * (1024 ** 3))} per month`
-    );
+    const storageUsed = formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3));
+    const storageAvailable = formatBytes(maxCluster.availableStorageGB * (1024 ** 3));
+
+    const storageStr = `Storage Capacity: ${storageUsed} of ${storageAvailable} available`;
+
+    const instanceType = maxCluster.type || '';
+    let instanceExplanation = '';
+    if (instanceType.startsWith('i7ie')) {
+        instanceExplanation = 'Instance Family: i7ie compute optimized';
+    } else if (instanceType.startsWith('i3en')) {
+        instanceExplanation = 'Instance Family: i3en storage optimized ';
+    }
+
+    if (instanceExplanation) explanations.push(instanceExplanation);
+    explanations.push(minClusterStr);
+    explanations.push(`: ${formatNumber(minOpsUsed)} of ${formatNumber(minOpsAvail)} ops/sec available`);
+    explanations.push(maxClusterStr);
+    explanations.push(`: ${formatNumber(maxOpsUsed)} of ${formatNumber(maxOpsAvail)} ops/sec available`);
+    explanations.push(storageStr);
 
     updateExplainedCosts(explanations);
 }
