@@ -128,7 +128,22 @@ document.getElementById('totalReads').addEventListener('input', (event) => {
     document.getElementById('workload').value = cfg.workload;
     if (!isNaN(newTotal) && cfg.seriesReads.length > 0) {
         const currentTotal = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
-        if (currentTotal === 0) return;
+
+        if (currentTotal === 0) {
+            // If currentTotal is 0 but newTotal is > 0, redraw the series
+            if (newTotal > 0) {
+                const pointsPerHour = newTotal / cfg.seriesReads.length;
+                cfg.seriesReads.forEach((point, index) => {
+                    point.y = pointsPerHour;
+                    chart.data.datasets[0].data[index] = point;
+                });
+                cfg.totalReads = newTotal;
+                encodeSeriesData();
+                document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
+                updateAll();
+            }
+            return;
+        }
 
         const scaleFactor = newTotal / currentTotal;
         cfg.seriesReads.forEach((point, index) => {
@@ -151,7 +166,22 @@ document.getElementById('totalWrites').addEventListener('input', (event) => {
     document.getElementById('workload').value = cfg.workload;
     if (!isNaN(newTotal) && cfg.seriesWrites.length > 0) {
         const currentTotal = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
-        if (currentTotal === 0) return;
+
+        if (currentTotal === 0) {
+            // If currentTotal is 0 but newTotal is > 0, redraw the series
+            if (newTotal > 0) {
+                const pointsPerHour = newTotal / cfg.seriesWrites.length;
+                cfg.seriesWrites.forEach((point, index) => {
+                    point.y = pointsPerHour;
+                    chart.data.datasets[1].data[index] = point;
+                });
+                cfg.totalWrites = newTotal;
+                encodeSeriesData();
+                document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
+                updateAll();
+            }
+            return;
+        }
 
         const scaleFactor = newTotal / currentTotal;
         cfg.seriesWrites.forEach((point, index) => {
