@@ -219,28 +219,31 @@ function explainCosts() {
     const maxOpsUsed = maxCluster.totalOpsPerSec ? maxCluster.totalOpsPerSec : 0;
     const minOpsAvail = minCluster.availOpsPerSec ? minCluster.availOpsPerSec : 0;
     const maxOpsAvail = maxCluster.availOpsPerSec ? maxCluster.availOpsPerSec : 0;
+    const minVCPU = minCluster.requiredVCPU || 0;
+    const maxVCPU = maxCluster.requiredVCPU || 0;
 
-    const minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes`;
-    const maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes`;
+    let minClusterStr = '';
+    let maxClusterStr = '';
+    const instanceType = maxCluster.type || '';
+    if (instanceType.startsWith('i7ie')) {
+        minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes (compute optimized)`;
+        maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes (compute optimized)`;
+    } else if (instanceType.startsWith('i3en')) {
+        minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes (storage optimized)`;
+        maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes (storage optimized)`;
+    }
 
     const storageUsed = formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3));
     const storageAvailable = formatBytes(maxCluster.availableStorageGB * (1024 ** 3));
 
     const storageStr = `Storage Capacity: ${storageUsed} of ${storageAvailable} available`;
 
-    const instanceType = maxCluster.type || '';
-    let instanceExplanation = '';
-    if (instanceType.startsWith('i7ie')) {
-        instanceExplanation = 'Instance Family: i7ie compute optimized';
-    } else if (instanceType.startsWith('i3en')) {
-        instanceExplanation = 'Instance Family: i3en storage optimized ';
-    }
-
-    if (instanceExplanation) explanations.push(instanceExplanation);
     explanations.push(minClusterStr);
-    explanations.push(`: ${formatNumber(minOpsUsed)} of ${formatNumber(minOpsAvail)} ops/sec available`);
+    explanations.push(`: Total of ${formatNumber(minOpsUsed)} requested. Up to ${formatNumber(minOpsAvail)} ops/sec available.`);
+    explanations.push(`: ${minVCPU} vCPU per zone required`)
     explanations.push(maxClusterStr);
-    explanations.push(`: ${formatNumber(maxOpsUsed)} of ${formatNumber(maxOpsAvail)} ops/sec available`);
+    explanations.push(`: Total of ${formatNumber(maxOpsUsed)} requested. Up to ${formatNumber(maxOpsAvail)} ops/sec available.`);
+    explanations.push(`: ${maxVCPU} vCPU per zone required`)
     explanations.push(storageStr);
 
     updateExplainedCosts(explanations);
