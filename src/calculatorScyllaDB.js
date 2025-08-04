@@ -253,7 +253,7 @@ function explainCosts() {
 
     const sizeUncompressed = formatBytes(cfg._costs.storage.sizeUncompressed * (1024 ** 3), 0);
     const sizeCompressedGB = formatBytes(cfg._costs.storage.sizeCompressedGB * (1024 ** 3), 0);
-    const sizeReplicatedGB = formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3), 0);
+    const sizeReplicatedGB = formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3), 1);
     const storageAvailable = formatBytes(minStorageGB * (1024 ** 3), 0);
     explanations.push(`Storage Capacity: ${sizeUncompressed} storage requested `);
     explanations.push(`: ${sizeCompressedGB} compressed storage required (up to ${storageAvailable} available)`);
