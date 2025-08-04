@@ -280,8 +280,8 @@ export const chart = new Chart(ctx, {
                             const recommended = cfg._costs.autoscale[hour];
                             const lines = [' '];
                             lines.push(`◦ ${recommended.nodes} × ${recommended.type} nodes`);
-                            lines.push(`◦ ${formatNumber(recommended.totalOpsPerSec)} of ${formatNumber(recommended.totalAvailOpsSec)} ops/sec available`);
-                            lines.push(`◦ ${formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3))} of ${formatBytes(recommended.availableStorageGB * (1024 ** 3))} available`);
+                            lines.push(`◦ ${formatNumber(recommended.totalOpsPerSec)} of ${formatNumber(recommended.availOpsPerSec)} ops/sec available`);
+                            lines.push(`◦ ${formatBytes(cfg._costs.storage.sizeCompressedGB * (1024 ** 3))} of ${formatBytes(recommended.availStorageGB * (1024 ** 3))} available`);
                             return lines;
                         }
                         return [];

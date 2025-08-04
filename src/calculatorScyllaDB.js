@@ -107,20 +107,30 @@ export function calculateScyllaDBCosts() {
             const opsPerVCPU = cfg.scyllaOpsPerVCPU[family] || 15_000;
 
             const requiredVCPU = Math.ceil(totalOpsPerSec / opsPerVCPU);
-            const requiredNodesPerZone = Math.ceil(requiredVCPU / spec.cpuCount); // per zone
+            const requiredNodesPerZoneCompute = Math.ceil(requiredVCPU / spec.cpuCount); // per zone
 
-            const usableStoragePerNodeGB = spec.totalStorage * cfg._costs.storage.ratioUtilization;
-            const nodesForStorage = Math.ceil(cfg._costs.storage.sizeReplicatedGB / usableStoragePerNodeGB);
+            const storageAvailablePerNode = spec.totalStorage * cfg._costs.storage.ratioUtilization;
+            const requiredNodesPerZoneStorage = Math.ceil(cfg._costs.storage.sizeCompressedGB / storageAvailablePerNode);
 
-            let nodes = Math.max(requiredNodesPerZone, nodesForStorage) * cfg.replication; // per cluster
+            let nodes = Math.max(requiredNodesPerZoneCompute, requiredNodesPerZoneStorage) * cfg.replication; // per cluster
 
             if (nodes % cfg.replication !== 0) {
                 nodes = nodes + (cfg.replication - (nodes % cfg.replication));
             }
             const cost = nodes * spec.price * (cfg.regions || 1); // per hour
-            const availOpsPerSec = requiredNodesPerZone * spec.cpuCount * opsPerVCPU;
+            const availOpsPerSec = nodes * spec.cpuCount * opsPerVCPU / cfg.replication; // per zone
+            const availStorageGB = nodes * spec.totalStorage / cfg.replication; // per zone
 
-            return {family, type, nodes, cost, requiredVCPU, opsPerVCPU, availOpsPerSec};
+            return {
+                family,
+                type,
+                nodes,
+                cost,
+                requiredVCPU,
+                opsPerVCPU,
+                availOpsPerSec,
+                availStorageGB
+            };
         });
 
         const best = getBestNodeConfig(nodeOptions);
@@ -138,7 +148,7 @@ export function calculateScyllaDBCosts() {
             availOpsPerSec: best.availOpsPerSec.toFixed(0),
             requiredVCPU: best.requiredVCPU,
             availableVCPUs: best.nodes * cfg.scyllaPrice[best.type].vcpu,
-            availableStorageGB: (best.nodes * cfg.scyllaPrice[best.type].totalStorage).toFixed(2),
+            availStorageGB: best.availStorageGB.toFixed(0),
         });
         daily += best.cost;
     }
@@ -221,6 +231,7 @@ function explainCosts() {
     const maxOpsAvail = maxCluster.availOpsPerSec ? maxCluster.availOpsPerSec : 0;
     const minVCPU = minCluster.requiredVCPU || 0;
     const maxVCPU = maxCluster.requiredVCPU || 0;
+    const minStorageGB = minCluster.availStorageGB || 0;
 
     let minClusterStr = '';
     let maxClusterStr = '';
@@ -233,18 +244,21 @@ function explainCosts() {
         maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes (storage optimized)`;
     }
 
-    const storageUsed = formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3));
-    const storageAvailable = formatBytes(maxCluster.availableStorageGB * (1024 ** 3));
-
-    const storageStr = `Storage Capacity: ${storageUsed} of ${storageAvailable} available`;
-
     explanations.push(minClusterStr);
-    explanations.push(`: ${formatNumber(minOpsUsed)} ops/sec requested. Up to ${formatNumber(minOpsAvail)} ops/sec available.`);
+    explanations.push(`: ${formatNumber(minOpsUsed)} ops/sec requested (up to ${formatNumber(minOpsAvail)} ops/sec available)`);
     explanations.push(`: ${minVCPU} vCPU per zone required`)
     explanations.push(maxClusterStr);
-    explanations.push(`: ${formatNumber(maxOpsUsed)} ops/sec requested. Up to ${formatNumber(maxOpsAvail)} ops/sec available.`);
+    explanations.push(`: ${formatNumber(maxOpsUsed)} ops/sec requested (up to ${formatNumber(maxOpsAvail)} ops/sec available)`);
     explanations.push(`: ${maxVCPU} vCPU per zone required`)
-    explanations.push(storageStr);
+
+    const sizeUncompressed = formatBytes(cfg._costs.storage.sizeUncompressed * (1024 ** 3), 0);
+    const sizeCompressedGB = formatBytes(cfg._costs.storage.sizeCompressedGB * (1024 ** 3), 0);
+    const sizeReplicatedGB = formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3), 0);
+    const storageAvailable = formatBytes(minStorageGB * (1024 ** 3), 0);
+    explanations.push(`Storage Capacity: ${sizeUncompressed} storage requested `);
+    explanations.push(`: ${sizeCompressedGB} compressed storage required (up to ${storageAvailable} available)`);
+    explanations.push(`: ${sizeReplicatedGB} compressed storage replicated`);
+    explanations.push(`: ${cfg.storageUtilization}% max utilization (${Number(cfg._costs.storage.sizeCompressedGB / minStorageGB * 100).toFixed(0)}% utilized)`);
 
     updateExplainedCosts(explanations);
 }
