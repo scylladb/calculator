@@ -239,10 +239,10 @@ function explainCosts() {
     const storageStr = `Storage Capacity: ${storageUsed} of ${storageAvailable} available`;
 
     explanations.push(minClusterStr);
-    explanations.push(`: Total of ${formatNumber(minOpsUsed)} requested. Up to ${formatNumber(minOpsAvail)} ops/sec available.`);
+    explanations.push(`: ${formatNumber(minOpsUsed)} ops/sec requested. Up to ${formatNumber(minOpsAvail)} ops/sec available.`);
     explanations.push(`: ${minVCPU} vCPU per zone required`)
     explanations.push(maxClusterStr);
-    explanations.push(`: Total of ${formatNumber(maxOpsUsed)} requested. Up to ${formatNumber(maxOpsAvail)} ops/sec available.`);
+    explanations.push(`: ${formatNumber(maxOpsUsed)} ops/sec requested. Up to ${formatNumber(maxOpsAvail)} ops/sec available.`);
     explanations.push(`: ${maxVCPU} vCPU per zone required`)
     explanations.push(storageStr);
 
