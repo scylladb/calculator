@@ -95,36 +95,32 @@ export function calculateScyllaDBCosts() {
     cfg._costs.autoscale = [];
     let daily = 0;
     const hours = Math.max(cfg.seriesReads.length, cfg.seriesWrites.length, 24);
-    const quorum = Math.floor(cfg.replication / 2) + 1;
-    const digest = 0.35; // assume 35% of the read ops are digests (not replicated)
-    const readFactor = (1 + (quorum - 1) * digest);
-    const writeFactor = cfg.replication;
 
     for (let hour = 0; hour < hours; hour++) {
         const readOpsPerSec = cfg.seriesReads[hour] ? cfg.seriesReads[hour].y : 0;
         const writeOpsPerSec = cfg.seriesWrites[hour] ? cfg.seriesWrites[hour].y : 0;
         const totalOpsPerSec = readOpsPerSec + writeOpsPerSec;
-        const totalRequiredOpsSec = readOpsPerSec * readFactor + writeOpsPerSec * writeFactor;
 
-        // For each node option, calculate requiredVCPUs using the correct opsPerVCPU for the family
+        // For each node option, calculate requiredVCPU using the correct opsPerVCPU for the family
         const nodeOptions = Object.entries(cfg.scyllaPrice).map(([type, spec]) => {
             const family = type.split('.')[0];
             const opsPerVCPU = cfg.scyllaOpsPerVCPU[family] || 15_000;
 
-            const requiredVCPUs = Math.ceil(totalRequiredOpsSec / opsPerVCPU);
-            const nodesForVCPU = Math.ceil(requiredVCPUs / spec.cpuCount);
+            const requiredVCPU = Math.ceil(totalOpsPerSec / opsPerVCPU);
+            const requiredNodesPerZone = Math.ceil(requiredVCPU / spec.cpuCount); // per zone
 
             const usableStoragePerNodeGB = spec.totalStorage * cfg._costs.storage.ratioUtilization;
             const nodesForStorage = Math.ceil(cfg._costs.storage.sizeReplicatedGB / usableStoragePerNodeGB);
 
-            let nodes = Math.max(nodesForVCPU, nodesForStorage);
+            let nodes = Math.max(requiredNodesPerZone, nodesForStorage) * cfg.replication; // per cluster
+
             if (nodes % cfg.replication !== 0) {
                 nodes = nodes + (cfg.replication - (nodes % cfg.replication));
             }
             const cost = nodes * spec.price * (cfg.regions || 1); // per hour
-            const totalAvailOpsSec = nodes * spec.cpuCount * opsPerVCPU;
+            const availOpsPerSec = requiredNodesPerZone * spec.cpuCount * opsPerVCPU;
 
-            return {family, type, nodes, cost, requiredVCPUs, opsPerVCPU, totalAvailOpsSec};
+            return {family, type, nodes, cost, requiredVCPU, opsPerVCPU, availOpsPerSec};
         });
 
         const best = getBestNodeConfig(nodeOptions);
@@ -139,9 +135,8 @@ export function calculateScyllaDBCosts() {
             writes: writeOpsPerSec.toFixed(0),
             opsPerVCPU: best.opsPerVCPU,
             totalOpsPerSec: totalOpsPerSec.toFixed(0),
-            totalRequiredOpsSec: totalRequiredOpsSec.toFixed(0),
-            totalAvailOpsSec: best.totalAvailOpsSec.toFixed(0),
-            requiredVCPUs: best.requiredVCPUs,
+            availOpsPerSec: best.availOpsPerSec.toFixed(0),
+            requiredVCPU: best.requiredVCPU,
             availableVCPUs: best.nodes * cfg.scyllaPrice[best.type].vcpu,
             availableStorageGB: (best.nodes * cfg.scyllaPrice[best.type].totalStorage).toFixed(2),
         });
@@ -220,10 +215,10 @@ function explainCosts() {
     const minCluster = autoscale[minOpsIdx] || {};
     const maxCluster = autoscale[maxOpsIdx] || {};
 
-    const minOpsUsed = minCluster.totalOpsPerSec ? minCluster.totalRequiredOpsSec : 0;
-    const maxOpsUsed = maxCluster.totalOpsPerSec ? maxCluster.totalRequiredOpsSec : 0;
-    const minOpsAvail = minCluster.totalAvailOpsSec ? minCluster.totalAvailOpsSec : 0;
-    const maxOpsAvail = maxCluster.totalAvailOpsSec ? maxCluster.totalAvailOpsSec : 0;
+    const minOpsUsed = minCluster.totalOpsPerSec ? minCluster.totalOpsPerSec : 0;
+    const maxOpsUsed = maxCluster.totalOpsPerSec ? maxCluster.totalOpsPerSec : 0;
+    const minOpsAvail = minCluster.availOpsPerSec ? minCluster.availOpsPerSec : 0;
+    const maxOpsAvail = maxCluster.availOpsPerSec ? maxCluster.availOpsPerSec : 0;
 
     const minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes`;
     const maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes`;
