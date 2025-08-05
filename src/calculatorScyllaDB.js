@@ -128,6 +128,9 @@ export function calculateScyllaDBCosts() {
                 cost,
                 requiredVCPU,
                 opsPerVCPU,
+                readOpsPerSec,
+                writeOpsPerSec,
+                totalOpsPerSec,
                 availOpsPerSec,
                 availStorageGB
             };
@@ -144,6 +147,8 @@ export function calculateScyllaDBCosts() {
             reads: readOpsPerSec.toFixed(0),
             writes: writeOpsPerSec.toFixed(0),
             opsPerVCPU: best.opsPerVCPU,
+            readOpsPerSec: best.readOpsPerSec.toFixed(0),
+            writeOpsPerSec: best.writeOpsPerSec.toFixed(0),
             totalOpsPerSec: totalOpsPerSec.toFixed(0),
             availOpsPerSec: best.availOpsPerSec.toFixed(0),
             requiredVCPU: best.requiredVCPU,
@@ -227,6 +232,10 @@ function explainCosts() {
 
     const minOpsUsed = minCluster.totalOpsPerSec ? minCluster.totalOpsPerSec : 0;
     const maxOpsUsed = maxCluster.totalOpsPerSec ? maxCluster.totalOpsPerSec : 0;
+    const minReadsOpsSec = minCluster.readOpsPerSec ? minCluster.readOpsPerSec : 0;
+    const maxReadsOpsSec = maxCluster.readOpsPerSec ? maxCluster.readOpsPerSec : 0;
+    const minWritesOpsSec = minCluster.writeOpsPerSec ? minCluster.writeOpsPerSec : 0;
+    const maxWritesOpsSec = maxCluster.writeOpsPerSec ? maxCluster.writeOpsPerSec : 0;
     const minOpsAvail = minCluster.availOpsPerSec ? minCluster.availOpsPerSec : 0;
     const maxOpsAvail = maxCluster.availOpsPerSec ? maxCluster.availOpsPerSec : 0;
     const minVCPU = minCluster.requiredVCPU || 0;
@@ -237,19 +246,21 @@ function explainCosts() {
     let maxClusterStr = '';
     const instanceType = maxCluster.type || '';
     if (instanceType.startsWith('i7ie')) {
-        minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes (compute optimized)`;
-        maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes (compute optimized)`;
+        minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes across ${cfg.replication} zones (compute bound)`;
+        maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes across ${cfg.replication} zones (compute bound)`;
     } else if (instanceType.startsWith('i3en')) {
-        minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes (storage optimized)`;
-        maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes (storage optimized)`;
+        minClusterStr = `Smallest Cluster: ${minCluster.nodes || 0} × ${minCluster.type || 0} nodes across ${cfg.replication} zones (storage bound)`;
+        maxClusterStr = `Largest Cluster: ${maxCluster.nodes || 0} × ${maxCluster.type || 0} nodes across ${cfg.replication} zones (storage bound)`;
     }
 
     explanations.push(minClusterStr);
-    explanations.push(`: ${formatNumber(minOpsUsed)} ops/sec requested (up to ${formatNumber(minOpsAvail)} ops/sec available)`);
-    explanations.push(`: ${minVCPU} vCPU per zone required`)
+    explanations.push(`: A total of ${formatNumber(minOpsUsed)} ops/sec requested (${formatNumber(minReadsOpsSec)} reads/sec, ${formatNumber(minWritesOpsSec)} writes/sec)`);
+    explanations.push(`: ${minVCPU} vCPU per zone required`);
+    explanations.push(`: up to ${formatNumber(minOpsAvail)} ops/sec available`);
     explanations.push(maxClusterStr);
-    explanations.push(`: ${formatNumber(maxOpsUsed)} ops/sec requested (up to ${formatNumber(maxOpsAvail)} ops/sec available)`);
-    explanations.push(`: ${maxVCPU} vCPU per zone required`)
+    explanations.push(`: A total of ${formatNumber(maxOpsUsed)} ops/sec requested (${formatNumber(maxReadsOpsSec)} reads/sec, ${formatNumber(maxWritesOpsSec)} writes/sec)`);
+    explanations.push(`: ${maxVCPU} vCPU per zone required`);
+    explanations.push(`: up to ${formatNumber(maxOpsAvail)} ops/sec available`);
 
     const sizeUncompressed = formatBytes(cfg._costs.storage.sizeUncompressed * (1024 ** 3), 1);
     const sizeCompressedGB = formatBytes(cfg._costs.storage.sizeCompressedGB * (1024 ** 3), 1);
