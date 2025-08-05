@@ -251,14 +251,15 @@ function explainCosts() {
     explanations.push(`: ${formatNumber(maxOpsUsed)} ops/sec requested (up to ${formatNumber(maxOpsAvail)} ops/sec available)`);
     explanations.push(`: ${maxVCPU} vCPU per zone required`)
 
-    const sizeUncompressed = formatBytes(cfg._costs.storage.sizeUncompressed * (1024 ** 3), 0);
-    const sizeCompressedGB = formatBytes(cfg._costs.storage.sizeCompressedGB * (1024 ** 3), 0);
+    const sizeUncompressed = formatBytes(cfg._costs.storage.sizeUncompressed * (1024 ** 3), 1);
+    const sizeCompressedGB = formatBytes(cfg._costs.storage.sizeCompressedGB * (1024 ** 3), 1);
     const sizeReplicatedGB = formatBytes(cfg._costs.storage.sizeReplicatedGB * (1024 ** 3), 1);
-    const storageAvailable = formatBytes(minStorageGB * (1024 ** 3), 0);
-    explanations.push(`Storage Capacity: ${sizeUncompressed} storage requested `);
-    explanations.push(`: ${sizeCompressedGB} compressed storage required (up to ${storageAvailable} available)`);
-    explanations.push(`: ${sizeReplicatedGB} compressed storage replicated`);
-    explanations.push(`: ${cfg.storageUtilization}% max utilization (${Number(cfg._costs.storage.sizeCompressedGB / minStorageGB * 100).toFixed(0)}% utilized)`);
+    const storageAvailable = formatBytes(minStorageGB * (1024 ** 3), 1);
+    explanations.push(`Storage Capacity: ${sizeUncompressed} raw storage requested`);
+    explanations.push(`: ${sizeCompressedGB} compressed, unreplicated storage expected`);
+    explanations.push(`: ${sizeReplicatedGB} compressed, replicated storage required`);
+    explanations.push(`: ${storageAvailable} hardware volume available`);
+    explanations.push(`: ${cfg.storageUtilization}% max utilization, ${Number(cfg._costs.storage.sizeCompressedGB / minStorageGB * 100).toFixed(0)}% current utilization`);
 
     updateExplainedCosts(explanations);
 }
