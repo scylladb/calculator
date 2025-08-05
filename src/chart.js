@@ -293,9 +293,12 @@ export const chart = new Chart(ctx, {
                         }
                         let costLine = '';
                         if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
-                            const cost = cfg._costs.autoscale[hour].cost;
-                            if (cost !== undefined) {
-                                costLine = `Cost: $${cost}/hr`;
+                            const baseCostHourly = cfg._costs.autoscale[hour].cost;
+                            const discount = cfg.scyllaDiscountTiers[cfg.pricing];
+                            const reserved = cfg.scyllaReserved / 100.0;
+                            const costHourly = (baseCostHourly * (1 - reserved)) + (baseCostHourly * reserved * (1 - discount));
+                            if (costHourly !== undefined) {
+                                costLine = `Cost: $${costHourly.toFixed(2)}/hr`;
                             }
                         }
                         return costLine ? [costLine] : [];
