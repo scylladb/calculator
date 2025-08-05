@@ -158,6 +158,15 @@ export function updateSeries() {
         chart.data.datasets[5].data = [];
     }
 
+    if (cfg.pricing === 'subscription' && cfg.scyllaReserved > 0) {
+        const peakReads = Math.max(...cfg.seriesReads.map(p => p.y));
+        const peakWrites = Math.max(...cfg.seriesWrites.map(p => p.y));
+        const maxOpsPerSec = Math.max(peakReads, peakWrites);
+        chart.data.datasets[6].data = Array(24).fill(cfg.scyllaReserved / 100.0 * maxOpsPerSec) || Array(24).fill(null);
+    } else {
+        chart.data.datasets[6].data = [];
+    }
+
     const allData = chart.data.datasets.flatMap(ds => ds.data);
     const maxY = Math.max(...allData.map(p => (typeof p === 'object' && p !== null ? p.y : p)));
 
@@ -239,6 +248,20 @@ export const chart = new Chart(ctx, {
             label: 'Reserved WCU',
             data: Array(24).fill(null),
             borderColor: 'rgba(255,85,0,0.80)',
+            borderWidth: 2,
+            borderDash: [3, 3],
+            fill: false,
+            pointRadius: 0,
+            pointHitRadius: 0,
+            tension: 0,
+            cubicInterpolationMode: 'monotone',
+            hidden: false,
+            showLine: true,
+            showInLegend: true
+        }, {
+            label: 'Pro Subscription',
+            data: Array(24).fill(null),
+            borderColor: 'rgb(35,145,234)',
             borderWidth: 2,
             borderDash: [3, 3],
             fill: false,

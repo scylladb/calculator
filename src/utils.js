@@ -344,6 +344,7 @@ export function toggleService() {
     const isScylla = cfg.service === 'scylladb';
     if (isScylla) {
         params.delete('service');
+        params.set('pricing', 'demand');
     } else {
         params.set('service', 'scylladb');
     }
