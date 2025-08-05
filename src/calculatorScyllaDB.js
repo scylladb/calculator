@@ -292,7 +292,7 @@ export function updateScyllaDBCosts() {
     calculateScyllaDBNetworkCosts();
 
     const discount = cfg.scyllaDiscountTiers[cfg.pricing];
-    const reserved = cfg.scyllaReserved / 100.0;
+    const reserved = cfg.pricing === 'subscription' ? cfg.scyllaReserved / 100.0 : 1;
     const baseCostMonthly = cfg._costs.base.monthly;
     const networkCostMonthly = cfg._costs.network.monthly || 0;
 
