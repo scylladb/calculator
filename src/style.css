@@ -2000,7 +2000,7 @@ small, .small {
 }
 
 .range-mini > input[type="range"]:active + span {
-    color: var(--secondary-light);
+    color: var(--secondary);
 }
 
 .value {
