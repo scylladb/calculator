@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {formatNumber, updateAll} from "./utils.js";
+import {formatBytes, formatNumber, updateAll} from "./utils.js";
 
 const ctx = document.getElementById('chart').getContext('2d');
 
@@ -18,7 +18,7 @@ function generateData(baseline, peak, peakDuration) {
         } else {
             value = baseline;
         }
-        data.push({ x: hour, y: value });
+        data.push({x: hour, y: value});
     }
 
     return data;
@@ -30,11 +30,11 @@ export function decodeSeriesData() {
 
     cfg.seriesReads = cfg.seriesReadsEncoded
         .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        .map((val, i) => ({x: i, y: parseInt(val, 10) * 1000}));
 
     cfg.seriesWrites = cfg.seriesWritesEncoded
         .split('.')
-        .map((val, i) => ({ x: i, y: parseInt(val, 10) * 1000 }));
+        .map((val, i) => ({x: i, y: parseInt(val, 10) * 1000}));
 }
 
 export function encodeSeriesData() {
@@ -90,7 +90,14 @@ export function updateSeries() {
                 value = Math.max(0, base * 4 - Math.max(0, (12 - Math.abs(i - 12)) * (base / 2)));
                 break;
             case "chaos":
-                value = base * (0.5 + Math.random() * 5);
+                let seed = (new Date()).getDate();
+                // Simple LCG for repeatable pseudo-random numbers
+                const seededRandom = () => {
+                    seed = (seed * 42 + 42) % 424242;
+                    return seed / 4242424;
+                };
+                const chaosSeries = Array.from({length: 24}, () => base * (0.5 + seededRandom() * 5));
+                value = chaosSeries[i];
                 break;
             case "custom":
                 break;
@@ -151,6 +158,15 @@ export function updateSeries() {
         chart.data.datasets[5].data = [];
     }
 
+    if (cfg.pricing === 'subscription' && cfg.scyllaReserved > 0) {
+        const peakReads = Math.max(...cfg.seriesReads.map(p => p.y));
+        const peakWrites = Math.max(...cfg.seriesWrites.map(p => p.y));
+        const maxOpsPerSec = Math.max(peakReads, peakWrites);
+        chart.data.datasets[6].data = Array(24).fill(cfg.scyllaReserved / 100.0 * maxOpsPerSec) || Array(24).fill(null);
+    } else {
+        chart.data.datasets[6].data = [];
+    }
+
     const allData = chart.data.datasets.flatMap(ds => ds.data);
     const maxY = Math.max(...allData.map(p => (typeof p === 'object' && p !== null ? p.y : p)));
 
@@ -166,7 +182,7 @@ export const chart = new Chart(ctx, {
             label: 'Reads',
             data: Array(24).fill(null),
             borderColor: '#326DE6',
-            borderWidth: 3,
+            borderWidth: 2,
             backgroundColor: bluePattern,
             fill: true,
             tension: 0.5,
@@ -242,6 +258,20 @@ export const chart = new Chart(ctx, {
             hidden: false,
             showLine: true,
             showInLegend: true
+        }, {
+            label: 'Pro Subscription',
+            data: Array(24).fill(null),
+            borderColor: 'rgb(35,145,234)',
+            borderWidth: 2,
+            borderDash: [3, 3],
+            fill: false,
+            pointRadius: 0,
+            pointHitRadius: 0,
+            tension: 0,
+            cubicInterpolationMode: 'monotone',
+            hidden: false,
+            showLine: true,
+            showInLegend: true
         }]
     }, options: {
         plugins: {
@@ -249,7 +279,7 @@ export const chart = new Chart(ctx, {
                 display: true,
                 position: 'bottom',
                 labels: {
-                    filter: function(item, chart) {
+                    filter: function (item, chart) {
                         // Only show legend for series 0 and 1
                         return item.datasetIndex === 0 || item.datasetIndex === 1;
                     }
@@ -262,8 +292,40 @@ export const chart = new Chart(ctx, {
                 display: true,
                 callbacks: {
                     label: function (context) {
-                        return context.dataset.label +  ': ' + formatNumber(context.raw.y) + ' ops/sec';
-                    }
+                        return context.dataset.label + ': ' + formatNumber(context.raw.y) + ' ops/sec';
+                    },
+                    afterBody: function (context) {
+                        let hour = null;
+                        if (context.length > 0) {
+                            hour = context[0].dataIndex;
+                        }
+                        if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
+                            const recommended = cfg._costs.autoscale[hour];
+                            const lines = [' '];
+                            lines.push(`◦ ${recommended.nodes} × ${recommended.type} nodes`);
+                            lines.push(`◦ ${formatNumber(recommended.totalOpsPerSec)} of ${formatNumber(recommended.availOpsPerSec)} ops/sec available`);
+                            lines.push(`◦ ${formatBytes(cfg._costs.storage.sizeCompressedGB * (1024 ** 3))} of ${formatBytes(recommended.availStorageGB * (1024 ** 3))} available`);
+                            return lines;
+                        }
+                        return [];
+                    },
+                    footer: (context) => {
+                        let hour = null;
+                        if (context.length > 0) {
+                            hour = context[0].dataIndex;
+                        }
+                        let costLine = '';
+                        if (hour !== null && cfg._costs && cfg._costs.autoscale && cfg._costs.autoscale[hour]) {
+                            const baseCostHourly = cfg._costs.autoscale[hour].cost;
+                            const discount = cfg.scyllaDiscountTiers[cfg.pricing];
+                            const reserved = cfg.scyllaReserved / 100.0;
+                            const costHourly = (baseCostHourly * (1 - reserved)) + (baseCostHourly * reserved * (1 - discount));
+                            if (costHourly !== undefined) {
+                                costLine = `Cost: $${costHourly.toFixed(2)}/hr`;
+                            }
+                        }
+                        return costLine ? [costLine] : [];
+                    },
                 },
             },
             dragData: {

@@ -9,6 +9,7 @@ export const cfg = {
     pricing: 'demand',
 
     // Model
+    service: 'dynamodb',
     workload: 'baselinePeak',
     baselineReads: 100000,
     baselineWrites: 200000,
@@ -16,17 +17,23 @@ export const cfg = {
     peakWrites: 500000,
     peakDurationReads: 2,
     peakDurationWrites: 4,
-    totalReads: 0,
-    totalWrites: 0,
+    totalReads: 0, // per day
+    totalWrites: 0, // per day
     totalReservedRCU: 0,
     totalReservedWCU: 0,
     hoursPerMonth: 730,
+    daysPerMonth: 365 / 12,
     itemSizeB: 1024,
+    itemSizeKB: 1,
     storageGB: 512,
     itemRCU: 1,
     itemWCU: 1,
     tableClass: 'standard',
     readConst: 100,
+    replication: 3,
+    storageCompression: 50,
+    storageUtilization: 90,
+    networkCompression: 50,
 
     // Demand
     pricePerRRU: 0.000000125,
@@ -44,7 +51,7 @@ export const cfg = {
     reserved: 0,
     reservedReads: 0,
     reservedWrites: 0,
-    overprovisioned: 0,
+    overprovisioned: 20,
 
     // Reserved
     pricePerReservedRCUUpfront: 0.30,
@@ -54,7 +61,8 @@ export const cfg = {
     regions: 1,
 
     // Data Transfer
-    priceIntraRegPerGB: 0.02,
+    networkRegionPerGB: 0.02,
+    networkZonePerGB: 0.01,
 
     // DAX Node Costs
     cacheSizeGB: 0,
@@ -72,6 +80,25 @@ export const cfg = {
         {instance: "dax.r5.24xlarge", memory: 768, nps: 1000000, price: 12.24000000},
     ],
 
-    // Other
-    override: false
+    daxOverride: false,
+
+    scyllaNodes: 3,
+    scyllaNodesMax: 6, // Maximum number of ScyllaDB nodes preferred for a cluster
+    scyllaInstanceClass: 'i7ie.large',
+    scyllaOverride: false,
+
+    // ScyllaDB Constants
+    scyllaPrice: {},
+
+    scyllaOpsPerVCPU: {
+        i3en: 10000,
+        i7ie: 15000
+    },
+
+    scyllaDiscountTiers: {
+        demand: 0.0,
+        flex: 0.12,
+        subscription: 0.28,
+    },
+    scyllaReserved: 100,
 };

@@ -1,6 +1,7 @@
 import {cfg} from './config.js';
-import {updateCosts} from "./calculator.js";
+import {updateCosts} from "./calculatorDynamoDB.js";
 import {updateSeries} from "./chart.js";
+import {updateScyllaDBCosts} from "./calculatorScyllaDB.js";
 
 // Format a number with suffixes (K, M, B)
 export function formatNumber(num) {
@@ -13,11 +14,11 @@ export function formatNumber(num) {
 }
 
 // Format bytes with appropriate units
-export function formatBytes(bytes) {
+export function formatBytes(bytes, decimals = 2) {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
     if (bytes === 0) return '0 B';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+    return (bytes / Math.pow(1024, i)).toFixed(decimals) + ' ' + sizes[i];
 }
 
 // Helper to parse and assign a param if present
@@ -37,6 +38,7 @@ function assignParam(param, parser = v => v) {
 export function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
 
+    assignParam('service');
     assignParam('workload');
     assignParam('baselineReads', parseInt);
     assignParam('baselineWrites', parseInt);
@@ -57,10 +59,16 @@ export function getQueryParams() {
     assignParam('reservedWrites', parseInt);
     assignParam('overprovisioned', parseInt);
     assignParam('readConst', parseInt);
+    assignParam('replication', parseInt);
+    assignParam('storageCompression', parseInt);
+    assignParam('storageUtilization', parseInt);
+    assignParam('networkCompression', parseInt);
+    assignParam('scyllaReserved', parseInt);
 
-    if (cfg.pricing === 'provisioned' || cfg.pricing === 'demand') {
-        const radio = document.querySelector(`input[name="pricing"][value="${cfg.pricing}"]`);
-        if (radio) radio.checked = true;
+    const pricing = (cfg.pricing === 'provisioned' && cfg.service === 'scylladb') ? 'demand' : cfg.pricing;
+    const radio = document.querySelector(`input[name="pricing"][value="${pricing}"]`);
+    if (radio) {
+        radio.checked = true;
     }
 
     if (cfg.reserved > 0) {
@@ -73,10 +81,14 @@ export function getQueryParams() {
         cfg.seriesWritesEncoded = params.get('seriesWrites') || '';
     }
 
-    if(params.get('daxNodes')) {
+    if (params.get('daxOverride') === 'true') {
         cfg.daxNodes = parseInt(params.get('daxNodes'));
         cfg.daxInstanceClass = params.get('daxInstanceClass');
-        cfg.override = true;
+    }
+
+    if (params.get('scyllaOverride') === 'true') {
+        cfg.scyllaNodes = parseInt(params.get('scyllaNodes'));
+        cfg.scyllaInstanceClass = params.get('scyllaInstanceClass');
     }
 
     if (params.get('standalone') === 'false') {
@@ -87,10 +99,10 @@ export function getQueryParams() {
         updateAll();
         const jsonResponse = JSON.stringify(cfg, null, 2);
         const response = new Response(jsonResponse, {
-            headers: { 'Content-Type': 'application/json' }
+            headers: {'Content-Type': 'application/json'}
         });
         response.text().then(text => {
-            const blob = new Blob([text], { type: 'application/json' });
+            const blob = new Blob([text], {type: 'application/json'});
             window.location.href = URL.createObjectURL(blob);
         });
     }
@@ -107,11 +119,14 @@ export function updateQueryParams() {
         const setOrDelete = (key, value, defaultValue = undefined) => {
             if (defaultValue !== undefined && value === defaultValue) {
                 params.delete(key);
+            } else if (value === false) {
+                params.delete(key);
             } else {
                 params.set(key, value.toString());
             }
         };
 
+        setOrDelete('service', cfg.service);
         setOrDelete('pricing', cfg.pricing);
         setOrDelete('storageGB', cfg.storageGB);
         setOrDelete('itemSizeB', cfg.itemSizeB);
@@ -131,6 +146,13 @@ export function updateQueryParams() {
         setOrDelete('seriesReads', cfg.seriesReadsEncoded);
         setOrDelete('seriesWrites', cfg.seriesWritesEncoded);
         setOrDelete('workload', cfg.workload);
+        setOrDelete('replication', cfg.replication);
+        setOrDelete('daxOverride', cfg.daxOverride);
+        setOrDelete('scyllaReserved', cfg.scyllaReserved);
+        setOrDelete('scyllaOverride', cfg.scyllaOverride);
+        setOrDelete('storageCompression', cfg.storageCompression);
+        setOrDelete('storageUtilization', cfg.storageUtilization);
+        setOrDelete('networkCompression', cfg.networkCompression);
 
         if (cfg.cacheSizeGB === 0) {
             params.delete('cacheSizeGB');
@@ -140,12 +162,20 @@ export function updateQueryParams() {
             setOrDelete('cacheRatio', cfg.cacheRatio);
         }
 
-        if (cfg.daxNodes === 0) {
-            params.delete('daxNodes');
-            params.delete('daxInstanceClass');
-        } else {
+        if (cfg.daxOverride) {
             setOrDelete('daxNodes', cfg.daxNodes);
             setOrDelete('daxInstanceClass', cfg.daxInstanceClass);
+        } else {
+            params.delete('daxNodes');
+            params.delete('daxInstanceClass');
+        }
+
+        if (cfg.scyllaOverride) {
+            setOrDelete('scyllaNodes', cfg.scyllaNodes);
+            setOrDelete('scyllaInstanceClass', cfg.scyllaInstanceClass);
+        } else {
+            params.delete('scyllaNodes');
+            params.delete('scyllaInstanceClass');
         }
 
         if (cfg.regions === 1) {
@@ -192,18 +222,33 @@ export function toggleProvisionedParams() {
     }
 }
 
+// Toggle between subscription and demand params
+export function toggleSubscriptionParams() {
+    const subscriptionParams = document.getElementById('subscriptionParams');
+    if (cfg.pricing === 'subscription') {
+        subscriptionParams.style.display = 'block';
+    } else {
+        subscriptionParams.style.display = 'none';
+    }
+}
+
 // Update all UI and calculations
 export function updateAll() {
+    toggleServiceParams()
     toggleProvisionedParams();
+    toggleSubscriptionParams();
     toggleOpsParams();
     updateSeries(); // we have to update series before costs
-    updateCosts();
+    if (cfg.service === 'dynamodb') {
+        updateCosts();
+    } else if (cfg.service === 'scylladb') {
+        updateScyllaDBCosts();
+    }
     updateSeries(); // update series after costs to ensure correct values
     updateOpsDisplays();
     updateQueryParams();
 }
 
-// Update the displayed costs in the DOM
 export function updateDisplayedCosts(logs) {
     const costs = document.getElementById('costs');
     costs.innerHTML = logs.map(log => {
@@ -218,6 +263,19 @@ export function updateDisplayedCosts(logs) {
         <span class="dollar-sign">$</span>
         <span class="number">${value}</span>
       </span>
+    </div>
+  `;
+    }).join('');
+}
+
+export function updateExplainedCosts(explanation) {
+    const explainedCosts = document.getElementById('explainedCosts');
+    explainedCosts.innerHTML = explanation.map(explanation => {
+        const [key, value] = explanation.split(': ');
+        return `
+    <div class="explain-entry">
+      <span class="explain-key">${key}</span>
+      <span class="explain-value">${value}</span>
     </div>
   `;
     }).join('');
@@ -272,3 +330,23 @@ copyLinkButton.addEventListener('click', () => {
             resultPara.textContent = 'Failed to copy: ' + err.message;
         });
 });
+
+export function toggleServiceParams() {
+    assignParam('service');
+    const isScylla = cfg.service === 'scylladb';
+    document.querySelectorAll('.dynamodb').forEach(el => el.style.display = isScylla ? 'none' : '');
+    document.querySelectorAll('.scylladb').forEach(el => el.style.display = isScylla ? '' : 'none');
+    document.getElementById('mainTitle').textContent = isScylla ? 'ScyllaDB Cost Calculator' : 'DynamoDB Cost Calculator';
+}
+
+export function toggleService() {
+    const params = new URLSearchParams(window.location.search);
+    const isScylla = cfg.service === 'scylladb';
+    if (isScylla) {
+        params.delete('service');
+        params.set('pricing', 'demand');
+    } else {
+        params.set('service', 'scylladb');
+    }
+    window.location.search = params.toString();
+}

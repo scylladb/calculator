@@ -1,78 +1,19 @@
 import {cfg} from './config.js';
-import {updateAll, updateDisplayedCosts} from "./utils.js";
+import {updateDisplayedCosts} from "./utils.js";
+import {
+    getDAX,
+    getHours,
+    getItemSize,
+    getOverprovisioned,
+    getPricing,
+    getReadConsistency,
+    getRegions,
+    getReserved,
+    getStorage,
+    getTableClass,
+    getTotalOpsPerDay
+} from "./calculatorCommon.js";
 
-function getPricing() {
-    cfg.pricing = document.querySelector('input[name="pricing"]:checked').value;
-}
-
-function getTableClass() {
-    cfg.tableClass = document.getElementById('tableClass').value;
-}
-
-function getReplicatedRegions() {
-    cfg.regions = parseInt(document.getElementById('regions').value);
-}
-
-function getDaxValues() {
-    cfg.daxInstanceClass = document.getElementById('daxInstanceClass').value;
-    cfg.cacheHitPercentage =  cfg.cacheRatio / 100;
-    cfg.cacheMissPercentage =  1 - cfg.cacheRatio / 100;
-}
-
-function getStorageValues() {
-    cfg.storageGB = parseInt(document.getElementById('storageGB').value);
-    cfg.itemSizeKB = parseInt(document.getElementById('itemSizeB').value) * (1 / 1024);
-    cfg.itemSizeKB = cfg.itemSizeKB > 1 ? Math.round(cfg.itemSizeKB) : cfg.itemSizeKB;
-    cfg.itemRRU = Math.ceil(cfg.itemSizeKB / 4.0);
-    cfg.itemWRU = Math.ceil(cfg.itemSizeKB);
-    cfg.itemRCU = Math.ceil(cfg.itemSizeKB / 4.0);
-    cfg.itemWCU = Math.ceil(cfg.itemSizeKB);
-}
-
-function getConsistencyValues() {
-    cfg.readConst = parseInt(document.getElementById('readConst').value);
-    cfg.readStronglyConsistent = cfg.readConst / 100;
-    cfg.readEventuallyConsistent = 1 - cfg.readStronglyConsistent;
-    cfg.readTransactional = 0;
-    cfg.readNonTransactional = 1 - cfg.readTransactional;
-    cfg.writeTransactional = 0;
-    cfg.writeNonTransactional = 1 - cfg.writeTransactional;
-}
-
-function getReservedValues() {
-    cfg.reservedReads = parseInt(document.getElementById('reservedReads').value);
-    cfg.reservedWrites = parseInt(document.getElementById('reservedWrites').value);
-}
-
-function getProvisionedValues() {
-    cfg.overprovisioned = parseInt(document.getElementById('overprovisioned').value);
-    cfg.overprovisionedPercentage = 1 + (cfg.overprovisioned / 100.0);
-}
-
-function getHoursValues() {
-    cfg.daysPerMonth = 365 / 12;
-    cfg.secondsPerDay = 24 * 60 * 60;
-    cfg.totalPeakHoursPerMonthReads = Number((cfg.peakDurationReads * cfg.daysPerMonth).toFixed(1));
-    cfg.totalPeakHoursPerMonthWrites = Number((cfg.peakDurationWrites * cfg.daysPerMonth).toFixed(1));
-    cfg.totalBaseHoursPerMonthReads = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthReads;
-    cfg.totalBaseHoursPerMonthWrites = cfg.hoursPerMonth - cfg.totalPeakHoursPerMonthWrites;
-    cfg.reservedReadsPercentage = parseInt(document.getElementById('reservedReads').value) / 100.0;
-    cfg.reservedWritesPercentage = parseInt(document.getElementById('reservedWrites').value) / 100.0;
-    cfg.unreservedReadsPercentage = 1 - cfg.reservedReadsPercentage;
-    cfg.unreservedWritesPercentage = 1 - cfg.reservedWritesPercentage;
-}
-
-function getTotalOps() {
-    cfg.totalReads = 0;
-    cfg.totalWrites = 0;
-
-    for (const point of cfg.seriesReads) {
-        cfg.totalReads += (point.y * 3600);
-    }
-    for (const point of cfg.seriesWrites) {
-        cfg.totalWrites += (point.y * 3600);
-    }
-}
 
 export function calculateProvisionedReads() {
     const costPerRCU = (cfg.tableClass === 'standard' ? cfg.pricePerRCU : cfg.pricePerRCU_IA);
@@ -252,8 +193,8 @@ export function calculateDemandCosts() {
 function calculateNetworkCosts() {
     cfg.totalReadsKB = cfg.totalReadOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
     cfg.totalWritesKB = cfg.totalWriteOpsSec * 3600 * cfg.hoursPerMonth * cfg.itemSizeKB;
-    cfg.totalReplicatedWritesGB =((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
-    cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.priceIntraRegPerGB;
+    cfg.totalReplicatedWritesGB = ((cfg.regions - 1) * cfg.totalWritesKB) / 1024 / 1024;
+    cfg.costNetwork = cfg.totalReplicatedWritesGB * cfg.networkRegionPerGB;
 }
 
 function findBestDaxCombination(targetRPS) {
@@ -283,7 +224,7 @@ function findBestDaxCombination(targetRPS) {
 }
 
 function calculateDaxCosts() {
-    if(cfg.override) {
+    if (cfg.daxOverride) {
         cfg.daxInstanceClassCost = cfg.daxInstanceClassCosts.find(instance => instance.instance === cfg.daxInstanceClass).price * cfg.daxNodes;
         cfg.dynamoDaxCost = cfg.hoursPerMonth * cfg.daxInstanceClassCost;
         return;
@@ -386,15 +327,17 @@ function logCosts() {
 
 export function updateCosts() {
     getPricing();
+    getRegions()
     getTableClass();
-    getReplicatedRegions()
-    getStorageValues();
-    getConsistencyValues();
-    getHoursValues();
-    getReservedValues();
-    getProvisionedValues()
-    getDaxValues();
-    getTotalOps();
+    getStorage();
+    getItemSize();
+    getReadConsistency();
+
+    getHours();
+    getReserved();
+    getOverprovisioned()
+    getDAX();
+    getTotalOpsPerDay();
 
     calculateProvisionedCosts();
     calculateDemandCosts();

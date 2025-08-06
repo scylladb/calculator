@@ -1,5 +1,5 @@
 import {cfg} from './config.js';
-import {formatBytes, formatNumber, getQueryParams, updateAll} from "./utils.js";
+import {formatBytes, formatNumber, getQueryParams, toggleService, updateAll} from "./utils.js";
 import {chart, encodeSeriesData} from "./chart.js";
 
 export function setupSliderInteraction(displayId, inputId, sliderId, formatFunction) {
@@ -7,35 +7,32 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     const input = document.getElementById(inputId);
     const slider = document.getElementById(sliderId);
 
-    // Set override when the slider is manually changed by hand
-    slider.addEventListener('mousedown', function () {
-        cfg.override = true;
-    });
+    if (input != null) {
+        input.addEventListener('mouseover', function () {
+            input.value = parseInt(slider.value.toString());
+        });
 
-    input.addEventListener('mouseover', function () {
-        input.value = parseInt(slider.value.toString());
-    });
+        input.addEventListener('blur', function () {
+            const newValue = parseInt(input.value.toString());
+            if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
+                slider.value = newValue;
+                display.innerText = formatFunction(newValue);
+                updateAll();
+            }
+        });
 
-    input.addEventListener('blur', function () {
-        const newValue = parseInt(input.value.toString());
-        if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
-            slider.value = newValue;
-            display.innerText = formatFunction(newValue);
-            updateAll();
-        }
-    });
+        input.addEventListener('keydown', function () {
+            if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
+                display.innerText = formatFunction(parseInt(this.value));
+                setTimeout(() => {
+                    slider.dispatchEvent(new Event('input', {bubbles: true}));
+                }, 0);
+                input.blur();
+                updateAll();
+            }
+        });
+    }
 
-    input.addEventListener('keydown', function () {
-        if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            display.innerText = formatFunction(parseInt(this.value));
-            setTimeout(() => {
-                slider.dispatchEvent(new Event('input', { bubbles: true }));
-            }, 0);
-            input.blur();
-            cfg.override = true;
-            updateAll();
-        }
-    });
 
     slider.addEventListener('input', function () {
         display.innerText = formatFunction(parseInt(this.value));
@@ -43,18 +40,13 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     });
 }
 
-document.querySelector('input[name="pricing"][value="demand"]').addEventListener('change', (event) => {
-    if (event.target.checked) {
-        cfg.pricing = 'demand';
-        updateAll();
-    }
-});
-
-document.querySelector('input[name="pricing"][value="provisioned"]').addEventListener('change', (event) => {
-    if (event.target.checked) {
-        cfg.pricing = 'provisioned';
-        updateAll();
-    }
+['demand', 'provisioned', 'flex', 'subscription'].forEach(type => {
+    document.querySelector(`input[name="pricing"][value="${type}"]`).addEventListener('change', (event) => {
+        if (event.target.checked) {
+            cfg.pricing = type;
+            updateAll();
+        }
+    });
 });
 
 document.getElementById("workload").addEventListener('change', (event) => {
@@ -139,7 +131,22 @@ document.getElementById('totalReads').addEventListener('input', (event) => {
     document.getElementById('workload').value = cfg.workload;
     if (!isNaN(newTotal) && cfg.seriesReads.length > 0) {
         const currentTotal = cfg.seriesReads.reduce((sum, point) => sum + point.y, 0);
-        if (currentTotal === 0) return;
+
+        if (currentTotal === 0) {
+            // If currentTotal is 0 but newTotal is > 0, redraw the series
+            if (newTotal > 0) {
+                const pointsPerHour = newTotal / cfg.seriesReads.length;
+                cfg.seriesReads.forEach((point, index) => {
+                    point.y = pointsPerHour;
+                    chart.data.datasets[0].data[index] = point;
+                });
+                cfg.totalReads = newTotal;
+                encodeSeriesData();
+                document.getElementById('totalReadsDsp').innerText = formatNumber(cfg.totalReads);
+                updateAll();
+            }
+            return;
+        }
 
         const scaleFactor = newTotal / currentTotal;
         cfg.seriesReads.forEach((point, index) => {
@@ -162,7 +169,22 @@ document.getElementById('totalWrites').addEventListener('input', (event) => {
     document.getElementById('workload').value = cfg.workload;
     if (!isNaN(newTotal) && cfg.seriesWrites.length > 0) {
         const currentTotal = cfg.seriesWrites.reduce((sum, point) => sum + point.y, 0);
-        if (currentTotal === 0) return;
+
+        if (currentTotal === 0) {
+            // If currentTotal is 0 but newTotal is > 0, redraw the series
+            if (newTotal > 0) {
+                const pointsPerHour = newTotal / cfg.seriesWrites.length;
+                cfg.seriesWrites.forEach((point, index) => {
+                    point.y = pointsPerHour;
+                    chart.data.datasets[1].data[index] = point;
+                });
+                cfg.totalWrites = newTotal;
+                encodeSeriesData();
+                document.getElementById('totalWritesDsp').innerText = formatNumber(cfg.totalWrites);
+                updateAll();
+            }
+            return;
+        }
 
         const scaleFactor = newTotal / currentTotal;
         cfg.seriesWrites.forEach((point, index) => {
@@ -241,7 +263,6 @@ document.getElementById('cacheSize').addEventListener('input', (event) => {
     const cacheSizeGB = parseInt(event.target.value);
     document.getElementById('cacheSizeDsp').innerText = cacheSizeGB >= 1024 ? (cacheSizeGB / 1024).toFixed(2) + ' TB' : cacheSizeGB + ' GB';
     cfg.cacheSizeGB = cacheSizeGB;
-    cfg.override = false;
     updateAll();
 });
 
@@ -250,7 +271,6 @@ document.getElementById('cacheRatio').addEventListener('input', (event) => {
     const cacheMissRatio = 100 - cacheHitRatio;
     document.getElementById('cacheRatioDsp').innerText = `${cacheHitRatio}/${cacheMissRatio}`;
     cfg.cacheRatio = cacheHitRatio;
-    cfg.override = false;
     updateAll();
 });
 
@@ -262,6 +282,71 @@ document.getElementById('daxNodes').addEventListener('input', (event) => {
 
 document.getElementById('daxInstanceClass').addEventListener('change', (event) => {
     cfg.daxInstanceClass = event.target.value;
+    updateAll();
+});
+
+document.getElementById('daxOverride').addEventListener('change', (event) => {
+    cfg.daxOverride = event.target.checked;
+    document.getElementById('daxNodesInp').disabled = !cfg.daxOverride;
+    document.getElementById('daxNodes').disabled = !cfg.daxOverride;
+    document.getElementById('daxInstanceClass').disabled = !cfg.daxOverride;
+    updateAll();
+});
+
+document.getElementById('replication').addEventListener('change', (event) => {
+    cfg.replication = event.target.value;
+    updateAll();
+});
+
+document.getElementById('storageCompression').addEventListener('input', (event) => {
+    const storageCompression = parseInt(event.target.value);
+    document.getElementById('storageCompressionDsp').innerText = storageCompression;
+    cfg.storageCompression = storageCompression;
+    updateAll();
+});
+
+document.getElementById('storageUtilization').addEventListener('input', (event) => {
+    const storageUtilization = parseInt(event.target.value);
+    document.getElementById('storageUtilizationDsp').innerText = storageUtilization;
+    cfg.storageUtilization = storageUtilization;
+    updateAll();
+});
+
+document.getElementById('networkCompression').addEventListener('input', (event) => {
+    const networkCompression = parseInt(event.target.value);
+    document.getElementById('networkCompressionDsp').innerText = networkCompression;
+    cfg.networkCompression = networkCompression;
+    updateAll();
+});
+
+document.getElementById('scyllaReserved').addEventListener('input', (event) => {
+    cfg.scyllaReserved = parseInt(event.target.value);
+    document.getElementById('scyllaReservedDsp').innerText = `${formatNumber(cfg.scyllaReserved)}`;
+    updateAll();
+});
+
+
+document.getElementById('scyllaNodes').addEventListener('input', (event) => {
+    cfg.scyllaNodes = parseInt(event.target.value);
+    document.getElementById('scyllaNodesDsp').innerText = `${formatNumber(cfg.scyllaNodes)}`;
+    updateAll();
+});
+
+document.getElementById('scyllaInstanceClass').addEventListener('change', (event) => {
+    cfg.scyllaInstanceClass = event.target.value;
+    updateAll();
+});
+
+document.getElementById('scyllaOverride').addEventListener('change', (event) => {
+    cfg.scyllaOverride = event.target.checked;
+    if (cfg.scyllaOverride) {
+        document.getElementById('scyllaManualClusterConfiguration').style.display = 'block';
+    } else {
+        document.getElementById('scyllaManualClusterConfiguration').style.display = 'none';
+    }
+    document.getElementById('scyllaNodesInp').disabled = !cfg.scyllaOverride;
+    document.getElementById('scyllaNodes').disabled = !cfg.scyllaOverride;
+    document.getElementById('scyllaInstanceClass').disabled = !cfg.scyllaOverride;
     updateAll();
 });
 
@@ -280,6 +365,11 @@ setupSliderInteraction('itemSizeDsp', 'itemSizeInp', 'itemSizeB', value => value
 setupSliderInteraction('storageDsp', 'storageInp', 'storageGB', value => formatBytes(value * 1024 * 1024 * 1024));
 setupSliderInteraction('regionsDsp', 'regionsInp', 'regions', value => value);
 setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value);
+setupSliderInteraction('storageCompressionDsp', 'storageCompressionInp', 'storageCompression', value => value);
+setupSliderInteraction('storageUtilizationDsp', 'storageUtilizationInp', 'storageUtilization', value => value);
+setupSliderInteraction('networkCompressionDsp', 'networkCompressionInp', 'networkCompression', value => value);
+setupSliderInteraction('scyllaReservedDsp', null, 'scyllaReserved', value => `${value}% commitment`);
+setupSliderInteraction('scyllaNodesDsp', 'scyllaNodesInp', 'scyllaNodes', value => value);
 
 if (cfg.pricing === 'demand') {
     document.querySelector('input[name="pricing"][value="demand"]').checked = true;
@@ -287,6 +377,12 @@ if (cfg.pricing === 'demand') {
 } else if (cfg.pricing === 'provisioned') {
     document.querySelector('input[name="pricing"][value="provisioned"]').checked = true;
     document.getElementById('provisionedParams').style.display = 'block';
+} else if (cfg.pricing === 'flex') {
+    document.querySelector('input[name="pricing"][value="flex"]').checked = true;
+    document.getElementById('scyllaReserved').style.display = 'block';
+} else if (cfg.pricing === 'subscription') {
+    document.querySelector('input[name="pricing"][value="subscription"]').checked = true;
+    document.getElementById('scyllaReserved').style.display = 'block';
 }
 
 getQueryParams();
@@ -312,6 +408,14 @@ document.getElementById('overprovisioned').value = cfg.overprovisioned;
 document.getElementById('readConst').value = cfg.readConst;
 document.getElementById('daxNodes').value = cfg.daxNodes;
 document.getElementById('daxInstanceClass').value = cfg.daxInstanceClass;
+document.getElementById('replication').value = cfg.replication;
+document.getElementById('storageCompression').value = cfg.storageCompression;
+document.getElementById('storageUtilization').value = cfg.storageUtilization;
+document.getElementById('networkCompression').value = cfg.networkCompression;
+document.getElementById('scyllaReserved').value = cfg.scyllaReserved;
+document.getElementById('scyllaNodes').value = cfg.scyllaNodes;
+document.getElementById('scyllaInstanceClass').value = cfg.scyllaInstanceClass;
+document.getElementById('scyllaOverride').checked = cfg.scyllaOverride;
 
 document.getElementById('baselineReadsDsp').innerText = formatNumber(cfg.baselineReads);
 document.getElementById('baselineWritesDsp').innerText = formatNumber(cfg.baselineWrites);
@@ -331,13 +435,23 @@ document.getElementById('reservedWritesDsp').innerText = `${cfg.reservedWrites}%
 document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
+document.getElementById('scyllaReservedDsp').innerText = `${cfg.scyllaReserved}% commitment`;
+document.getElementById('scyllaNodesDsp').innerText = `${cfg.scyllaNodes}`;
+document.getElementById('storageCompressionDsp').innerText = `${cfg.storageCompression}`;
+document.getElementById('storageUtilizationDsp').innerText = `${cfg.storageUtilization}`;
+document.getElementById('networkCompressionDsp').innerText = `${cfg.networkCompression}`;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    const logos = document.querySelectorAll('.logo');
+    logos.forEach(logo => {
+        logo.addEventListener('click', toggleService);
+    });
+
     const tabLabels = document.querySelectorAll('.tab-label');
     const tabContents = document.querySelectorAll('.tab-content');
 
     tabLabels.forEach(tabLabel => {
-        tabLabel.addEventListener('click', function(e) {
+        tabLabel.addEventListener('click', function (e) {
             e.preventDefault();
 
             tabLabels.forEach(tab => tab.classList.remove('active'));
@@ -366,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function() {
             csv += `${hour},${reads},${writes}\n`;
         }
 
-        const blob = new Blob([csv], { type: "text/csv" });
+        const blob = new Blob([csv], {type: "text/csv"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
