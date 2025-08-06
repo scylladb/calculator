@@ -1990,7 +1990,7 @@ small, .small {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--spacer-xxs);
+    gap: var(--spacer-3xs);
     height: auto;
 }
 
