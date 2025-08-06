@@ -52,7 +52,9 @@
           <option value="chaos">Chaos (Random)</option>
           <option value="custom">Custom</option>
         </select>
+
         <div id="costParams">
+
           <div class="radio-container">
             <label> <input checked name="pricing" type="radio" value="demand"/> On-Demand </label>
             <label class="dynamodb"> <input class="dynamodb" name="pricing" type="radio" value="provisioned"/>
@@ -63,6 +65,13 @@
             <label class="scylladb"> <input class="scylladb" name="pricing" type="radio" value="subscription"/>
               Pro Subscription
             </label>
+            <div id="subscriptionParams" class="scylladb">
+              <div class="range-mini">
+                <input class="scylladb" id="scyllaReserved" max="100" min="0" step="1" type="range"
+                       value="100" style="height:20px"/>
+                <span class="scylladb" id="scyllaReservedDsp">100% commitment</span>
+              </div>
+            </div>
           </div>
           <div class="costs" id="costs"></div>
         </div>
@@ -331,29 +340,7 @@
                 </div>
               </div>
             </div>
-            <div id="subscriptionParams" class="scylladb" style="display: none;">
-              <div class="row-sm">
-                <div class="col vstack gap-3">
-                  <div class="range-group">
-                    <div class="range-group-top">
-                      <label for="scyllaReserved">Subscription Commitment:</label>
-                      <div class="inline-input">
-                        <div class="value">
-                          <input id="scyllaReservedInp" type="text"/>
-                          <span id="scyllaReservedDsp">100</span>
-                        </div>
-                        <div class="units"></div>
-                      </div>
-                      <span class="info-icon">
-                        <i class="icon-info-outline"></i>
-                        <span class="tooltip-text">Enter the percentage of operations to commit via a pro-subscription, minimum term 1-year.</span>
-                      </span>
-                    </div>
-                    <input id="scyllaReserved" max="100" min="0" step="1" type="range" value="100"/>
-                  </div>
-                </div>
-              </div>
-            </div>
+
             <div id="consistencyParams" class="dynamodb">
               <div class="range-group">
                 <div class="range-group-top">

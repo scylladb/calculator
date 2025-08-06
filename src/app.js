@@ -7,29 +7,32 @@ export function setupSliderInteraction(displayId, inputId, sliderId, formatFunct
     const input = document.getElementById(inputId);
     const slider = document.getElementById(sliderId);
 
-    input.addEventListener('mouseover', function () {
-        input.value = parseInt(slider.value.toString());
-    });
+    if (input != null) {
+        input.addEventListener('mouseover', function () {
+            input.value = parseInt(slider.value.toString());
+        });
 
-    input.addEventListener('blur', function () {
-        const newValue = parseInt(input.value.toString());
-        if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
-            slider.value = newValue;
-            display.innerText = formatFunction(newValue);
-            updateAll();
-        }
-    });
+        input.addEventListener('blur', function () {
+            const newValue = parseInt(input.value.toString());
+            if (!isNaN(newValue) && newValue >= slider.min && newValue <= slider.max) {
+                slider.value = newValue;
+                display.innerText = formatFunction(newValue);
+                updateAll();
+            }
+        });
 
-    input.addEventListener('keydown', function () {
-        if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
-            display.innerText = formatFunction(parseInt(this.value));
-            setTimeout(() => {
-                slider.dispatchEvent(new Event('input', {bubbles: true}));
-            }, 0);
-            input.blur();
-            updateAll();
-        }
-    });
+        input.addEventListener('keydown', function () {
+            if (event.key === 'Enter' || event.key === 'Tab' || event.key === 'Escape') {
+                display.innerText = formatFunction(parseInt(this.value));
+                setTimeout(() => {
+                    slider.dispatchEvent(new Event('input', {bubbles: true}));
+                }, 0);
+                input.blur();
+                updateAll();
+            }
+        });
+    }
+
 
     slider.addEventListener('input', function () {
         display.innerText = formatFunction(parseInt(this.value));
@@ -365,7 +368,7 @@ setupSliderInteraction('daxNodesDsp', 'daxNodesInp', 'daxNodes', value => value)
 setupSliderInteraction('storageCompressionDsp', 'storageCompressionInp', 'storageCompression', value => value);
 setupSliderInteraction('storageUtilizationDsp', 'storageUtilizationInp', 'storageUtilization', value => value);
 setupSliderInteraction('networkCompressionDsp', 'networkCompressionInp', 'networkCompression', value => value);
-setupSliderInteraction('scyllaReservedDsp', 'scyllaReservedInp', 'scyllaReserved', value => `${value}%`);
+setupSliderInteraction('scyllaReservedDsp', null, 'scyllaReserved', value => `${value}% commitment`);
 setupSliderInteraction('scyllaNodesDsp', 'scyllaNodesInp', 'scyllaNodes', value => value);
 
 if (cfg.pricing === 'demand') {
@@ -376,10 +379,10 @@ if (cfg.pricing === 'demand') {
     document.getElementById('provisionedParams').style.display = 'block';
 } else if (cfg.pricing === 'flex') {
     document.querySelector('input[name="pricing"][value="flex"]').checked = true;
-    document.getElementById('subscriptionParams').style.display = 'block';
+    document.getElementById('scyllaReserved').style.display = 'block';
 } else if (cfg.pricing === 'subscription') {
     document.querySelector('input[name="pricing"][value="subscription"]').checked = true;
-    document.getElementById('subscriptionParams').style.display = 'block';
+    document.getElementById('scyllaReserved').style.display = 'block';
 }
 
 getQueryParams();
@@ -432,7 +435,7 @@ document.getElementById('reservedWritesDsp').innerText = `${cfg.reservedWrites}%
 document.getElementById('overprovisionedDsp').innerText = `${cfg.overprovisioned}%`;
 document.getElementById('readConstDsp').innerText = cfg.readConst === 0 ? 'Eventually Consistent' : cfg.readConst === 100 ? 'Strongly Consistent' : `Strongly Consistent: ${cfg.readConst}%, Eventually Consistent: ${100 - cfg.readConst}%`;
 document.getElementById('daxNodesDsp').innerText = `${cfg.daxNodes}`;
-document.getElementById('scyllaReservedDsp').innerText = `${cfg.scyllaReserved}%`;
+document.getElementById('scyllaReservedDsp').innerText = `${cfg.scyllaReserved}% commitment`;
 document.getElementById('scyllaNodesDsp').innerText = `${cfg.scyllaNodes}`;
 document.getElementById('storageCompressionDsp').innerText = `${cfg.storageCompression}`;
 document.getElementById('storageUtilizationDsp').innerText = `${cfg.storageUtilization}`;

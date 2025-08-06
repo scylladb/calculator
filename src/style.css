@@ -1986,6 +1986,23 @@ small, .small {
     font-size: var(--font-size-body);
 }
 
+.range-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacer-xxxs);
+    height: auto;
+}
+
+.range-mini > span {
+    color: var(--secondary-lighter);
+    font-size: 14px;
+}
+
+.range-mini > input[type="range"]:active + span {
+    color: var(--secondary-light);
+}
+
 .value {
     font-size: 16px;
     font-weight: 600;

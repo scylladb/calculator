@@ -201,19 +201,21 @@ function logCosts() {
 
     if (cfg.pricing === 'demand') {
         logs.push(`Monthly on-demand cost: ${Math.floor(cfg._costs.demand.monthly).toLocaleString()}`);
+        logs.push(`---: ---`);
         logs.push(`Total monthly cost: ${Math.floor(cfg._costs.demand.total.monthly).toLocaleString()}`);
         logs.push(`Total annual cost: ${Math.floor(cfg._costs.demand.total.annual).toLocaleString()}`);
     } else if (cfg.pricing === 'flex') {
         logs.push(`Monthly pro flex cost: ${Math.floor(cfg._costs.flex.monthly).toLocaleString()}`);
+        logs.push(`---: ---`);
         logs.push(`Total monthly cost: ${Math.floor(cfg._costs.flex.total.monthly).toLocaleString()}`);
         logs.push(`Total annual cost: ${Math.floor(cfg._costs.flex.total.annual).toLocaleString()}`);
     } else if (cfg.pricing === 'subscription') {
         logs.push(`Monthly pro subscription cost: ${Math.floor(cfg._costs.subscription.monthly).toLocaleString()}`);
+        logs.push(`---: ---`);
         logs.push(`Total monthly cost: ${Math.floor(cfg._costs.subscription.total.monthly).toLocaleString()}`);
         logs.push(`Total annual cost: ${Math.floor(cfg._costs.subscription.total.annual).toLocaleString()}`);
     }
 
-    logs.push(`---: ---`);
 
     updateDisplayedCosts(logs);
 }
